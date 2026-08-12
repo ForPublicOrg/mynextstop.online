@@ -321,6 +321,11 @@ main { padding-top: var(--top-h); }
 .alt-sub { font-size: 11.5px; opacity: .9; font-weight: 600; }
 
 /* ————— dialogs (origin + saved) ————— */
+/* fallback for browsers without native <dialog>: they render the element
+   as always-visible, so gate visibility on the open attribute ourselves */
+dialog:not([open]) { display: none; }
+dialog[open] { display: block; }
+
 .origin-dlg {
   border: 0; border-radius: 22px 22px 0 0; padding: 0; margin: 0;
   width: 100%; max-width: 640px; max-height: 82dvh;

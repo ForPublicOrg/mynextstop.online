@@ -65,7 +65,11 @@ npx vercel --prod
 ## Data
 
 Season windows follow: winter = Dec–Feb, summer = Mar–May, monsoon = Jun–Sep,
-autumn = Oct–Nov. Corrections welcome — the whole dataset is one readable JSON file.
+autumn = Oct–Nov. The `festival` field must contain a month name (e.g.
+`"Nov: Pushkar camel fair"`, `"Feb/Mar: Losar"`) — the app parses the first
+month it finds to time festival badges and score boosts. `category` values
+must come from the 16 keys in [js/themes.js](js/themes.js). Corrections
+welcome — the whole dataset is one readable JSON file.
 
 ## Contributing
 

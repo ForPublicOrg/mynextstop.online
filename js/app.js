@@ -34,21 +34,31 @@ init();
 async function init() {
   buildMonthSel();
   buildDistChips();
-  buildMoodChips();
   buildHeroStrip();
   wireEvents();
 
   try {
     const [d, h] = await Promise.all([
-      fetch('data/destinations.json').then(r => r.json()),
+      fetch('data/destinations.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
       fetch('data/holidays.json').then(r => r.json()).catch(() => []),
     ]);
+    if (!Array.isArray(d) || !d.length) throw 0;
     DESTS = d;
     HOLIDAYS = h;
   } catch {
-    toast('Could not load destination data — check your connection and refresh.');
+    // persistent error state — distinct from "no results for these filters"
+    $('btnLocate').disabled = true;
+    $('btnManual').disabled = true;
+    $('heroNote').innerHTML =
+      '⚠️ Couldn’t load the destination catalogue — check your connection. ' +
+      '<button id="btnRetry" class="btn btn-ghost">Try again</button>';
+    $('btnRetry').onclick = () => location.reload();
+    $('screen-map').hidden = true;
+    $('screen-home').hidden = false;
     return;
   }
+
+  buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
 
   if (S.origin) enterMap();
 }
@@ -86,13 +96,15 @@ function buildDistChips() {
 
 function buildMoodChips() {
   const row = $('moodChips');
+  const used = new Set(DESTS.flatMap(d => d.category || []));
+  for (const c of used) if (!CATEGORY_THEME[c]) console.warn(`destination category "${c}" has no theme/chip — check data/destinations.json`);
   const all = document.createElement('button');
   all.className = 'chip' + (S.moods.size === 0 ? ' is-on' : '');
   all.dataset.k = '';
   all.textContent = '✨ Any mood';
   all.onclick = () => { S.moods.clear(); syncMoods(); };
   row.appendChild(all);
-  for (const [key, t] of Object.entries(CATEGORY_THEME)) {
+  for (const [key, t] of Object.entries(CATEGORY_THEME).filter(([k]) => used.has(k))) {
     const b = document.createElement('button');
     b.className = 'chip' + (S.moods.has(key) ? ' is-on' : '');
     b.dataset.k = key;
@@ -123,8 +135,10 @@ function buildHeroStrip() {
 }
 
 function wireEvents() {
+  wireDlgFallback($('originDlg'));
+  wireDlgFallback($('savedDlg'));
   $('btnLocate').onclick = doLocate;
-  $('dlgLocate').onclick = () => { $('originDlg').close(); doLocate(); };
+  $('dlgLocate').onclick = () => { closeDlg($('originDlg')); doLocate(); };
   $('btnManual').onclick = openOriginDlg;
   $('originBtn').onclick = openOriginDlg;
   $('themeBtn').onclick = toggleTheme;
@@ -142,8 +156,24 @@ function wireEvents() {
   });
 }
 
+// <dialog> fallback for browsers without showModal (older iOS Safari, WebViews):
+// toggle the open attribute manually and stop method="dialog" form submits
+// from navigating.
+function openDlg(dlg) {
+  if (typeof dlg.showModal === 'function') { dlg.showModal(); return; }
+  dlg.setAttribute('open', '');
+}
+function closeDlg(dlg) {
+  if (typeof dlg.close === 'function') { dlg.close(); return; }
+  dlg.removeAttribute('open');
+}
+function wireDlgFallback(dlg) {
+  dlg.querySelector('form').addEventListener('submit', e => {
+    if (typeof dlg.close !== 'function') { e.preventDefault(); closeDlg(dlg); }
+  });
+}
 function dialogOpen() {
-  return $('originDlg').open || $('savedDlg').open;
+  return $('originDlg').hasAttribute('open') || $('savedDlg').hasAttribute('open');
 }
 
 // ————— screens —————
@@ -195,7 +225,7 @@ function setOrigin(o) {
 function openOriginDlg() {
   $('originSearch').value = '';
   renderOriginResults('');
-  $('originDlg').showModal();
+  openDlg($('originDlg'));
   setTimeout(() => $('originSearch').focus(), 60);
 }
 
@@ -220,7 +250,7 @@ function renderOriginResults(q) {
     b.type = 'button';
     b.className = 'origin-item';
     b.innerHTML = `<span>${h.type === 'city' ? '🏙️' : '📍'}</span> ${h.name} <span class="oi-type">${h.type === 'city' ? 'city' : h.type}</span>`;
-    b.onclick = () => { $('originDlg').close(); setOrigin({ name: h.name, lat: h.lat, lng: h.lng }); };
+    b.onclick = () => { closeDlg($('originDlg')); setOrigin({ name: h.name, lat: h.lat, lng: h.lng }); };
     box.appendChild(b);
   }
   if (!hits.length) box.innerHTML = '<p class="saved-empty">No match — try a bigger city nearby.</p>';
@@ -329,6 +359,7 @@ function renderSheet(item) {
           <span>🗓️ <b>${d.days}${d.days === 1 ? ' day' : '+ days'}</b></span>
           <span>💰 <b>${rupee}</b></span>
           <span>🎒 solo <b>${d.solo}/5</b></span>
+          ${d.crowd ? `<span>👥 <b>${['quiet', 'moderate', 'packed'][d.crowd - 1] || 'moderate'}</b> in peak</span>` : ''}
           ${d.alt > 500 ? `<span>⛰️ <b>${d.alt.toLocaleString('en-IN')} m</b></span>` : ''}
         </div>
         <div class="card-meta"><span>🧳 ${d.vibe}</span></div>
@@ -462,7 +493,7 @@ async function shareDest(d, item) {
 // ————— saved dialog —————
 function openSavedDlg() {
   renderSaved();
-  $('savedDlg').showModal();
+  openDlg($('savedDlg'));
 }
 function renderSaved() {
   fillList($('savedList'), store.saved, 'Nothing saved yet — tap ♡ Save on any pick.', id => {
@@ -489,7 +520,7 @@ function fillList(el, ids, emptyMsg, onRemove) {
       </button>
       <button type="button" class="s-remove" aria-label="Remove">✕</button>`;
     row.querySelector('.s-main').onclick = () => {
-      $('savedDlg').close();
+      closeDlg($('savedDlg'));
       if (!S.origin) { openOriginDlg(); return; }
       S.pinned = d;
       render(true);

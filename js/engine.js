@@ -26,11 +26,17 @@ export function seasonStatus(d, month) {
   return 'off';
 }
 
-// Parse "Nov: Pushkar camel fair" → month number, or 0
+// Find the first month name anywhere in the festival string:
+// "Nov: Pushkar camel fair", "Feb/Mar: Losar", "early December: Hornbill" all parse.
 export function festivalMonth(d) {
   if (!d.festival) return 0;
-  const m = MONTHS.findIndex(mo => d.festival.toLowerCase().startsWith(mo.toLowerCase()));
-  return m === -1 ? 0 : m + 1;
+  const s = d.festival.toLowerCase();
+  let best = 0, bestPos = Infinity;
+  MONTHS.forEach((mo, i) => {
+    const p = s.indexOf(mo.toLowerCase());
+    if (p !== -1 && p < bestPos) { bestPos = p; best = i + 1; }
+  });
+  return best;
 }
 
 // Stable small jitter so near-ties don't always order identically,
