@@ -1,0 +1,80 @@
+[
+  {
+    "id": "kasol", "name": "Kasol", "state": "Himachal Pradesh", "lat": 32.010, "lng": 77.315,
+    "category": ["backpacker", "mountains", "trek"], "tagline": "Parvati valley's backpacker basecamp",
+    "peakMonths": [3, 4, 5, 10, 11], "shoulderMonths": [12, 1, 2, 6, 9], "avoidMonths": [7, 8],
+    "why": {
+      "winter": "Cold and quiet — snow on the peaks, cafés half-empty, real Parvati valley calm.",
+      "summer": "Peak café season — the valley is green, treks to Kheerganga are open, everyone's here.",
+      "monsoon": "Landslide season on the Bhuntar road — roads close without warning, skip Jul–Aug.",
+      "autumn": "Crisp air, golden light, thinner crowds — arguably the best version of Kasol."
+    },
+    "days": 3, "budget": 1, "solo": 5, "vibe": "Hostel bonfires and café conversations — the easiest place in India to meet travellers.",
+    "hub": "Overnight bus Delhi→Bhuntar, then 1.5h local bus", "alt": 1580, "crowd": 3, "festival": ""
+  },
+  {
+    "id": "jaipur", "name": "Jaipur", "state": "Rajasthan", "lat": 26.912, "lng": 75.787,
+    "category": ["heritage", "city", "culture"], "tagline": "The pink city — forts, bazaars, rooftop sunsets",
+    "peakMonths": [11, 12, 1, 2], "shoulderMonths": [3, 10, 9], "avoidMonths": [4, 5, 6],
+    "why": {
+      "winter": "Perfect fort weather — cool mornings at Amber, kachori and chai evenings.",
+      "summer": "40°C+ by April — sightseeing becomes a punishment, skip it.",
+      "monsoon": "Sporadic rain cools things down; Sep is a decent quiet window.",
+      "autumn": "The season begins — festivals, clear skies, bearable afternoons."
+    },
+    "days": 2, "budget": 2, "solo": 4, "vibe": "Big hostel scene, walking tours, easy trains onward — a classic solo circuit stop.",
+    "hub": "Direct trains/flights from every metro", "alt": 431, "crowd": 3, "festival": "Jan: Jaipur Literature Festival"
+  },
+  {
+    "id": "palolem", "name": "Palolem", "state": "Goa", "lat": 15.010, "lng": 74.023,
+    "category": ["beach", "backpacker", "party"], "tagline": "South Goa's crescent beach, huts on the sand",
+    "peakMonths": [11, 12, 1, 2], "shoulderMonths": [3, 10], "avoidMonths": [5, 6, 7, 8],
+    "why": {
+      "winter": "Peak Goa — beach huts open, silent discos, kayaks at sunrise. This is the postcard.",
+      "summer": "April is hot and emptying out; by May most shacks are packed away.",
+      "monsoon": "Rough seas, shuttered huts — moodily beautiful but nothing runs.",
+      "autumn": "Shacks are being rebuilt through Oct; Nov opens the season fresh."
+    },
+    "days": 3, "budget": 2, "solo": 5, "vibe": "Solo-traveller default: hostels on the beach, everyone eats dinner with strangers.",
+    "hub": "Fly/train to Madgaon (Margao), then 45 min taxi", "alt": 0, "crowd": 3, "festival": ""
+  },
+  {
+    "id": "munnar", "name": "Munnar", "state": "Kerala", "lat": 10.089, "lng": 77.060,
+    "category": ["mountains", "offbeat"], "tagline": "Tea gardens stacked to the horizon",
+    "peakMonths": [9, 10, 11, 12, 1], "shoulderMonths": [2, 3, 8], "avoidMonths": [6, 7],
+    "why": {
+      "winter": "Cold, clear tea-garden mornings — the classic Munnar you came for.",
+      "summer": "Warm but green; Apr–May is honeymoon-crowd season, book ahead.",
+      "monsoon": "Jun–Jul is heavy rain and leeches; late Aug turns lush and misty.",
+      "autumn": "Post-monsoon Munnar glows — waterfalls full, hills impossibly green."
+    },
+    "days": 3, "budget": 2, "solo": 3, "vibe": "More couples than backpackers, but scooter loops and viewpoints fill a solo day easily.",
+    "hub": "Fly Kochi, then 4h winding bus/taxi climb", "alt": 1532, "crowd": 3, "festival": ""
+  },
+  {
+    "id": "rishikesh", "name": "Rishikesh", "state": "Uttarakhand", "lat": 30.087, "lng": 78.268,
+    "category": ["spiritual", "backpacker", "trek"], "tagline": "Yoga, the Ganga, and river adrenaline",
+    "peakMonths": [10, 11, 2, 3], "shoulderMonths": [12, 1, 4, 9], "avoidMonths": [6, 7, 8],
+    "why": {
+      "winter": "Yoga-course season — cool days, campfires by the Ganga, rafting from Feb.",
+      "summer": "Warming up fast; Mar–Apr still lovely, May is hot in the valley.",
+      "monsoon": "River runs brown and high — rafting shut, trails slippery.",
+      "autumn": "The sweet spot: rafting reopens, clear skies, cafés buzzing again."
+    },
+    "days": 2, "budget": 1, "solo": 5, "vibe": "Ashrams, hostels and rooftop cafés — solo travellers are the default here.",
+    "hub": "Train/bus to Haridwar or fly Dehradun, then 1h", "alt": 372, "crowd": 3, "festival": "Mar: International Yoga Festival"
+  },
+  {
+    "id": "hampi", "name": "Hampi", "state": "Karnataka", "lat": 15.335, "lng": 76.460,
+    "category": ["heritage", "backpacker", "offbeat"], "tagline": "Ruined empire in a boulder desert",
+    "peakMonths": [11, 12, 1, 2], "shoulderMonths": [10, 3, 7, 8, 9], "avoidMonths": [4, 5, 6],
+    "why": {
+      "winter": "Golden mornings on the boulders, cycle between temples — Hampi at its best.",
+      "summer": "A furnace by March-end; 40°C among bare rocks. Don't.",
+      "monsoon": "Green paddy against brown boulders — atmospheric and quiet.",
+      "autumn": "Cooling down, river flowing, climbers arriving — season's opening act."
+    },
+    "days": 3, "budget": 1, "solo": 5, "vibe": "Sunset points full of backpackers; guesthouse thalis eaten with strangers.",
+    "hub": "Overnight train/bus Bengaluru→Hosapete, then 30 min", "alt": 467, "crowd": 2, "festival": ""
+  }
+]
