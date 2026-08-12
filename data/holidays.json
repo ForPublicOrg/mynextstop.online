@@ -1,5 +1,177 @@
 [
-  { "date": "2026-08-15", "name": "Independence Day", "kind": "national" },
-  { "date": "2026-10-02", "name": "Gandhi Jayanti", "kind": "national" },
-  { "date": "2027-01-26", "name": "Republic Day", "kind": "national" }
+ {
+  "date": "2026-08-15",
+  "name": "Independence Day",
+  "kind": "national"
+ },
+ {
+  "date": "2026-08-26",
+  "name": "Onam (Thiruvonam)",
+  "kind": "major"
+ },
+ {
+  "date": "2026-08-26",
+  "name": "Eid Milad-un-Nabi (Id-e-Milad)",
+  "kind": "major"
+ },
+ {
+  "date": "2026-08-28",
+  "name": "Raksha Bandhan",
+  "kind": "major"
+ },
+ {
+  "date": "2026-09-04",
+  "name": "Krishna Janmashtami",
+  "kind": "major"
+ },
+ {
+  "date": "2026-09-14",
+  "name": "Ganesh Chaturthi",
+  "kind": "major"
+ },
+ {
+  "date": "2026-10-02",
+  "name": "Gandhi Jayanti",
+  "kind": "national"
+ },
+ {
+  "date": "2026-10-20",
+  "name": "Dussehra (Vijayadashami)",
+  "kind": "major"
+ },
+ {
+  "date": "2026-11-08",
+  "name": "Diwali (Lakshmi Puja)",
+  "kind": "major"
+ },
+ {
+  "date": "2026-11-15",
+  "name": "Chhath Puja",
+  "kind": "major"
+ },
+ {
+  "date": "2026-11-24",
+  "name": "Guru Nanak Jayanti (Gurpurab)",
+  "kind": "major"
+ },
+ {
+  "date": "2026-12-25",
+  "name": "Christmas",
+  "kind": "major"
+ },
+ {
+  "date": "2027-01-15",
+  "name": "Makar Sankranti / Pongal",
+  "kind": "major"
+ },
+ {
+  "date": "2027-01-26",
+  "name": "Republic Day",
+  "kind": "national"
+ },
+ {
+  "date": "2027-03-06",
+  "name": "Mahashivratri",
+  "kind": "major"
+ },
+ {
+  "date": "2027-03-10",
+  "name": "Eid al-Fitr",
+  "kind": "major"
+ },
+ {
+  "date": "2027-03-22",
+  "name": "Holi (Rangwali Holi / Dhulandi)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-03-26",
+  "name": "Good Friday",
+  "kind": "major"
+ },
+ {
+  "date": "2027-03-28",
+  "name": "Easter Sunday",
+  "kind": "major"
+ },
+ {
+  "date": "2027-04-15",
+  "name": "Ram Navami",
+  "kind": "major"
+ },
+ {
+  "date": "2027-04-19",
+  "name": "Mahavir Jayanti",
+  "kind": "major"
+ },
+ {
+  "date": "2027-05-17",
+  "name": "Eid al-Adha (Bakrid)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-06-15",
+  "name": "Muharram (Day of Ashura)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-08-15",
+  "name": "Independence Day",
+  "kind": "national"
+ },
+ {
+  "date": "2027-08-16",
+  "name": "Eid Milad-un-Nabi (Id-e-Milad)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-08-17",
+  "name": "Raksha Bandhan",
+  "kind": "major"
+ },
+ {
+  "date": "2027-08-25",
+  "name": "Krishna Janmashtami",
+  "kind": "major"
+ },
+ {
+  "date": "2027-09-04",
+  "name": "Ganesh Chaturthi",
+  "kind": "major"
+ },
+ {
+  "date": "2027-09-12",
+  "name": "Onam (Thiruvonam)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-10-02",
+  "name": "Gandhi Jayanti",
+  "kind": "national"
+ },
+ {
+  "date": "2027-10-09",
+  "name": "Dussehra (Vijayadashami)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-10-29",
+  "name": "Diwali (Lakshmi Puja)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-11-04",
+  "name": "Chhath Puja",
+  "kind": "major"
+ },
+ {
+  "date": "2027-11-14",
+  "name": "Guru Nanak Jayanti (Gurpurab)",
+  "kind": "major"
+ },
+ {
+  "date": "2027-12-25",
+  "name": "Christmas",
+  "kind": "major"
+ }
 ]
