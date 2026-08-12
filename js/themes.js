@@ -1,26 +1,40 @@
-// Visual identity per category: gradient stops + emoji.
-// The first category on a destination decides its card's look.
+// Visual identity per category: gradient stops + a glyph from the icon set
+// (icon name === category key). The first category decides a card's look.
+import { icon } from './icons.js';
+
 export const CATEGORY_THEME = {
-  mountains:  { g: ['#16324f', '#3a7ca5'], e: '🏔️', label: 'Mountains' },
-  beach:      { g: ['#075985', '#0ea5e9'], e: '🏖️', label: 'Beach' },
-  heritage:   { g: ['#7c2d12', '#c2410c'], e: '🏛️', label: 'Heritage' },
-  spiritual:  { g: ['#5b21b6', '#8b5cf6'], e: '🛕', label: 'Spiritual' },
-  wildlife:   { g: ['#14532d', '#15803d'], e: '🐅', label: 'Wildlife' },
-  trek:       { g: ['#1e3a8a', '#3b82f6'], e: '🥾', label: 'Trek' },
-  backpacker: { g: ['#9d174d', '#ec4899'], e: '🎒', label: 'Backpacker' },
-  desert:     { g: ['#92400e', '#d97706'], e: '🐪', label: 'Desert' },
-  island:     { g: ['#115e59', '#14b8a6'], e: '🏝️', label: 'Island' },
-  lake:       { g: ['#155e75', '#0891b2'], e: '🌊', label: 'Lakes' },
-  waterfall:  { g: ['#164e63', '#06b6d4'], e: '💧', label: 'Waterfalls' },
-  city:       { g: ['#1f2937', '#4b5563'], e: '🌆', label: 'City' },
-  offbeat:    { g: ['#312e81', '#6366f1'], e: '🤫', label: 'Offbeat' },
-  party:      { g: ['#86198f', '#d946ef'], e: '🎉', label: 'Party' },
-  culture:    { g: ['#9a3412', '#ea8a0c'], e: '🎭', label: 'Culture' },
-  snow:       { g: ['#1e40af', '#60a5fa'], e: '❄️', label: 'Snow' },
+  mountains:  { g: ['#16324f', '#3a7ca5'], label: 'Mountains' },
+  beach:      { g: ['#075985', '#0ea5e9'], label: 'Beach' },
+  heritage:   { g: ['#7c2d12', '#c2410c'], label: 'Heritage' },
+  spiritual:  { g: ['#5b21b6', '#8b5cf6'], label: 'Spiritual' },
+  wildlife:   { g: ['#14532d', '#15803d'], label: 'Wildlife' },
+  trek:       { g: ['#1e3a8a', '#3b82f6'], label: 'Trek' },
+  backpacker: { g: ['#9d174d', '#ec4899'], label: 'Backpacker' },
+  desert:     { g: ['#92400e', '#d97706'], label: 'Desert' },
+  island:     { g: ['#115e59', '#14b8a6'], label: 'Island' },
+  lake:       { g: ['#155e75', '#0891b2'], label: 'Lakes' },
+  waterfall:  { g: ['#164e63', '#06b6d4'], label: 'Waterfalls' },
+  city:       { g: ['#1f2937', '#4b5563'], label: 'City' },
+  offbeat:    { g: ['#312e81', '#6366f1'], label: 'Offbeat' },
+  party:      { g: ['#86198f', '#d946ef'], label: 'Party' },
+  culture:    { g: ['#9a3412', '#ea8a0c'], label: 'Culture' },
+  snow:       { g: ['#1e40af', '#60a5fa'], label: 'Snow' },
 };
 
 export function themeOf(d) {
   return CATEGORY_THEME[(d.category || [])[0]] || CATEGORY_THEME.offbeat;
+}
+
+// the category glyph for a destination, as an inline svg
+export function catIcon(d, cls = '') {
+  const k = (d.category || [])[0];
+  return icon(CATEGORY_THEME[k] ? k : 'offbeat', cls);
+}
+
+// small tinted badge holding the category glyph (used on peeks, lists)
+export function catBadge(d) {
+  const t = themeOf(d);
+  return `<span class="cat-badge" style="background:${t.g[1]}22;color:${t.g[1]}">${catIcon(d)}</span>`;
 }
 
 export function cardBackground(d) {

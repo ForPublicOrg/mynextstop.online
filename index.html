@@ -71,16 +71,20 @@
 
   <header class="top" id="topBar">
     <a class="brand" href="/" aria-label="my next stop — home">
-      <span class="brand-mark" aria-hidden="true">🧭</span>
+      <svg class="ic brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
       <span class="brand-name">my next stop</span>
     </a>
     <div class="top-actions">
       <label class="month-wrap" title="Plan for a different month">
-        <span class="month-icon" aria-hidden="true">📅</span>
+        <svg class="ic month-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg>
         <select id="monthSel" aria-label="Travel month"></select>
       </label>
-      <button id="savedBtn" class="icon-btn" aria-label="Saved places">♡</button>
-      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">◐</button>
+      <button id="savedBtn" class="icon-btn" aria-label="Saved places">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4 4.8 13a4.9 4.9 0 0 1 7-6.9l.2.2.2-.2a4.9 4.9 0 0 1 7 6.9z"/></svg>
+      </button>
+      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a7 7 0 0 0 10 10z"/></svg>
+      </button>
     </div>
   </header>
 
@@ -89,11 +93,15 @@
     <!-- ————— HOME ————— -->
     <section id="screen-home" class="screen screen-home">
       <div class="hero">
-        <div class="hero-compass" aria-hidden="true">🧭</div>
+        <div class="hero-compass" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/><path d="M12 2v1.6M12 20.4V22M2 12h1.6M20.4 12H22" stroke-width="1.2"/></svg>
+        </div>
         <h1>Where next?</h1>
         <p class="hero-sub">You're somewhere in India. It's a certain time of year. Somewhere near you is <em>at its best right now.</em> One tap and you'll see it on the map — route and all.</p>
         <div class="hero-cta">
-          <button id="btnLocate" class="btn btn-primary btn-big">📍 Find my next stop</button>
+          <button id="btnLocate" class="btn btn-primary btn-big">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg>
+            Find my next stop</button>
           <button id="btnManual" class="btn btn-ghost">I'll type where I am</button>
         </div>
         <p class="hero-note" id="heroNote">Works mid-trip too — open it <em>from</em> Manali and it finds your next hop. Nothing to sign up for. Your location never leaves this page.</p>
@@ -111,18 +119,13 @@
       <div class="map-overlay-top">
         <div class="overlay-row">
           <button id="originBtn" class="origin-btn" title="Change starting point">
-            <span aria-hidden="true">📍</span>
             <span id="originLabel">…</span>
             <span class="origin-edit" aria-hidden="true">change</span>
           </button>
-        </div>
-        <div class="chip-row" id="distChips" role="radiogroup" aria-label="How far will you go?"></div>
-        <div class="chip-row chip-row-moods" id="moodChips" aria-label="Mood filters"></div>
-        <div class="map-legend" aria-hidden="true">
-          <span><i class="dot dot-peak"></i> in season</span>
-          <span><i class="dot dot-shoulder"></i> shoulder</span>
-          <span><i class="dot dot-off"></i> off</span>
-          <span><i class="dot dot-avoid"></i> avoid</span>
+          <button id="filterBtn" class="filter-btn" aria-label="Filters">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21v-6M5 9V3M12 21v-9M12 6V3M19 21v-3M19 12V3"/><path d="M2.5 15h5M9.5 8.5h5M16.5 18h5"/></svg>
+            Filters<span id="filterCount" class="filter-count" hidden></span>
+          </button>
         </div>
       </div>
 
@@ -141,10 +144,34 @@
         <h2>Where are you right now?</h2>
         <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
       </div>
-      <button type="button" id="dlgLocate" class="btn btn-primary btn-wide">📍 Use my location</button>
+      <button type="button" id="dlgLocate" class="btn btn-primary btn-wide">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg>
+        Use my location</button>
       <div class="origin-sep"><span>or</span></div>
       <input id="originSearch" type="search" placeholder="Type a city or place… e.g. Indore, Manali" autocomplete="off" enterkeyhint="search" />
       <div id="originResults" class="origin-results" role="listbox"></div>
+    </form>
+  </dialog>
+
+  <!-- filters -->
+  <dialog id="filterDlg" class="origin-dlg">
+    <form method="dialog" class="origin-form">
+      <div class="origin-dlg-head">
+        <h2>Tune your picks</h2>
+        <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <h3 class="f-label">How far will you go?</h3>
+      <div class="chip-wrap" id="distChips" role="radiogroup" aria-label="How far will you go?"></div>
+      <h3 class="f-label">Mood</h3>
+      <div class="chip-wrap" id="moodChips" aria-label="Mood filters"></div>
+      <h3 class="f-label">Dots on the map</h3>
+      <div class="legend-inline">
+        <span><i class="dot dot-peak"></i> in season</span>
+        <span><i class="dot dot-shoulder"></i> shoulder</span>
+        <span><i class="dot dot-off"></i> off-season</span>
+        <span><i class="dot dot-avoid"></i> avoid now</span>
+      </div>
+      <button value="ok" class="btn btn-primary btn-wide">Show my picks</button>
     </form>
   </dialog>
 
@@ -156,9 +183,9 @@
         <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
       </div>
       <div class="saved-wrap">
-        <h3>♡ Saved for later</h3>
+        <h3>Saved for later</h3>
         <div id="savedList" class="saved-list"></div>
-        <h3>✓ Been there</h3>
+        <h3>Been there</h3>
         <p class="saved-hint">Places you mark “been there” stop showing up as suggestions.</p>
         <div id="beenList" class="saved-list"></div>
       </div>

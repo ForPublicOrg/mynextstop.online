@@ -30,6 +30,8 @@ backend, no planning spiral.
 
 ### Other features
 
+- ✈️ **Transport modes** — every destination is tagged with how you practically reach
+  it (flight / train / road), so road-only valleys like Spiti stand out before you commit.
 - 🗓️ **Long-weekend radar** — knows upcoming Indian holidays, spots ≥3-day windows, and
   tags picks that fit them.
 - 🗺️ **Season map** — every destination as a dot: green = in season now, amber = shoulder,
@@ -50,7 +52,10 @@ Zero-framework static frontend — the same pattern as
   months, four season-specific "why now" lines, solo score, budget, transport hub,
   altitude, signature festival.
 - `data/holidays.json` — verified Indian holidays through 2027 for the long-weekend radar.
-- Leaflet (lazy-loaded from unpkg only when the map tab opens) + CARTO basemap tiles.
+- `js/icons.js` — the mynextstop icon set: one hand-kept line-icon system (UI glyphs +
+  16 category glyphs + transport modes), all `currentColor` SVG. No emoji, no icon fonts.
+- Leaflet + CARTO basemap tiles (theme-aware light/dark), with India's official boundary
+  drawn as a corrective overlay (see DATA-LICENSE.md).
 - No analytics, no cookies, no accounts. Geolocation is used in-page only.
 
 ## Deploy

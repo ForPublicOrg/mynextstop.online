@@ -9,7 +9,6 @@
 //    (data/india-border.geojson) as a thin line ON TOP, coloured to match the
 //    basemap's own admin lines — the presented border is India's official claim.
 import { seasonStatus, travelText } from './engine.js';
-import { themeOf } from './themes.js';
 
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -146,8 +145,7 @@ export function updateMap(state) {
       fillColor: STATUS_COLOR[status],
       fillOpacity: status === 'avoid' ? 0.5 : 0.95,
     });
-    const t = themeOf(d);
-    m.bindTooltip(`${t.e} ${d.name}`, { direction: 'top', offset: [0, -8], opacity: 0.94 });
+    m.bindTooltip(d.name, { direction: 'top', offset: [0, -8], opacity: 0.94 });
     m.on('click', () => onSelect && onSelect(d));
     m.addTo(dotsLayer);
   }
@@ -169,13 +167,13 @@ export function updateMap(state) {
       permanent: true, direction: 'center', className: 'route-label', opacity: 1,
     });
 
-    // onward hints: where you'd go NEXT from there — the "next stop" chain
+    // onward hints: where you'd go NEXT from there — the "next stop" chain.
+    // Unlabelled dashed arcs — their names live in the card, so the map
+    // carries exactly one floating label (the route distance).
     for (const o of onward) {
       const opts2 = arcPoints(b, [o.d.lat, o.d.lng], 0.12);
       L.polyline(opts2, {
         color: ROUTE_COLOR[theme], weight: 2, opacity: 0.55, dashArray: '4 7', interactive: false,
-      }).bindTooltip(`then ${o.d.name} · ${o.roadKm} km`, {
-        permanent: true, direction: 'center', className: 'route-label route-label-onward',
       }).addTo(routeLayer);
     }
 
@@ -183,8 +181,8 @@ export function updateMap(state) {
       const bounds = L.latLngBounds([a, b]);
       for (const o of onward) bounds.extend([o.d.lat, o.d.lng]);
       map.flyToBounds(bounds, {
-        paddingTopLeft: [36, 130],
-        paddingBottomRight: [36, Math.min(window.innerHeight * 0.42, 360)],
+        paddingTopLeft: [36, 76],
+        paddingBottomRight: [36, Math.min(window.innerHeight * 0.3, 240)],
         duration: 0.8, maxZoom: 9,
       });
     }

@@ -42,7 +42,11 @@
   "hub": "Weekly ferry (10-12h) or road from Port Blair via Mayabunder.",
   "festival": "",
   "alt": 0,
-  "crowd": 1
+  "crowd": 1,
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "havelock",
@@ -87,7 +91,10 @@
   "hub": "Fly to Port Blair, then 2-3h ferry to Havelock jetty.",
   "festival": "",
   "alt": 0,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight"
+  ]
  },
  {
   "id": "neil-island",
@@ -131,7 +138,10 @@
   "hub": "Fly to Port Blair, then 1-1.5h ferry, or hop from Havelock.",
   "festival": "",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight"
+  ]
  },
  {
   "id": "port-blair",
@@ -175,7 +185,10 @@
   "hub": "Fly direct from major Indian cities, or ship from Chennai.",
   "festival": "",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight"
+  ]
  },
  {
   "id": "araku-valley",
@@ -220,7 +233,11 @@
   "crowd": 2,
   "vibe": "Coffee estates and Adivasi villages draw nature-and-culture travelers, not a party crowd.",
   "hub": "Train/road from Visakhapatnam (3-4h), or the scenic toy train.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "gandikota",
@@ -265,7 +282,12 @@
   "crowd": 1,
   "vibe": "A sparse ruin for photographers and campers - unfenced edges mean caution after dark.",
   "hub": "Fly/train to Kadapa, then 1.5h taxi to the gorge.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "tirupati",
@@ -309,7 +331,12 @@
   "crowd": 3,
   "vibe": "A pilgrimage machine, not a social scene - solo devotees move through efficient queues.",
   "hub": "Fly/train to Tirupati, then 1-1.5h bus or the Alipiri hill footpath.",
-  "festival": "Sep-Oct: Brahmotsavam, nine days of processions and Garuda Seva"
+  "festival": "Sep-Oct: Brahmotsavam, nine days of processions and Garuda Seva",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "visakhapatnam",
@@ -354,7 +381,12 @@
   "crowd": 2,
   "vibe": "A workaday port city - solo travelers mostly pass through en route to Araku.",
   "hub": "Direct flights and trains from all major Indian cities.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "dirang",
@@ -399,7 +431,10 @@
   "crowd": 1,
   "vibe": "A quiet stopover — travellers breaking their Tawang journey, Monpa homestay hosts.",
   "hub": "Fly Tezpur, 8h drive via Bhalukpong. ILP + PAP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "mechuka",
@@ -444,7 +479,10 @@
   "crowd": 1,
   "vibe": "Likely the only outsider in the guesthouse — welcoming villages, no traveller circuit.",
   "hub": "Fly to Aalo, then 6-8h rough mountain road. ILP + PAP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "tawang",
@@ -489,7 +527,10 @@
   "crowd": 2,
   "vibe": "Monks, army convoys, a few backpackers — quiet monastery evenings, no party scene.",
   "hub": "Guwahati + 2-day drive via Bomdila-Dirang. ILP + PAP.",
-  "festival": "Dec/Jan: Torgya Festival at Tawang Monastery"
+  "festival": "Dec/Jan: Torgya Festival at Tawang Monastery",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "ziro-valley",
@@ -534,7 +575,10 @@
   "crowd": 2,
   "vibe": "Apatani homestays; packed with backpackers each Sept festival, quiet otherwise.",
   "hub": "Fly Guwahati-Hollongi, 4-5h drive. ILP + PAP.",
-  "festival": "Late Sep: Ziro Music Festival (dates shift yearly)"
+  "festival": "Late Sep: Ziro Music Festival (dates shift yearly)",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "guwahati",
@@ -578,7 +622,12 @@
   "crowd": 2,
   "vibe": "Transit-hub energy — most solo travellers pass through for a night before heading on.",
   "hub": "Major airport (LGBI), direct flights nationwide. No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kaziranga",
@@ -621,7 +670,12 @@
   "crowd": 2,
   "vibe": "Resort-lodge crowd doing sunrise safaris — easy to team up and split a jeep.",
   "hub": "4-5h drive/bus from Guwahati airport. No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "majuli",
@@ -666,7 +720,10 @@
   "crowd": 1,
   "vibe": "Homestays with mask-making or pottery families — slow island pace, not a party scene.",
   "hub": "Fly to Jorhat, then 1h ferry across the Brahmaputra. No ILP.",
-  "festival": "Nov: Raas Mahotsav (Vaishnavite festival)"
+  "festival": "Nov: Raas Mahotsav (Vaishnavite festival)",
+  "modes": [
+   "flight"
+  ]
  },
  {
   "id": "bodh-gaya",
@@ -710,7 +767,12 @@
   "crowd": 2,
   "vibe": "Monastery guesthouses fill with Buddhist pilgrims from Japan, Thailand, Tibet.",
   "hub": "Fly/train to Gaya, 15km; or 2hr drive from Patna.",
-  "festival": "May: Buddha Purnima"
+  "festival": "May: Buddha Purnima",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "rajgir",
@@ -754,7 +816,12 @@
   "crowd": 1,
   "vibe": "A pilgrim/history stop more than a backpacker hub - quiet, early evenings.",
   "hub": "Rajgir has its own station; 1.5hr from Patna by road/rail.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chandigarh",
@@ -798,7 +865,12 @@
   "solo": 3,
   "crowd": 2,
   "vibe": "Safe and easy alone, but more a comfortable stopover than a place to linger.",
-  "hub": "Fly into Chandigarh (IXC) or 4h train/bus from Delhi"
+  "hub": "Fly into Chandigarh (IXC) or 4h train/bus from Delhi",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chitrakote-falls",
@@ -843,7 +915,12 @@
   "hub": "Fly/train to Jagdalpur via Raipur (7-8h), then local taxi.",
   "festival": "Aug-Oct: Bastar Dussehra — a 75-day tribal festival.",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mainpat",
@@ -888,7 +965,11 @@
   "hub": "Reach Ambikapur via Bilaspur/Raipur, then 1h taxi up.",
   "festival": "",
   "alt": 1085,
-  "crowd": 1
+  "crowd": 1,
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "delhi",
@@ -933,7 +1014,12 @@
   "solo": 4,
   "crowd": 3,
   "vibe": "Huge hostel scene in Paharganj and Hauz Khas; stay street-smart after dark.",
-  "hub": "International/domestic airport (DEL) or major rail hub"
+  "hub": "International/domestic airport (DEL) or major rail hub",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "anjuna-vagator",
@@ -978,7 +1064,12 @@
   "crowd": 3,
   "vibe": "Hostel-hopping party strip - flea markets, sunset parties, easiest place to meet people",
   "hub": "Fly into Goa (Dabolim/Manohar), taxi or bus 40min to Anjuna",
-  "festival": "Dec: Sunburn Festival (nearby Vagator)"
+  "festival": "Dec: Sunburn Festival (nearby Vagator)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "palolem-agonda",
@@ -1022,7 +1113,12 @@
   "crowd": 2,
   "vibe": "Yoga retreats and hammock cafes - calmer crowd than North Goa but still very social",
   "hub": "Fly into Goa (Dabolim), 1.5h taxi or bus south to Palolem",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ahmedabad",
@@ -1067,7 +1163,12 @@
   "crowd": 2,
   "vibe": "Heritage-walk city - a handful of hostels make it easy to link up with other travellers",
   "hub": "Fly into Ahmedabad (AMD) or overnight train from major cities",
-  "festival": "Jan 14: Uttarayan (International Kite Festival)"
+  "festival": "Jan 14: Uttarayan (International Kite Festival)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bhuj",
@@ -1112,7 +1213,12 @@
   "crowd": 1,
   "vibe": "Handicraft-village hub - a good base to meet other Kutch-bound travellers before the Rann",
   "hub": "Fly to Bhuj (BHJ) or overnight train/bus from Ahmedabad (7-8h)",
-  "festival": "Nov-Feb: Rann Utsav season (Bhuj is the gateway city)"
+  "festival": "Nov-Feb: Rann Utsav season (Bhuj is the gateway city)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "diu",
@@ -1157,7 +1263,11 @@
   "crowd": 1,
   "vibe": "Slow island town - rare place in dry Gujarat to get a beer, mellow backpacker trickle",
   "hub": "Fly direct to Diu (DIU) or drive/bus 2h from Una/Veraval; no train",
-  "festival": "Feb: Diu Carnival (Portuguese-Goan-style street parade)"
+  "festival": "Feb: Diu Carnival (Portuguese-Goan-style street parade)",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "dwarka",
@@ -1201,7 +1311,12 @@
   "crowd": 3,
   "vibe": "Pilgrim town through and through - devotional crowds, not a place solo travellers mingle",
   "hub": "Fly to Jamnagar (JGA), 2h drive, or overnight train direct to Dwarka",
-  "festival": "Aug/Sep: Janmashtami (Krishna's birthday) - massive pilgrim crowds"
+  "festival": "Aug/Sep: Janmashtami (Krishna's birthday) - massive pilgrim crowds",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "gir",
@@ -1244,7 +1359,12 @@
   "crowd": 2,
   "vibe": "Small forest-lodge town for lion safaris - photographers and families in shared jeeps",
   "hub": "Fly to Diu (DIU) or Rajkot (RAJ), then 1.5-2h drive to Sasan Gir",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "rann-of-kutch",
@@ -1289,7 +1409,12 @@
   "crowd": 2,
   "vibe": "Tent-city festival crowd - folk music, camel safaris, book the Rann Utsav camp",
   "hub": "Fly to Bhuj (BHJ), 1.5-2h drive to Dhordo (register for entry)",
-  "festival": "Nov-Feb: Rann Utsav (tent city, folk music, full moon nights)"
+  "festival": "Nov-Feb: Rann Utsav (tent city, folk music, full moon nights)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "saputara",
@@ -1334,7 +1459,10 @@
   "crowd": 2,
   "vibe": "Small, quiet lake town - Gujarati family holidaymakers, boating rather than any nightlife",
   "hub": "3h drive from Surat, or 2h from Nashik across the Maharashtra border",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "somnath",
@@ -1378,7 +1506,12 @@
   "crowd": 2,
   "vibe": "Devotional pilgrim crowds and a seaside sound-and-light show - quiet, little socialising",
   "hub": "Fly to Diu (1h) or Rajkot (3h), then drive; also rail-connected",
-  "festival": "Feb/Mar: Maha Shivratri - biggest pilgrim gathering of the year"
+  "festival": "Feb/Mar: Maha Shivratri - biggest pilgrim gathering of the year",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "statue-of-unity",
@@ -1422,7 +1555,12 @@
   "crowd": 3,
   "vibe": "Big-ticket domestic attraction - buses of families and school groups, easy solo day trip",
   "hub": "Fly/train to Vadodara (BRC), then 1.5-2h drive/shuttle bus to Kevadia",
-  "festival": "Oct 31: Rashtriya Ekta Diwas (Statue of Unity anniversary)"
+  "festival": "Oct 31: Rashtriya Ekta Diwas (Statue of Unity anniversary)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kurukshetra",
@@ -1466,7 +1604,12 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "A pilgrim day-trip crowd around Brahma Sarovar; friendly but not a hangout.",
-  "hub": "3h train from Delhi, or 1.5h from Chandigarh"
+  "hub": "3h train from Delhi, or 1.5h from Chandigarh",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "morni-hills",
@@ -1511,7 +1654,12 @@
   "solo": 3,
   "crowd": 1,
   "vibe": "Chandigarh's weekend-escape crowd; a few camps make it easy to meet people.",
-  "hub": "1.5h taxi from Chandigarh; no public transport up the hill"
+  "hub": "1.5h taxi from Chandigarh; no public transport up the hill",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "barot",
@@ -1556,7 +1704,12 @@
   "solo": 2,
   "vibe": "A trout hatchery, a few guesthouses, barely any other tourists at all.",
   "hub": "Fly Bhuntar/Kangra (3h) via Mandi, Joginder Nagar; own vehicle best.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bir",
@@ -1601,7 +1754,12 @@
   "solo": 4,
   "vibe": "Monks, paragliders and yoga retreaters share three cafes - easy to strike up talk.",
   "hub": "Fly Dharamshala (2h drive) or overnight Delhi bus (12h) to Bir.",
-  "festival": "Feb/Mar: Losar (Tibetan New Year) in the Tibetan colony"
+  "festival": "Feb/Mar: Losar (Tibetan New Year) in the Tibetan colony",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chitkul",
@@ -1646,7 +1804,10 @@
   "solo": 2,
   "vibe": "A handful of homestays and ITBP soldiers - beautiful solitude, not a crowd of travellers.",
   "hub": "Fly/train to Shimla, 9-10h via Kinnaur (Reckong Peo, Sangla).",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "dalhousie",
@@ -1691,7 +1852,11 @@
   "solo": 2,
   "vibe": "More honeymoon couples and families than backpackers - pleasant, no crowd scene.",
   "hub": "Fly Gaggal (2.5h) or Delhi-Pathankot train, then 3h taxi in.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "jibhi",
@@ -1736,7 +1901,11 @@
   "solo": 3,
   "vibe": "Homestay bonfires draw more couples on weekend escapes than big backpacker groups.",
   "hub": "Fly Bhuntar (2h drive) or Delhi-Aut bus (10h), 1h taxi to Jibhi.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "kalpa",
@@ -1781,7 +1950,10 @@
   "solo": 2,
   "vibe": "Old Kinnauri wood houses and orchard homestays - peaceful, few solo travellers.",
   "hub": "Fly/train to Shimla, 7-8h drive via Reckong Peo, Kinnaur.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "kasol",
@@ -1826,7 +1998,11 @@
   "solo": 5,
   "vibe": "German bakeries and trance beats - the easiest place in India to join strangers by lunch.",
   "hub": "Fly Bhuntar (30 min) or overnight Delhi bus (11h), then 1h to Kasol.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "kaza",
@@ -1870,7 +2046,10 @@
   "solo": 3,
   "vibe": "Shared taxis and Zostel Spiti gather a small rotating cast of overlanders.",
   "hub": "Fly Bhuntar, 10-12h via Kunzum (Jun-Oct) or the Shimla-Kinnaur road.",
-  "festival": "Aug: Ladarcha trade fair"
+  "festival": "Aug: Ladarcha trade fair",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "khajjiar",
@@ -1915,7 +2094,11 @@
   "solo": 2,
   "vibe": "A day-trip stop for Dalhousie tourists, not really a solo base.",
   "hub": "Reach via Dalhousie (24km, ~45 min taxi); base in Dalhousie.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "kheerganga",
@@ -1960,7 +2143,10 @@
   "solo": 4,
   "vibe": "Communal tent camps and a shared hot spring make it easy to bond with fellow trekkers.",
   "hub": "Fly Bhuntar, drive to Barshaini (1.5h), then trek 9-10km/5-6h.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "malana",
@@ -2005,7 +2191,11 @@
   "solo": 2,
   "vibe": "Strict local customs (no touching villagers/homes) - observe, don't socialise.",
   "hub": "Fly Bhuntar (1h to Jari), then 3km/1.5h uphill trek, no road in.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "manali",
@@ -2050,7 +2240,11 @@
   "solo": 5,
   "vibe": "Old Manali's cafe strip makes it easy to fall into a group of travellers by dinner.",
   "hub": "Fly Bhuntar (50 min) or overnight Volvo from Delhi (12-14h) to Manali.",
-  "festival": "Jan: Manali Winter Carnival"
+  "festival": "Jan: Manali Winter Carnival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "mcleod-ganj",
@@ -2095,7 +2289,12 @@
   "solo": 5,
   "vibe": "Meditation courses by day, guitar circles and momos by night - an easy solo scene to join.",
   "hub": "Fly Gaggal (20 min) or overnight Volvo from Delhi (10-12h).",
-  "festival": "Feb/Mar: Losar (Tibetan New Year) at the main temple"
+  "festival": "Feb/Mar: Losar (Tibetan New Year) at the main temple",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "naggar",
@@ -2140,7 +2339,11 @@
   "solo": 3,
   "vibe": "A history-and-art crowd rather than a party one - easy chat over a castle-view coffee.",
   "hub": "Fly Bhuntar (30 min) or bus to Manali, 30 min taxi to Naggar.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "parashar-lake",
@@ -2185,7 +2388,10 @@
   "solo": 3,
   "vibe": "A popular Delhi/Chandigarh weekend camping spot - easy to join a bonfire with campers.",
   "hub": "Fly Bhuntar, 2h drive to Baggi village, then a 5km trek to the lake.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "rakcham",
@@ -2230,7 +2436,10 @@
   "solo": 2,
   "vibe": "A tiny cluster of guesthouses on the Baspa - you'll likely have the valley to yourself.",
   "hub": "Fly/train to Shimla, 9h via Sangla; shared taxis run from there.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "sangla",
@@ -2275,7 +2484,10 @@
   "solo": 3,
   "vibe": "A small guesthouse cluster where trekkers heading to Chitkul and Rakcham cross paths.",
   "hub": "Fly/train to Shimla, 8h drive via Reckong Peo into the Baspa valley.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "shimla",
@@ -2320,7 +2532,12 @@
   "solo": 3,
   "vibe": "More honeymooners and families on Mall Road than backpackers, but easy to spend time solo.",
   "hub": "Fly Jubbarhatti, or Kalka-Shimla toy train / 7h Volvo from Delhi.",
-  "festival": "May: Shimla Summer Festival"
+  "festival": "May: Shimla Summer Festival",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "tirthan-valley",
@@ -2365,7 +2582,10 @@
   "solo": 2,
   "vibe": "Riverside guesthouses run by trout-farming families - solitude and nature, not a crowd.",
   "hub": "Fly Bhuntar (1.5h) or Delhi-Aut bus (10h), 1h taxi via Larji.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "tosh",
@@ -2410,7 +2630,11 @@
   "solo": 4,
   "vibe": "Cliffside cafes draw the Kasol crowd who hiked up for cheaper stays.",
   "hub": "Fly Bhuntar (1.5h to Barshaini), 30-45 min uphill walk to Tosh.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "gulmarg",
@@ -2454,7 +2678,11 @@
   "solo": 3,
   "vibe": "International ski crowd in winter, easy to team up at lodges; summer is quiet and empty.",
   "hub": "Fly to Srinagar, then 1-1.5h taxi to Gulmarg (56km)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "katra-vaishno-devi",
@@ -2499,7 +2727,12 @@
   "solo": 3,
   "vibe": "A pilgrimage crowd, not backpackers, but solo-safe - easy to join a group on the climb.",
   "hub": "Fly/train to Jammu, then train/taxi to Katra (~2h)",
-  "festival": "Oct: Sharad Navratri peak pilgrimage rush"
+  "festival": "Oct: Sharad Navratri peak pilgrimage rush",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "pahalgam",
@@ -2544,7 +2777,11 @@
   "solo": 3,
   "vibe": "Amarnath pilgrims in season plus trekkers for Kolahoi Glacier or Tarsar-Marsar treks.",
   "hub": "Fly to Srinagar, then ~2h taxi or shared sumo to Pahalgam (95km)",
-  "festival": "Jul-Aug: Amarnath Yatra pilgrimage transits through Pahalgam"
+  "festival": "Jul-Aug: Amarnath Yatra pilgrimage transits through Pahalgam",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "sonamarg",
@@ -2589,7 +2826,11 @@
   "solo": 3,
   "vibe": "Day-trippers for glacier views and pony rides; trek camps fill with backpackers Jul-Sep.",
   "hub": "Fly to Srinagar, then ~2h taxi to Sonamarg (80km)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "srinagar",
@@ -2634,7 +2875,12 @@
   "solo": 3,
   "vibe": "Houseboat stays feel like a floating community, easy to link up for Gulmarg or Pahalgam.",
   "hub": "Fly direct from Delhi (~1.5h); well-connected from most metros",
-  "festival": "Apr: Tulip Festival at Indira Gandhi Memorial Tulip Garden"
+  "festival": "Apr: Tulip Festival at Indira Gandhi Memorial Tulip Garden",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "netarhat",
@@ -2679,7 +2925,10 @@
   "crowd": 1,
   "vibe": "State guesthouses and little else after dark - this is solitude, not a scene.",
   "hub": "4hr drive from Ranchi; own vehicle recommended, buses are sparse.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "agumbe",
@@ -2724,7 +2973,11 @@
   "crowd": 1,
   "vibe": "A handful of naturalists and photographers - homestay dinners are the social hub.",
   "hub": "Fly Mangalore, 3h drive; a rental car is close to essential.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "badami-aihole-pattadakal",
@@ -2769,7 +3022,12 @@
   "crowd": 1,
   "vibe": "Quiet, independent-traveler territory - easy to chat with the handful of other visitors.",
   "hub": "Fly Hubli, 2h drive; Aihole/Pattadakal a further taxi loop.",
-  "festival": "Jan: Pattadakal Dance Festival amid the ancient temples"
+  "festival": "Jan: Pattadakal Dance Festival amid the ancient temples",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "belur-halebidu",
@@ -2814,7 +3072,11 @@
   "crowd": 1,
   "vibe": "A quiet day-trip stop for architecture fans - almost no traveler social scene here.",
   "hub": "3h train/bus from Bengaluru to Hassan, then 30-40min to Belur.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bengaluru",
@@ -2858,7 +3120,12 @@
   "crowd": 2,
   "vibe": "Huge hostel and coworking-cafe scene - easy to meet travelers, expats, and nomads fast.",
   "hub": "Major international airport (BLR) with direct flights nationwide.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chikmagalur",
@@ -2903,7 +3170,11 @@
   "crowd": 2,
   "vibe": "Trekking base camps and estate homestays draw Bengaluru weekenders - easy to join a hike.",
   "hub": "Fly Mangalore or Bengaluru, 4-5h drive; nearest train Kadur (1h).",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "coorg-madikeri",
@@ -2948,7 +3219,10 @@
   "crowd": 3,
   "vibe": "More honeymoon resorts than hostels, but homestays and trekking groups work fine solo.",
   "hub": "Fly Mangalore/Bengaluru, 5-6h drive; nearest train Mysuru (3h).",
-  "festival": "Nov-Dec: Puthari, the Kodava rice harvest festival"
+  "festival": "Nov-Dec: Puthari, the Kodava rice harvest festival",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "dandeli",
@@ -2993,7 +3267,12 @@
   "crowd": 2,
   "vibe": "River-camp hostels and group rafting trips make solo travel easy here.",
   "hub": "Fly Goa (2.5h) or Hubli; overnight bus from Bengaluru (7-8h).",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "gokarna",
@@ -3038,7 +3317,12 @@
   "crowd": 3,
   "vibe": "Backpacker beach-hop scene close to Goa's energy but mellower - easy to find a crew.",
   "hub": "Train to Gokarna Rd, or fly Goa/Hubli then 2-3h taxi.",
-  "festival": "Feb/Mar: Shivaratri car festival at Mahabaleshwar Temple"
+  "festival": "Feb/Mar: Shivaratri car festival at Mahabaleshwar Temple",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "hampi",
@@ -3082,7 +3366,11 @@
   "crowd": 3,
   "vibe": "Hippie Island guesthouses draw a laid-back backpacker crowd for sunset boulder views.",
   "hub": "Train to Hospet Jn, 15min auto; overnight bus from Bengaluru.",
-  "festival": "Feb/Mar: Hampi Utsav (Vijaya Utsav) cultural festival"
+  "festival": "Feb/Mar: Hampi Utsav (Vijaya Utsav) cultural festival",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "jog-falls",
@@ -3126,7 +3414,11 @@
   "crowd": 2,
   "vibe": "A viewpoint stop for photographers and day-trippers, not really a place to linger solo.",
   "hub": "Nearest hub Shimoga (2.5h drive) or fly Mangalore (3.5h).",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "kabini",
@@ -3170,7 +3462,11 @@
   "crowd": 2,
   "vibe": "Small-group safaris are naturally social, but the resort-lodge format runs pricey.",
   "hub": "Drive from Mysuru (1.5-2h) or Bengaluru (5-6h) via road.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mysuru",
@@ -3215,7 +3511,12 @@
   "crowd": 3,
   "vibe": "Walkable heritage core with a small hostel scene and plenty of Bengaluru daytrippers.",
   "hub": "3h train or bus from Bengaluru, frequent departures.",
-  "festival": "Oct: Mysuru Dasara - ten days of processions and palace illumination"
+  "festival": "Oct: Mysuru Dasara - ten days of processions and palace illumination",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "sakleshpur",
@@ -3260,7 +3561,12 @@
   "crowd": 2,
   "vibe": "Weekend trekking crowd from Bengaluru and estate homestays - decent for meeting people.",
   "hub": "4-5h drive from Bengaluru, or overnight train to Sakleshpur Jn.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "udupi-malpe",
@@ -3305,7 +3611,12 @@
   "crowd": 2,
   "vibe": "A pilgrim-and-daytrip crowd rather than backpackers, but easy enough to wander solo.",
   "hub": "Fly Mangalore, 1h to Udupi/Malpe; also on the Konkan Railway line.",
-  "festival": "Jan: Paryaya, biennial handover festival at Krishna Matha"
+  "festival": "Jan: Paryaya, biennial handover festival at Krishna Matha",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "alleppey-backwaters",
@@ -3348,7 +3659,12 @@
   "solo": 3,
   "vibe": "Houseboats cost more solo, but homestays and kayak tours make it easy to meet people",
   "hub": "Fly to Cochin, 1.5h taxi/bus to the Alleppey houseboat jetty",
-  "festival": "Aug: Nehru Trophy Snake Boat Race"
+  "festival": "Aug: Nehru Trophy Snake Boat Race",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "athirappilly-falls",
@@ -3391,7 +3707,12 @@
   "solo": 2,
   "vibe": "Mostly a day-trip crowd of families and photographers; better as a stop than a base",
   "hub": "Fly to Cochin, 1.5-2h taxi/bus into the Sholayar forest range",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bekal",
@@ -3435,7 +3756,12 @@
   "solo": 2,
   "vibe": "Sleepy and uncrowded - the ramparts to yourself, but little backpacker scene",
   "hub": "Nearest airport Mangalore; or train to Kanhangad, taxi to fort",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "fort-kochi",
@@ -3479,7 +3805,12 @@
   "solo": 4,
   "vibe": "Compact and walkable with a steady cafe crowd - easy to chat at a heritage guesthouse",
   "hub": "Fly into Cochin International Airport, 45min taxi/bus to Fort Kochi",
-  "festival": "Dec: Kochi-Muziris Biennale (biennial art festival)"
+  "festival": "Dec: Kochi-Muziris Biennale (biennial art festival)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kannur",
@@ -3523,7 +3854,12 @@
   "solo": 2,
   "vibe": "Few backpackers make it this far north - you meet devotees and locals more than travellers",
   "hub": "Fly to Kannur airport or train to Kannur, auto/taxi to Muzhappilangad",
-  "festival": "Dec-Mar: Theyyam ritual season at village shrines"
+  "festival": "Dec-Mar: Theyyam ritual season at village shrines",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kovalam",
@@ -3565,7 +3901,12 @@
   "solo": 3,
   "vibe": "More resort-y than backpacker-dense, but promenade cafes are an easy spot to meet people",
   "hub": "Fly to Trivandrum airport, 20min taxi to Kovalam",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kumarakom",
@@ -3608,7 +3949,12 @@
   "solo": 2,
   "vibe": "Skews toward couples and resorts - peaceful for birding, not a place to meet backpackers",
   "hub": "Fly to Cochin, 1.5h taxi to Kumarakom via Kottayam",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "munnar",
@@ -3651,7 +3997,11 @@
   "solo": 3,
   "vibe": "Hostels draw a steady trickle of solo travellers for tea-garden treks and campfires",
   "hub": "Fly to Cochin, 4h taxi/bus via Munnar ghat road",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "ponmudi",
@@ -3694,7 +4044,12 @@
   "solo": 2,
   "vibe": "A Trivandrum weekender day trip more than a backpacker stop - come for the drive",
   "hub": "Fly to Trivandrum, 1.5h taxi up the 22-hairpin ghat road",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "thekkady",
@@ -3737,7 +4092,11 @@
   "solo": 3,
   "vibe": "Kumily's guesthouses organise group treks and rafting - an easy way for solos to team up",
   "hub": "Fly to Cochin or Madurai, 4-5h taxi/bus to Kumily/Thekkady",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "vagamon",
@@ -3781,7 +4140,12 @@
   "solo": 3,
   "vibe": "Quieter than Munnar - few homestays, but paragliding trips help you meet people",
   "hub": "Fly to Cochin, 3h taxi via Kottayam (best with own/rented vehicle)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "varkala",
@@ -3825,7 +4189,12 @@
   "solo": 5,
   "vibe": "Kerala's easiest place to meet solos - yoga classes, cliff cafes, year-round hostel crowd",
   "hub": "Fly to Trivandrum, 45min train or taxi to Varkala",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "wayanad",
@@ -3869,7 +4238,11 @@
   "solo": 3,
   "vibe": "Plantation homestays and a few hostels bring trekkers; scooters help you meet people",
   "hub": "Fly to Calicut, 2.5h taxi/bus up Thamarassery Ghat into Wayanad",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "hanle",
@@ -3914,7 +4287,10 @@
   "solo": 2,
   "vibe": "A tiny village of stargazers and homestay families - some of India's darkest skies.",
   "hub": "Taxi from Leh via Nyoma (5-6h); needs ILP plus Hanle permit",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "kargil",
@@ -3959,7 +4335,10 @@
   "solo": 2,
   "vibe": "A functional highway town, not a hangout - road-trippers breaking Leh-Srinagar journey.",
   "hub": "Overnight stop on the Srinagar-Leh highway, ~5-6h from either city",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "leh",
@@ -4004,7 +4383,11 @@
   "solo": 5,
   "vibe": "Rooftop cafes full of bikers; easy to join a shared taxi to Pangong or Nubra.",
   "hub": "Fly Delhi-Leh year-round; Manali/Srinagar highway Jun-Sep",
-  "festival": "Sep: Ladakh Festival"
+  "festival": "Sep: Ladakh Festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "nubra-valley",
@@ -4049,7 +4432,10 @@
   "solo": 3,
   "vibe": "Quiet Hunder/Diskit homestays, fellow travellers mostly on the same Pangong loop.",
   "hub": "Taxi/bike from Leh over Khardung La (~5h); ILP required",
-  "festival": "Oct/Nov: Diskit Gustor monastery festival"
+  "festival": "Oct/Nov: Diskit Gustor monastery festival",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "pangong-tso",
@@ -4094,7 +4480,10 @@
   "solo": 3,
   "vibe": "Tent camps at Spangmik, bonfires with fellow travellers, freezing nights even in July.",
   "hub": "Shared taxi/bike from Leh via Chang La (5-6h, ILP required)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "tso-moriri",
@@ -4139,7 +4528,10 @@
   "solo": 2,
   "vibe": "A few Korzok homestays, overlanders and photographers - solitude, not a party scene.",
   "hub": "Taxi from Leh via Chumathang (7-8h, ILP); pair with Hanle",
-  "festival": "Jul/Aug: Korzok Gustor monastery festival"
+  "festival": "Jul/Aug: Korzok Gustor monastery festival",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "turtuk",
@@ -4184,7 +4576,10 @@
   "solo": 3,
   "vibe": "Balti-family homestays - more likely to share a meal with locals than meet travellers.",
   "hub": "Taxi from Leh via Khardung La and Nubra (~7-8h); needs ILP",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "zanskar",
@@ -4229,7 +4624,10 @@
   "solo": 2,
   "vibe": "Summer road-trippers or Chadar trekkers - a small, serious adventure-travel crowd.",
   "hub": "Taxi via Kargil (2 days) Jun-Sep; winter: guided Chadar trek",
-  "festival": "Jul/Aug: Karsha Gustor monastery festival"
+  "festival": "Jul/Aug: Karsha Gustor monastery festival",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "agatti-lakshadweep",
@@ -4273,7 +4671,10 @@
   "solo": 2,
   "vibe": "Package-tour visitors mostly - no budget stays, but tour-mates become fast friends",
   "hub": "Fly Kochi-Agatti; mandatory Entry Permit via Lakshadweep Tourism",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight"
+  ]
  },
  {
   "id": "bandhavgarh",
@@ -4316,7 +4717,12 @@
   "hub": "Fly to Jabalpur (170km) or train to Umaria, then taxi.",
   "festival": "",
   "alt": 440,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bhopal-sanchi",
@@ -4361,7 +4767,12 @@
   "hub": "Direct flights/trains to Bhopal; Sanchi 1h taxi away.",
   "festival": "",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kanha",
@@ -4404,7 +4815,11 @@
   "hub": "Fly to Jabalpur (165km) or Nagpur (250km), then taxi.",
   "festival": "",
   "alt": 600,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "khajuraho",
@@ -4448,7 +4863,12 @@
   "hub": "Fly direct to Khajuraho, or train to Jhansi (175km) + taxi.",
   "festival": "Feb: Khajuraho Dance Festival, classical dance below the temples.",
   "alt": 0,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "maheshwar",
@@ -4493,7 +4913,12 @@
   "hub": "Nearest hub Indore (90km), 2-2.5h taxi via Dhamnod.",
   "festival": "",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mandu",
@@ -4538,7 +4963,12 @@
   "hub": "Nearest hub Indore (95km), 2.5h taxi/bus via Dhar.",
   "festival": "",
   "alt": 633,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "omkareshwar",
@@ -4583,7 +5013,12 @@
   "hub": "Nearest station Omkareshwar Road (12km); Indore 80km.",
   "festival": "Feb/Mar: Maha Shivratri mela draws huge pilgrim crowds.",
   "alt": 0,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "orchha",
@@ -4628,7 +5063,12 @@
   "hub": "Train/flight to Jhansi (16km), then auto or local bus.",
   "festival": "",
   "alt": 0,
-  "crowd": 2
+  "crowd": 2,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "pachmarhi",
@@ -4672,7 +5112,11 @@
   "hub": "Train to Pipariya (52km), then 1.5h shared taxi up the ghat.",
   "festival": "",
   "alt": 1067,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ujjain",
@@ -4716,7 +5160,12 @@
   "hub": "Direct trains to Ujjain; Indore airport 55km, 1h taxi.",
   "festival": "Oct-Nov: Kartik Mela fair on the Kshipra ghats",
   "alt": 0,
-  "crowd": 3
+  "crowd": 3,
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ajanta-ellora",
@@ -4760,7 +5209,12 @@
   "crowd": 2,
   "vibe": "History-focused travellers and tour groups - easy to go solo, more awe than nightlife",
   "hub": "Fly/train to Aurangabad, taxi (Ellora 30km, Ajanta 100km)",
-  "festival": "Feb: Ellora Ajanta International Festival (classical music and dance)"
+  "festival": "Feb: Ellora Ajanta International Festival (classical music and dance)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "alibaug",
@@ -4803,7 +5257,11 @@
   "crowd": 2,
   "vibe": "Weekend crowd from Mumbai - beach shacks, homestays, easygoing, not a backpacker scene",
   "hub": "Ferry from Gateway of India (1h) to Mandwa, then 30min drive",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "amboli",
@@ -4848,7 +5306,12 @@
   "crowd": 1,
   "vibe": "Barely-visited Ghat town - birders and nature resorts, near-total solitude, not a scene",
   "hub": "2h drive from Goa via Chorla Ghat, or Kolhapur/Belgaum; taxi essential",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bhandardara",
@@ -4894,7 +5357,11 @@
   "crowd": 2,
   "vibe": "Trekking-club crowd headed up Kalsubai for sunrise - easy to tag along with a group solo",
   "hub": "3h drive from Mumbai/Pune, or cab from Igatpuri/Ghoti; no direct train",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "igatpuri",
@@ -4939,7 +5406,12 @@
   "crowd": 1,
   "vibe": "Silent Vipassana retreats draw a global crowd; monsoon weekends bring trekkers to Kalsubai",
   "hub": "2h train from Mumbai or Nashik Road, Igatpuri sits on the main line",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kaas-plateau",
@@ -4983,7 +5455,12 @@
   "crowd": 3,
   "vibe": "Day-trip nature spot, not a hangout - family groups during bloom, quiet otherwise",
   "hub": "Fly/train to Pune, 4h drive to Satara; permit needed in bloom season",
-  "festival": "Sep: Kaas flower bloom (peak 2-3 weeks, weather-dependent)"
+  "festival": "Sep: Kaas flower bloom (peak 2-3 weeks, weather-dependent)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "lonavala",
@@ -5027,7 +5504,12 @@
   "crowd": 3,
   "vibe": "Weekend crowd from Mumbai and Pune - a couple of hostels make it easy to link up for treks",
   "hub": "1.5-2h train or drive from Mumbai/Pune via the expressway",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mahabaleshwar",
@@ -5071,7 +5553,11 @@
   "crowd": 3,
   "vibe": "Popular honeymoon/family hill station - strawberry farms, sociable, not a backpacker hub",
   "hub": "4h drive or bus from Pune or Mumbai via Panchgani",
-  "festival": "Mar-Apr: Strawberry Festival"
+  "festival": "Mar-Apr: Strawberry Festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "malvan-tarkarli",
@@ -5115,7 +5601,11 @@
   "crowd": 1,
   "vibe": "Quiet Konkan fishing-village feel - scuba schools and homestays draw a small diving crowd",
   "hub": "Overnight train/bus to Kudal/Sindhudurg, then 20-30min local transport",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "matheran",
@@ -5159,7 +5649,12 @@
   "crowd": 2,
   "vibe": "Quiet car-free forest town - mostly families and honeymooners, easy chats on the toy train",
   "hub": "Train to Neral, then toy train; 2h from Mumbai",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mumbai",
@@ -5203,7 +5698,12 @@
   "crowd": 3,
   "vibe": "Big anonymous metro - Colaba/Bandra hostels fill with a young backpacker and expat crowd",
   "hub": "Fly into Mumbai (BOM) or overnight train from anywhere in the country",
-  "festival": "Aug/Sep: Ganesh Chaturthi (Ganpati Visarjan) - huge processions"
+  "festival": "Aug/Sep: Ganesh Chaturthi (Ganpati Visarjan) - huge processions",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "pune",
@@ -5247,7 +5747,12 @@
   "crowd": 2,
   "vibe": "College-town energy - cafes full of students, Osho Ashram draws a trickle of foreigners",
   "hub": "Fly into Pune (PNQ) or 3h expressway bus/train from Mumbai",
-  "festival": "Aug/Sep: Ganesh Chaturthi - Pune's version rivals Mumbai's"
+  "festival": "Aug/Sep: Ganesh Chaturthi - Pune's version rivals Mumbai's",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "tadoba",
@@ -5290,7 +5795,12 @@
   "crowd": 2,
   "vibe": "Photographers and wildlife fans sharing jeeps - safaris throw solo travellers together",
   "hub": "Fly to Nagpur (NAG), then 2.5-3h drive to Moharli or Kolara gate",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "loktak-lake",
@@ -5335,7 +5845,11 @@
   "crowd": 1,
   "vibe": "Quiet stilted fishing villages; check current travel advisories before going.",
   "hub": "Fly Imphal, 1h drive to Moirang. ILP + PAP; check advisories.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "cherrapunji",
@@ -5380,7 +5894,11 @@
   "crowd": 2,
   "vibe": "Small Khasi villages, guesthouse guides, same trekkers doing the falls circuit.",
   "hub": "1.5h shared taxi from Shillong (3h from Guwahati). No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "dawki-shnongpdeng",
@@ -5425,7 +5943,11 @@
   "crowd": 2,
   "vibe": "River-camp bonfires, kayaking by day, cheap tents by the water, easy to meet people.",
   "hub": "2h shared taxi from Shillong, 4-5h from Guwahati. No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "mawlynnong",
@@ -5469,7 +5991,10 @@
   "crowd": 2,
   "vibe": "Homestay evenings with Khasi families, mostly day-trippers, quiet overnight stays.",
   "hub": "1h from Dawki, 2.5h shared taxi from Shillong. No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "nongriat",
@@ -5514,7 +6039,10 @@
   "crowd": 2,
   "vibe": "Riverside guesthouses full of trekkers, communal dinners, easy to find company.",
   "hub": "Drive to Tyrna (1h from Cherrapunji), trek 3,500 steps down. No ILP.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "shillong",
@@ -5559,7 +6087,11 @@
   "crowd": 3,
   "vibe": "Cafe crowd and shared taxis — easy to link up with travellers heading onward.",
   "hub": "Fly/bus to Guwahati, then 3h shared taxi to Shillong. No ILP.",
-  "festival": "Nov: Shillong Cherry Blossom Festival"
+  "festival": "Nov: Shillong Cherry Blossom Festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "aizawl",
@@ -5604,7 +6136,11 @@
   "crowd": 1,
   "vibe": "Church-going, coffee-shop city — safe and welcoming, small traveller scene.",
   "hub": "Fly to Lengpui airport, 40min out. ILP + PAP.",
-  "festival": "Early Mar: Chapchar Kut spring festival"
+  "festival": "Early Mar: Chapchar Kut spring festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "reiek",
@@ -5649,7 +6185,11 @@
   "crowd": 1,
   "vibe": "Half-day escape from Aizawl — cultural-village shows, mostly domestic day-trippers.",
   "hub": "1h drive from Aizawl. ILP + PAP for foreigners.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "dzukou-valley",
@@ -5694,7 +6234,11 @@
   "crowd": 2,
   "vibe": "Trekking-hut camaraderie — shared meals cooked over a wood stove with fellow hikers.",
   "hub": "From Kohima: 1h drive + 3-4h trek from Viswema. ILP covers it.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "kohima",
@@ -5739,7 +6283,11 @@
   "crowd": 3,
   "vibe": "Hornbill month is a huge friendly crowd; otherwise a quiet WWII-history town.",
   "hub": "Fly Dimapur, 3h shared taxi to Kohima. ILP + PAP.",
-  "festival": "Dec 1-10: Hornbill Festival, Kisama Village"
+  "festival": "Dec 1-10: Hornbill Festival, Kisama Village",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "chilika-lake",
@@ -5784,7 +6332,12 @@
   "crowd": 2,
   "vibe": "Day-trip crowd from Puri - sharing a dolphin boat is the easiest way to meet people.",
   "hub": "1.5hr drive from Puri to Satapada jetty for boat tours.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "daringbadi",
@@ -5829,7 +6382,10 @@
   "crowd": 1,
   "vibe": "Barely any tourist infrastructure - mostly Kandha villagers, not backpackers.",
   "hub": "7hr drive from Bhubaneswar via Phulbani; own vehicle recommended.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "gopalpur",
@@ -5873,7 +6429,11 @@
   "crowd": 1,
   "vibe": "Old lighthouse, empty sand, not much else after dark - solitude, not a scene.",
   "hub": "Nearest hub Berhampur, 30min auto; 6hr from Bhubaneswar.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "konark",
@@ -5916,7 +6476,12 @@
   "crowd": 2,
   "vibe": "A half-day monument stop for most; stay overnight for December's dance festival.",
   "hub": "35km/1hr from Puri by shared auto or bus; easy day trip.",
-  "festival": "Dec: Konark Dance Festival"
+  "festival": "Dec: Konark Dance Festival",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "puri",
@@ -5961,7 +6526,12 @@
   "crowd": 3,
   "vibe": "More pilgrims than backpackers, but easy day trips to Konark and Chilika keep it social.",
   "hub": "Direct train from Kolkata/Bhubaneswar; Puri has its own station.",
-  "festival": "Jun-Jul: Rath Yatra"
+  "festival": "Jun-Jul: Rath Yatra",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "pondicherry",
@@ -6007,7 +6577,12 @@
   "crowd": 3,
   "vibe": "French Quarter cafes and Auroville draw a backpacker-yogi crowd, easy to meet people",
   "hub": "Fly/train to Chennai, 3hr drive; or train to Villupuram + bus",
-  "festival": "Aug 15: Sri Aurobindo's birthday celebrations at the Ashram"
+  "festival": "Aug 15: Sri Aurobindo's birthday celebrations at the Ashram",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "amritsar",
@@ -6052,7 +6627,12 @@
   "solo": 4,
   "crowd": 3,
   "vibe": "The Golden Temple's langar hall makes it genuinely easy to meet people.",
-  "hub": "Fly into Amritsar (ATQ) or 6h train from Delhi/Chandigarh"
+  "hub": "Fly into Amritsar (ATQ) or 6h train from Delhi/Chandigarh",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "patiala",
@@ -6096,7 +6676,12 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "Almost no traveler infrastructure — you'll be sightseeing largely on your own.",
-  "hub": "1h train/bus from Chandigarh, or 4h from Delhi"
+  "hub": "1h train/bus from Chandigarh, or 4h from Delhi",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bharatpur",
@@ -6140,7 +6725,12 @@
   "solo": 3,
   "crowd": 2,
   "vibe": "Birders and cyclists share dirt paths — easy to strike up talk with fellow travelers.",
-  "hub": "Train from Delhi (3.5h) or Agra (1.5h); explore by cycle-rickshaw"
+  "hub": "Train from Delhi (3.5h) or Agra (1.5h); explore by cycle-rickshaw",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bikaner",
@@ -6185,7 +6775,11 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "Off the backpacker circuit — expect to explore the fort mostly on your own.",
-  "hub": "Overnight train from Delhi (7-8h) or 5h bus from Jaipur"
+  "hub": "Overnight train from Delhi (7-8h) or 5h bus from Jaipur",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "bundi",
@@ -6230,7 +6824,11 @@
   "solo": 3,
   "crowd": 1,
   "vibe": "Quiet and unpolished; you'll mostly meet the same handful of travelers staying in town.",
-  "hub": "3h bus/train from Kota, or 5h from Jaipur"
+  "hub": "3h bus/train from Kota, or 5h from Jaipur",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chittorgarh",
@@ -6274,7 +6872,12 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "A day-trip town from Udaipur — quiet evenings, little traveler mixing.",
-  "hub": "2h train/bus from Udaipur, or 4h from Jaipur"
+  "hub": "2h train/bus from Udaipur, or 4h from Jaipur",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "jaipur",
@@ -6319,7 +6922,12 @@
   "solo": 4,
   "crowd": 3,
   "vibe": "Hostel-heavy and social — easiest Rajasthan city to instantly find a travel group.",
-  "hub": "Fly into Jaipur (Sanganer) or 4.5h train/bus from Delhi"
+  "hub": "Fly into Jaipur (Sanganer) or 4.5h train/bus from Delhi",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "jaisalmer",
@@ -6364,7 +6972,12 @@
   "solo": 4,
   "crowd": 2,
   "vibe": "Desert-camp bonfires and shared jeep safaris turn strangers into a travel crew fast.",
-  "hub": "Overnight train from Jodhpur (5h) or fly direct into Jaisalmer"
+  "hub": "Overnight train from Jodhpur (5h) or fly direct into Jaisalmer",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "jodhpur",
@@ -6409,7 +7022,12 @@
   "solo": 4,
   "crowd": 3,
   "vibe": "Blue-lane guesthouses under the fort make it easy to fall into a group within a day.",
-  "hub": "Fly into Jodhpur or 5h train from Jaipur"
+  "hub": "Fly into Jodhpur or 5h train from Jaipur",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kumbhalgarh",
@@ -6454,7 +7072,11 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "Remote and resort-driven; you'll likely be the only solo guest most nights.",
-  "hub": "2h drive/taxi from Udaipur; no direct train"
+  "hub": "2h drive/taxi from Udaipur; no direct train",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "mandawa",
@@ -6499,7 +7121,10 @@
   "solo": 3,
   "crowd": 1,
   "vibe": "Haveli homestays and painted-mansion walks; peaceful and quiet, not very social.",
-  "hub": "4h drive/bus from Jaipur or Delhi via Sikar"
+  "hub": "4h drive/bus from Jaipur or Delhi via Sikar",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "mount-abu",
@@ -6544,7 +7169,12 @@
   "solo": 3,
   "crowd": 3,
   "vibe": "Mostly Gujarati honeymooners and families around Nakki Lake; solo travelers stand out.",
-  "hub": "Fly/train to Udaipur, then 2.5h taxi/bus up the ghat"
+  "hub": "Fly/train to Udaipur, then 2.5h taxi/bus up the ghat",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "neemrana",
@@ -6588,7 +7218,11 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "A Delhi-couples weekend crowd at the fort hotel; not built for solo mixing.",
-  "hub": "1.5h drive/bus from Delhi or Jaipur on NH48"
+  "hub": "1.5h drive/bus from Delhi or Jaipur on NH48",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "pushkar",
@@ -6633,7 +7267,12 @@
   "solo": 5,
   "crowd": 3,
   "vibe": "Lake-ghat cafes and yoga classes — one of India's easiest towns to travel solo.",
-  "hub": "Fly/train to Ajmer, then 30min bus or auto"
+  "hub": "Fly/train to Ajmer, then 30min bus or auto",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ranakpur",
@@ -6678,7 +7317,12 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "A half-day temple stop, not a stay — barely any traveler scene to speak of.",
-  "hub": "1.5h drive from Udaipur, often combined with Kumbhalgarh"
+  "hub": "1.5h drive from Udaipur, often combined with Kumbhalgarh",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ranthambore",
@@ -6721,7 +7365,11 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "Couples and families on safari packages; evenings are resort-bound, not very social.",
-  "hub": "Train to Sawai Madhopur (4.5h from Jaipur), taxi to park gate"
+  "hub": "Train to Sawai Madhopur (4.5h from Jaipur), taxi to park gate",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "sariska",
@@ -6765,7 +7413,11 @@
   "solo": 2,
   "crowd": 2,
   "vibe": "Safari-lodge crowd is mostly domestic families; sociable at breakfast, not a hangout.",
-  "hub": "2.5h drive from Delhi or 1h from Alwar train station"
+  "hub": "2.5h drive from Delhi or 1h from Alwar train station",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "udaipur",
@@ -6810,7 +7462,12 @@
   "solo": 4,
   "crowd": 3,
   "vibe": "Lakeside rooftop cafes are full of backpackers swapping Rajasthan routes nightly.",
-  "hub": "Fly into Udaipur or overnight train from Delhi/Jaipur"
+  "hub": "Fly into Udaipur or overnight train from Delhi/Jaipur",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "gangtok",
@@ -6855,7 +7512,11 @@
   "crowd": 3,
   "vibe": "Zostel crowd planning North Sikkim runs; easy to share permits and jeep seats.",
   "hub": "Fly Bagdogra, 4hr shared taxi; Indians need a free ILP.",
-  "festival": "May: International Flower Festival"
+  "festival": "May: International Flower Festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "north-sikkim",
@@ -6900,7 +7561,10 @@
   "crowd": 2,
   "vibe": "No independent travel - permits put you in an agent's shared jeep with strangers.",
   "hub": "From Gangtok, agent-booked permit and shared jeep required.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "pelling",
@@ -6944,7 +7608,10 @@
   "crowd": 2,
   "vibe": "Quieter than Gangtok - sunrise balconies, day trips to Khecheopalri lake.",
   "hub": "4-5hr shared jeep from Gangtok or NJP via Jorethang.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "ravangla",
@@ -6989,7 +7656,10 @@
   "crowd": 1,
   "vibe": "Quiet monastery town, far fewer tourists than Gangtok or Pelling - good for slow days.",
   "hub": "3-4hr shared jeep from Gangtok, en route to Pelling.",
-  "festival": "Aug-Sep: Pang Lhabsol at Ralang Monastery"
+  "festival": "Aug-Sep: Pang Lhabsol at Ralang Monastery",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "yuksom",
@@ -7034,7 +7704,10 @@
   "crowd": 2,
   "vibe": "Trekkers gather before Dzongri/Goecha La; permits assign you a small trek group.",
   "hub": "6-7hr drive from NJP/Bagdogra; permit via trek agent at check-post.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "zuluk",
@@ -7079,7 +7752,10 @@
   "crowd": 1,
   "vibe": "Homestay dinners, zero nightlife - you meet whoever's in your shared taxi.",
   "hub": "From Gangtok, permit + 4-5hr drive via Rongli; homestays only.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "chennai",
@@ -7124,7 +7800,12 @@
   "crowd": 3,
   "vibe": "A proper metro - hostels, easy transport, and backpackers passing through en route south",
   "hub": "Major airport (MAA) and rail hub - gateway to all of Tamil Nadu",
-  "festival": "Dec-Jan: Margazhi Music Season - world's largest music festival"
+  "festival": "Dec-Jan: Margazhi Music Season - world's largest music festival",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "chettinad",
@@ -7169,7 +7850,12 @@
   "crowd": 2,
   "vibe": "A heritage and food pilgrimage; homestays let solo travellers settle in easily",
   "hub": "Fly to Madurai or Trichy, then 1.5-2hr drive/bus to Karaikudi",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "coonoor",
@@ -7214,7 +7900,12 @@
   "crowd": 2,
   "vibe": "Sleepy tea-estate town, homestays over hostels - better for quiet solo walks than a crowd",
   "hub": "Fly to Coimbatore (70km, 2.5hr) or toy train from Mettupalayam",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kanyakumari",
@@ -7259,7 +7950,12 @@
   "crowd": 3,
   "vibe": "A bucket-list stop with many day-trippers; budget lodges near the rock ease meeting others",
   "hub": "Fly to Trivandrum (90km, 1.5hr) or train from Madurai (4hr)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kodaikanal",
@@ -7305,7 +8001,12 @@
   "crowd": 3,
   "vibe": "Backpacker trekking hub - goStops hostel, bike rentals, easy to team up for treks",
   "hub": "Fly to Madurai (120km, 3hr) or train to Kodai Road + bus/taxi",
-  "festival": "May: Kodaikanal Summer Festival (boat pageant, flower show)"
+  "festival": "May: Kodaikanal Summer Festival (boat pageant, flower show)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kolli-hills",
@@ -7351,7 +8052,10 @@
   "crowd": 1,
   "vibe": "Undiscovered by backpackers - a few eco-stays, ideal for solo travellers wanting quiet",
   "hub": "Nearest town Namakkal; the 70-hairpin Ghat road (1hr) from Semmedu",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "madurai",
@@ -7397,7 +8101,12 @@
   "crowd": 3,
   "vibe": "Pilgrims and heritage travellers, not a party crowd; lodges near the temple ease day trips",
   "hub": "Fly direct to Madurai airport, or overnight train from Chennai (8hr)",
-  "festival": "Apr-May: Chithirai Festival, Meenakshi's temple procession"
+  "festival": "Apr-May: Chithirai Festival, Meenakshi's temple procession",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mahabalipuram",
@@ -7442,7 +8151,11 @@
   "crowd": 3,
   "vibe": "A real backpacker beach vibe near Chennai - surf schools and cafes help you meet people",
   "hub": "1hr drive/bus down the ECR from Chennai, frequent buses from CMBT",
-  "festival": "Dec-Jan: Mahabalipuram Dance Festival at the Shore Temple"
+  "festival": "Dec-Jan: Mahabalipuram Dance Festival at the Shore Temple",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "ooty",
@@ -7487,7 +8200,12 @@
   "crowd": 3,
   "vibe": "More honeymooners than backpackers, but Zostel and the toy-train crowd help you link up",
   "hub": "Fly to Coimbatore (85km, 3hr) or train to Mettupalayam + toy train",
-  "festival": "May: Ooty Summer Festival (flower and fruit show)"
+  "festival": "May: Ooty Summer Festival (flower and fruit show)",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "rameswaram",
@@ -7533,7 +8251,12 @@
   "crowd": 3,
   "vibe": "A pilgrim town at heart, but the Dhanushkodi ghost-town trip draws solo photographers",
   "hub": "Train/bus from Madurai (3hr) over the Pamban Bridge, or fly to Madurai",
-  "festival": "Feb: Maha Shivaratri celebrations at Ramanathaswamy Temple"
+  "festival": "Feb: Maha Shivaratri celebrations at Ramanathaswamy Temple",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "thanjavur",
@@ -7577,7 +8300,12 @@
   "crowd": 2,
   "vibe": "A quiet heritage stop, not a hangout town - mostly day-trippers and history buffs",
   "hub": "Train from Chennai (6hr) or fly to Trichy (65km) then bus/auto",
-  "festival": "Feb: Thanjavur Music & Dance Festival at Brihadeeswarar Temple"
+  "festival": "Feb: Thanjavur Music & Dance Festival at Brihadeeswarar Temple",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "valparai",
@@ -7623,7 +8351,11 @@
   "crowd": 1,
   "vibe": "Almost no backpacker scene - a few estate stays, best for solo travellers who like quiet",
   "hub": "Fly to Coimbatore, drive to Pollachi then the 40-hairpin Ghat road",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "yelagiri",
@@ -7669,7 +8401,11 @@
   "crowd": 2,
   "vibe": "A low-key weekend escape for Bangalore/Chennai crowds, not a backpacker circuit",
   "hub": "Nearest rail Jolarpettai (8km); self-drive 3.5hr from Bangalore",
-  "festival": "May: Yelagiri Summer Festival (Tamil Nadu Tourism)"
+  "festival": "May: Yelagiri Summer Festival (Tamil Nadu Tourism)",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "hyderabad",
@@ -7714,7 +8450,12 @@
   "crowd": 2,
   "vibe": "Growing hostel and cafe scene, huge student/IT crowd - easy to find company.",
   "hub": "Major international airport (HYD) with direct flights nationwide.",
-  "festival": "Jul-Aug: Bonalu, Telangana's signature folk festival for Mahakali"
+  "festival": "Jul-Aug: Bonalu, Telangana's signature folk festival for Mahakali",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "warangal",
@@ -7759,7 +8500,11 @@
   "crowd": 1,
   "vibe": "A quiet day-trip circuit for history buffs - easy alone, but not much of a social scene.",
   "hub": "2.5-3h train or bus from Hyderabad; Ramappa a further 1.5h taxi.",
-  "festival": "Jan: Medaram Jatara (Sammakka-Saralamma), biennial tribal fair"
+  "festival": "Jan: Medaram Jatara (Sammakka-Saralamma), biennial tribal fair",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "agartala-unakoti",
@@ -7804,7 +8549,11 @@
   "crowd": 1,
   "vibe": "Overlooked capital — often the only visitor at Unakoti's carvings.",
   "hub": "Fly to Agartala; Unakoti is 3-4h drive via Kailashahar. No ILP.",
-  "festival": "Jul: Kharchi Puja, Tripura's major traditional festival"
+  "festival": "Jul: Kharchi Puja, Tripura's major traditional festival",
+  "modes": [
+   "flight",
+   "road"
+  ]
  },
  {
   "id": "agra",
@@ -7849,7 +8598,11 @@
   "solo": 3,
   "vibe": "Taj Ganj guesthouses cluster travelers together, though touts can be relentless",
   "hub": "Gatimaan/Shatabdi Express from Delhi 1h45m, or drive 3.5h",
-  "festival": "Feb: Taj Mahotsav"
+  "festival": "Feb: Taj Mahotsav",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "ayodhya",
@@ -7894,7 +8647,12 @@
   "solo": 2,
   "vibe": "Overwhelmingly a pilgrim crowd post-Ram Mandir — here for the temple, not socializing",
   "hub": "New Ayodhya airport direct flights, or train from Lucknow 2h",
-  "festival": "Oct/Nov: Deepotsav lamp festival"
+  "festival": "Oct/Nov: Deepotsav lamp festival",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "lucknow",
@@ -7939,7 +8697,12 @@
   "solo": 3,
   "vibe": "More food-and-heritage city than backpacker hub — solo dining beats meeting travelers",
   "hub": "Flights or train from Delhi 6-7h; well connected by air",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "varanasi",
@@ -7984,7 +8747,12 @@
   "solo": 4,
   "vibe": "Long-term travelers linger for weeks on the ghats; boat-sharing makes solo mixing easy",
   "hub": "Flights/trains from Delhi 12h; airport 25km from the ghats",
-  "festival": "Nov: Dev Deepawali"
+  "festival": "Nov: Dev Deepawali",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "vrindavan-mathura",
@@ -8029,7 +8797,11 @@
   "solo": 3,
   "vibe": "ISKCON's international devotees give this temple town a surprisingly easy-to-meet vibe",
   "hub": "Train Delhi to Mathura 2-3h, then auto to Vrindavan 15km",
-  "festival": "Mar: Holi, incl. Barsana's Lathmar Holi"
+  "festival": "Mar: Holi, incl. Barsana's Lathmar Holi",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "almora",
@@ -8074,7 +8846,10 @@
   "solo": 4,
   "vibe": "Quiet old bazaar; the real traveler scene is a short ride away in Kasar Devi's hostels",
   "hub": "Rail Kathgodam 90km, 3h shared taxi; or overnight Delhi bus 9-10h",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "auli",
@@ -8119,7 +8894,10 @@
   "solo": 2,
   "vibe": "Ski instructors and Delhi weekenders; here for slopes and cable car, not nightlife",
   "hub": "Fly Dehradun 280km or train Rishikesh, then 9-10h via Joshimath",
-  "festival": "Jan: Auli Winter Games"
+  "festival": "Jan: Auli Winter Games",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "binsar",
@@ -8164,7 +8942,10 @@
   "solo": 2,
   "vibe": "Near-silent forest — you'll likely have the trails and rest house to yourself",
   "hub": "Rail Kathgodam 120km, 4h taxi via Almora; no public bus inside",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "chakrata",
@@ -8209,7 +8990,10 @@
   "solo": 2,
   "vibe": "Barely visited even by Indian tourists — likely the only outsider at Tiger Falls",
   "hub": "Train Dehradun 90km, 3h taxi; foreigners need prior permission",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "chopta",
@@ -8254,7 +9038,10 @@
   "solo": 3,
   "vibe": "Trekkers swap trail stories in tiny dhabas — small but genuine traveler community",
   "hub": "Taxi/bus from Rishikesh or Haridwar 7-8h via Rudraprayag",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "kausani",
@@ -8298,7 +9085,10 @@
   "solo": 2,
   "vibe": "Mostly honeymooners chasing sunrise views; solo travelers may find few peers here",
   "hub": "Rail Kathgodam 135km, then 4-5h taxi via Almora; no direct air/rail",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "kedarnath",
@@ -8342,7 +9132,10 @@
   "solo": 3,
   "vibe": "Shoulder-to-shoulder with pilgrims on the climb — devotion, not a party circuit",
   "hub": "Bus/taxi to Sonprayag 9-10h, jeep to Gaurikund, 16km trek or heli",
-  "festival": "Apr/May: Kapat opening ceremony"
+  "festival": "Apr/May: Kapat opening ceremony",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "lansdowne",
@@ -8387,7 +9180,11 @@
   "solo": 2,
   "vibe": "Empty pine roads and military-town hush — solitude more than social mixing",
   "hub": "Train to Kotdwar 40km, then 1.5h taxi or shared jeep up",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mukteshwar",
@@ -8432,7 +9229,11 @@
   "solo": 3,
   "vibe": "Weekend paragliders from Delhi/Bengaluru; friendly, not much of a hostel scene",
   "hub": "Rail Kathgodam 50km, 2h taxi; easy day trip from Nainital",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "munsiyari",
@@ -8477,7 +9278,10 @@
   "solo": 2,
   "vibe": "A trekking basecamp of serious hikers; guesthouse owners become your main company",
   "hub": "Fly Kathgodam, then 8-9h drive via Almora; shared jeeps run",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "mussoorie",
@@ -8522,7 +9326,12 @@
   "solo": 3,
   "vibe": "Honeymooners throng Mall Road; solo travelers drift to quieter Landour nearby",
   "hub": "Fly/train Dehradun 35km, then 1h taxi up the hill",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "nainital",
@@ -8567,7 +9376,11 @@
   "solo": 3,
   "vibe": "Boating families crowd the lake; solo travelers escape to quieter Naina Peak trails",
   "hub": "Rail Kathgodam 35km or overnight Delhi bus 7-8h to town",
-  "festival": "Sep: Nanda Devi Mela"
+  "festival": "Sep: Nanda Devi Mela",
+  "modes": [
+   "train",
+   "road"
+  ]
  },
  {
   "id": "rishikesh",
@@ -8612,7 +9425,12 @@
   "solo": 5,
   "vibe": "Zostel dorms full of backpackers doing yoga by day, riverside chai by night",
   "hub": "Fly Dehradun 35km or overnight Delhi bus 6-7h; local auto-rickshaw",
-  "festival": "Mar: International Yoga Festival"
+  "festival": "Mar: International Yoga Festival",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "valley-of-flowers",
@@ -8657,7 +9475,10 @@
   "solo": 3,
   "vibe": "Trekkers and Hemkund Sahib pilgrims share the trail — good camaraderie in Ghangaria",
   "hub": "Drive Rishikesh to Govindghat 10h, trek 14km to Ghangaria (permit)",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "darjeeling",
@@ -8702,7 +9523,12 @@
   "crowd": 3,
   "vibe": "Backpacker cafés on Nehru Road; easy to link a Sikkim loop or Sandakphu trek.",
   "hub": "Fly Bagdogra, 3hr jeep up; or NJP rail for the toy train.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kalimpong",
@@ -8747,7 +9573,12 @@
   "crowd": 2,
   "vibe": "Slower than Darjeeling, fewer backpackers - good for a quiet reset.",
   "hub": "Bagdogra airport or NJP rail, then 1.5-2hr taxi/jeep.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "kolkata",
@@ -8792,7 +9623,12 @@
   "crowd": 3,
   "vibe": "Hostel common rooms, street-food crawls, easy to meet fellow backpackers.",
   "hub": "Major air/rail hub; direct flights and trains nationwide.",
-  "festival": "Oct: Durga Puja"
+  "festival": "Oct: Durga Puja",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ]
  },
  {
   "id": "mandarmani",
@@ -8836,7 +9672,10 @@
   "crowd": 3,
   "vibe": "Weekend crowd of Kolkata twenty-somethings, beach shacks and bonfires.",
   "hub": "3hr drive/bus from Kolkata via Digha Road.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "sandakphu",
@@ -8881,7 +9720,10 @@
   "crowd": 2,
   "vibe": "Teahouse trek, trekkers worldwide; a mandatory guide means you're never truly alone.",
   "hub": "Base in Darjeeling; jeep to Manebhanjan, guide compulsory.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  },
  {
   "id": "sundarbans",
@@ -8925,6 +9767,9 @@
   "crowd": 2,
   "vibe": "Little solo scene - most join a shared boat tour and bond over 3 days.",
   "hub": "2hr drive from Kolkata to Godkhali jetty, then boat in.",
-  "festival": ""
+  "festival": "",
+  "modes": [
+   "road"
+  ]
  }
 ]
