@@ -199,6 +199,21 @@ main { padding-top: var(--top-h); }
 .dot-off { background: var(--off); }
 .dot-avoid { background: var(--avoid); }
 
+/* Leaflet chrome follows the site theme (extra specificity to beat the
+   later-injected leaflet.css) */
+.screen-map .map-el .leaflet-bar a {
+  background: var(--panel); color: var(--ink); border-bottom-color: var(--line);
+}
+.screen-map .map-el .leaflet-bar a.leaflet-disabled { color: var(--muted); }
+.screen-map .map-el .leaflet-control-attribution {
+  background: color-mix(in srgb, var(--panel) 82%, transparent); color: var(--muted);
+}
+.screen-map .map-el .leaflet-control-attribution a { color: var(--muted); }
+.screen-map .map-el .leaflet-tooltip:not(.route-label) {
+  background: var(--panel); color: var(--ink); border-color: var(--line);
+}
+.screen-map .map-el .leaflet-tooltip-top:not(.route-label)::before { border-top-color: var(--line); }
+
 /* route labels on the map */
 .route-label {
   background: var(--panel); color: var(--ink);

@@ -1,5 +1,13 @@
 // The map IS the UI. Stateful Leaflet manager: season dots, the selected pick's
 // route arc from the origin, and dashed "onward" arcs to the pick's own next hops.
+//
+// Two things ported from humanconnect.online's map engine:
+// 1. Theme-aware CARTO basemap (voyager light / dark-matter dark), switched live.
+// 2. India-compliant borders: raster tiles bake in the international depiction of
+//    J&K / Aksai Chin / Arunachal, not the Survey of India one. We can't repaint
+//    tile pixels, so we draw India's official national boundary
+//    (data/india-border.geojson) as a thin line ON TOP, coloured to match the
+//    basemap's own admin lines — the presented border is India's official claim.
 import { seasonStatus, travelText } from './engine.js';
 import { themeOf } from './themes.js';
 
@@ -9,9 +17,15 @@ const SRI_JS = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
 const SRI_CSS = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
 
 const STATUS_COLOR = { peak: '#0f9d6e', shoulder: '#e8890c', off: '#98928a', avoid: '#d4482c' };
+const TILE_STYLES = { light: 'rastertiles/voyager_nolabels', dark: 'dark_nolabels' };
+// matches CARTO's own admin-boundary line colour in each style
+const BORDER_COLOR = { light: '#b3a59a', dark: '#5b5f66' };
+const ROUTE_COLOR = { light: '#0e7a6c', dark: '#2fae9c' };
+const CASING_OPACITY = { light: 0.85, dark: 0.5 };
 
-let map = null, dotsLayer = null, routeLayer = null, loading = null;
-let onSelect = null;
+let map = null, dotsLayer = null, routeLayer = null, tiles = null, borderLayer = null;
+let loading = null, onSelect = null;
+let theme = 'light';
 
 function loadLeaflet() {
   if (window.L) return Promise.resolve();
@@ -29,17 +43,59 @@ function loadLeaflet() {
   return loading;
 }
 
-export async function initMap(el, selectCallback) {
+function setTiles() {
+  const L = window.L;
+  if (tiles) map.removeLayer(tiles);
+  tiles = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${TILE_STYLES[theme]}/{z}/{x}/{y}{r}.png`, {
+    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19,
+  }).addTo(map);
+  tiles.bringToBack();
+}
+
+// India's official boundary on its own pane: above tiles (200), below overlays
+// (400). Failure is non-fatal — the map still works, just with tile borders.
+async function addIndiaBorder() {
+  try {
+    const res = await fetch('data/india-border.geojson');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const geo = await res.json();
+    const pane = map.createPane('india-border');
+    pane.style.zIndex = 250;
+    pane.style.pointerEvents = 'none';
+    borderLayer = window.L.geoJSON(geo, {
+      pane: 'india-border',
+      interactive: false,
+      style: {
+        color: BORDER_COLOR[theme], weight: 1, opacity: 0.95,
+        fill: false, lineJoin: 'round', lineCap: 'round',
+      },
+    }).addTo(map);
+  } catch (err) {
+    console.warn('India boundary overlay failed to load:', err);
+  }
+}
+
+// Switch basemap + border colour live (called on theme toggle / OS change).
+// The caller re-renders routes so arcs pick up the themed colour too.
+export function setMapTheme(t) {
+  theme = t === 'dark' ? 'dark' : 'light';
+  if (!map) return;
+  setTiles();
+  if (borderLayer) borderLayer.setStyle({ color: BORDER_COLOR[theme] });
+}
+
+export async function initMap(el, selectCallback, initialTheme = 'light') {
   await loadLeaflet();
   onSelect = selectCallback;
+  theme = initialTheme === 'dark' ? 'dark' : 'light';
   if (map) return;
   const L = window.L;
   map = L.map(el, { zoomControl: false, attributionControl: true, minZoom: 4, maxZoom: 13 });
   L.control.zoom({ position: 'topright' }).addTo(map);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19,
-  }).addTo(map);
+  map.attributionControl.setPrefix(false);
   map.setView([22.5, 80], 5);
+  setTiles();
+  addIndiaBorder();
   dotsLayer = L.layerGroup().addTo(map);
   routeLayer = L.layerGroup().addTo(map);
 }
@@ -86,7 +142,7 @@ export function updateMap(state) {
     const isSel = d.id === selId;
     const m = L.circleMarker([d.lat, d.lng], {
       radius: isSel ? 11 : (status === 'peak' ? 7.5 : 6),
-      color: '#fff', weight: isSel ? 3 : 1.5,
+      color: theme === 'dark' ? '#2a2a2a' : '#fff', weight: isSel ? 3 : 1.5,
       fillColor: STATUS_COLOR[status],
       fillOpacity: status === 'avoid' ? 0.5 : 0.95,
     });
@@ -107,8 +163,8 @@ export function updateMap(state) {
   if (origin && selected) {
     const a = [origin.lat, origin.lng], b = [selected.d.lat, selected.d.lng];
     const pts = arcPoints(a, b);
-    L.polyline(pts, { color: '#ffffff', weight: 7, opacity: 0.85, interactive: false }).addTo(routeLayer);
-    const line = L.polyline(pts, { color: '#0e7a6c', weight: 3.5, opacity: 0.95, interactive: false }).addTo(routeLayer);
+    L.polyline(pts, { color: '#ffffff', weight: 7, opacity: CASING_OPACITY[theme], interactive: false }).addTo(routeLayer);
+    const line = L.polyline(pts, { color: ROUTE_COLOR[theme], weight: 3.5, opacity: 0.95, interactive: false }).addTo(routeLayer);
     line.bindTooltip(`≈ ${travelText(selected.roadKm, selected.hours)}`, {
       permanent: true, direction: 'center', className: 'route-label', opacity: 1,
     });
@@ -117,7 +173,7 @@ export function updateMap(state) {
     for (const o of onward) {
       const opts2 = arcPoints(b, [o.d.lat, o.d.lng], 0.12);
       L.polyline(opts2, {
-        color: '#0e7a6c', weight: 2, opacity: 0.55, dashArray: '4 7', interactive: false,
+        color: ROUTE_COLOR[theme], weight: 2, opacity: 0.55, dashArray: '4 7', interactive: false,
       }).bindTooltip(`then ${o.d.name} · ${o.roadKm} km`, {
         permanent: true, direction: 'center', className: 'route-label route-label-onward',
       }).addTo(routeLayer);

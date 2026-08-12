@@ -6,7 +6,8 @@ CSS and JavaScript. It does not cover the destination catalogue.**
 | What | Where | Licence |
 | --- | --- | --- |
 | Software | `index.html`, `css/`, `js/` | MIT — see [LICENSE](LICENSE) |
-| Destination & holiday catalogue | `data/` | CC BY 4.0 — see below |
+| Destination & holiday catalogue | `data/destinations.json`, `data/holidays.json` | CC BY 4.0 — see below |
+| India boundary line | `data/india-border.geojson` | from [udit-001/india-maps-data](https://github.com/udit-001/india-maps-data) — see below |
 
 ## The destination catalogue
 
@@ -23,6 +24,17 @@ Suggested attribution:
 > (CC BY 4.0)
 
 **Full CC BY 4.0 text:** https://creativecommons.org/licenses/by/4.0/
+
+## The India boundary overlay
+
+Raster map tiles bake the international depiction of India's disputed borders
+into the image. To present the **Survey of India / official depiction**, the
+app draws India's national boundary on top of the tiles from
+`data/india-border.geojson` — geometry derived from the official-boundary
+dataset [udit-001/india-maps-data](https://github.com/udit-001/india-maps-data)
+(exterior mesh of the states layer, simplified), the same corrective approach
+used by [humanconnect.online](https://github.com/ForPublicOrg/humanconnect.online).
+That upstream dataset's own terms apply to the boundary geometry.
 
 ## What the repository does not contain
 

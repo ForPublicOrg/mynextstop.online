@@ -3,7 +3,7 @@ import { CATEGORY_THEME, themeOf, cardBackground } from './themes.js';
 import { CITIES, nearestCity } from './cities.js';
 import { locate, inIndia } from './geo.js';
 import { store } from './store.js';
-import { initMap, updateMap, nudgeMap } from './map.js';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js';
 
 // ————— state —————
 let DESTS = [];
@@ -181,7 +181,7 @@ async function enterMap() {
   $('screen-home').hidden = true;
   $('screen-map').hidden = false;
   try {
-    await initMap($('mapEl'), d => { S.pinned = d; S.idx = 0; render(true); });
+    await initMap($('mapEl'), d => { S.pinned = d; S.idx = 0; render(true); }, effectiveTheme());
   } catch {
     toast('Map failed to load — check your connection and refresh.');
     return;
@@ -531,14 +531,29 @@ function fillList(el, ids, emptyMsg, onRemove) {
 }
 
 // ————— theme / toast —————
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme') ||
+function effectiveTheme() {
+  return document.documentElement.getAttribute('data-theme') ||
     (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  const next = cur === 'dark' ? 'light' : 'dark';
+}
+
+function applyTheme(next) {
+  setMapTheme(next);                       // basemap + India-border colour
+  if (S.origin && !$('screen-map').hidden) render(false);  // arcs pick up themed colours
+}
+
+function toggleTheme() {
+  const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
   document.documentElement.style.colorScheme = next;
   store.theme = next;
+  applyTheme(next);
 }
+
+// follow OS theme flips while the user hasn't made an explicit choice
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (document.documentElement.getAttribute('data-theme')) return;
+  applyTheme(e.matches ? 'dark' : 'light');
+});
 
 let toastTimer = null;
 function toast(msg) {
