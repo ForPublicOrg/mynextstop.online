@@ -2,23 +2,25 @@
 // (icon name === category key). The first category decides a card's look.
 import { icon } from './icons.js';
 
+// Gradient stops are kept dark enough that solid white text passes WCAG AA
+// (~4.5:1) on the lighter stop — don't brighten these without re-checking.
 export const CATEGORY_THEME = {
-  mountains:  { g: ['#16324f', '#3a7ca5'], label: 'Mountains' },
-  beach:      { g: ['#075985', '#0ea5e9'], label: 'Beach' },
+  mountains:  { g: ['#16324f', '#2f5f80'], label: 'Mountains' },
+  beach:      { g: ['#0c4a6e', '#0369a1'], label: 'Beach' },
   heritage:   { g: ['#7c2d12', '#c2410c'], label: 'Heritage' },
-  spiritual:  { g: ['#5b21b6', '#8b5cf6'], label: 'Spiritual' },
+  spiritual:  { g: ['#4c1d95', '#6d28d9'], label: 'Spiritual' },
   wildlife:   { g: ['#14532d', '#15803d'], label: 'Wildlife' },
-  trek:       { g: ['#1e3a8a', '#3b82f6'], label: 'Trek' },
-  backpacker: { g: ['#9d174d', '#ec4899'], label: 'Backpacker' },
-  desert:     { g: ['#92400e', '#d97706'], label: 'Desert' },
-  island:     { g: ['#115e59', '#14b8a6'], label: 'Island' },
-  lake:       { g: ['#155e75', '#0891b2'], label: 'Lakes' },
-  waterfall:  { g: ['#164e63', '#06b6d4'], label: 'Waterfalls' },
+  trek:       { g: ['#1e3a8a', '#1d4ed8'], label: 'Trek' },
+  backpacker: { g: ['#831843', '#be185d'], label: 'Backpacker' },
+  desert:     { g: ['#78350f', '#b45309'], label: 'Desert' },
+  island:     { g: ['#134e4a', '#0f766e'], label: 'Island' },
+  lake:       { g: ['#155e75', '#0e7490'], label: 'Lakes' },
+  waterfall:  { g: ['#164e63', '#12809c'], label: 'Waterfalls' },
   city:       { g: ['#1f2937', '#4b5563'], label: 'City' },
-  offbeat:    { g: ['#312e81', '#6366f1'], label: 'Offbeat' },
-  party:      { g: ['#86198f', '#d946ef'], label: 'Party' },
-  culture:    { g: ['#9a3412', '#ea8a0c'], label: 'Culture' },
-  snow:       { g: ['#1e40af', '#60a5fa'], label: 'Snow' },
+  offbeat:    { g: ['#312e81', '#4338ca'], label: 'Offbeat' },
+  party:      { g: ['#701a75', '#a21caf'], label: 'Party' },
+  culture:    { g: ['#7c2d12', '#b45309'], label: 'Culture' },
+  snow:       { g: ['#1c3d8f', '#2b5cc4'], label: 'Snow' },
 };
 
 export function themeOf(d) {

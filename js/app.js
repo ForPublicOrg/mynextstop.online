@@ -9,7 +9,9 @@ import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js';
 // ————— state —————
 let DESTS = [];
 let HOLIDAYS = [];
-const now = new Date();
+// IST "today", regardless of device timezone — the whole product (season
+// windows, holidays.json dates) is defined in Indian time.
+const now = (() => { const d = new Date(); return new Date(d.getTime() + (330 + d.getTimezoneOffset()) * 60000); })();
 const S = {
   origin: store.origin,            // {name, lat, lng}
   month: now.getMonth() + 1,       // 1-12, defaults to "now"
@@ -60,6 +62,26 @@ async function init() {
   }
 
   buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
+
+  // CTAs stay disabled until the catalogue is in memory — a cached GPS fix
+  // can resolve faster than the fetch and would rank an empty list
+  $('btnLocate').disabled = false;
+  $('btnManual').disabled = false;
+
+  // keep the origin dialog's input above the iOS keyboard: the keyboard
+  // shrinks only the visual viewport, not the layout viewport fixed
+  // elements use, so nudge the dialog up by the difference
+  const vv = window.visualViewport;
+  if (vv) {
+    const dlg = $('originDlg');
+    const adjust = () => {
+      if (!dlg.hasAttribute('open')) return;
+      dlg.style.bottom = Math.max(0, window.innerHeight - vv.height - vv.offsetTop) + 'px';
+    };
+    vv.addEventListener('resize', adjust);
+    vv.addEventListener('scroll', adjust);
+    dlg.addEventListener('close', () => { dlg.style.bottom = ''; });
+  }
 
   if (S.origin) enterMap();
 }
@@ -186,7 +208,10 @@ async function enterMap() {
   try {
     await initMap($('mapEl'), d => { S.pinned = d; S.idx = 0; render(true); }, effectiveTheme());
   } catch {
-    toast('Map failed to load — check your connection and refresh.');
+    // don't strand the user on a blank map screen — back to home, retryable
+    $('screen-map').hidden = true;
+    $('screen-home').hidden = false;
+    toast('Map failed to load — check your connection and tap Find again.');
     return;
   }
   nudgeMap();
@@ -431,8 +456,9 @@ function renderSheet(item) {
   };
   $('actBeen').onclick = () => {
     store.toggleBeen(d.id);
-    toast(`Nice ✓ — ${d.name} won't be suggested again`);
+    toast(`Done — ${d.name} won't be suggested again`);
     S.pinned = null;
+    S.idx = 0;  // ranked list just shrank; restart from the top pick
     render(true);
   };
 
@@ -475,8 +501,10 @@ function wireSheetDrag() {
   const sheet = $('sheet');
   let startY = null, startExpanded = false;
   const onDown = e => {
-    // only drag from the handle / card header area, never from buttons or the scrolling alt grid
-    if (e.target.closest('.sheet-acts, .alt-grid, a, .btn')) return;
+    // drag ONLY from the handle or the collapsed peek — the expanded body
+    // scrolls, and a drag gesture there must scroll, not collapse the sheet
+    if (!e.target.closest('#sheetHandle, .sheet-peek')) return;
+    if (e.target.closest('.btn, a')) return;
     startY = (e.touches ? e.touches[0] : e).clientY;
     startExpanded = sheet.classList.contains('is-expanded');
   };

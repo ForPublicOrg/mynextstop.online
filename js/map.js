@@ -36,7 +36,10 @@ function loadLeaflet() {
     document.head.appendChild(css);
     const js = document.createElement('script');
     js.src = LEAFLET_JS; js.integrity = SRI_JS; js.crossOrigin = 'anonymous';
-    js.onload = resolve; js.onerror = () => reject(new Error('leaflet failed'));
+    js.onload = resolve;
+    // reset the cache on failure so a later tap can retry instead of
+    // replaying the same rejected promise forever
+    js.onerror = () => { loading = null; reject(new Error('leaflet failed')); };
     document.head.appendChild(js);
   });
   return loading;
