@@ -1,5 +1,5 @@
 import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js';
-import { CATEGORY_LABEL, catBadge } from './themes.js';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground } from './themes.js';
 import { icon } from './icons.js';
 import { CITIES, nearestCity } from './cities.js';
 import { locate, inIndia } from './geo.js';
@@ -44,10 +44,21 @@ function cleanDest(d) {
 // ----- boot -----
 init();
 async function init() {
+  // the GPU-stall redirect carries the month so a December browse survives it
+  const qm = +new URLSearchParams(location.search).get('m');
+  if (qm >= 1 && qm <= 12) S.month = qm;
+
   paintThemeBtns();
   buildMonthSel();
   buildDistChips();
   wireEvents();
+
+  try {
+    if (sessionStorage.getItem('mns-stall-redirect')) {
+      sessionStorage.removeItem('mns-stall-redirect');
+      toast('This device has trouble drawing the 3D globe, so you get the flat map.');
+    }
+  } catch { /* private mode */ }
 
   try {
     const [d, h] = await Promise.all([
@@ -429,23 +440,25 @@ function renderSheet(item) {
     </div>
 
     <div class="sheet-full">
-      <div class="card-head">
-        ${catBadge(d)}
-        <div class="card-head-main">
-          <h2 class="card-name">${d.name}</h2>
-          <div class="card-state">${d.state} · ${d.tagline}</div>
+      <div class="sheet-card" style="background:${cardBackground(d)}">
+        <div class="card-head">
+          <span class="card-glyph">${catIcon(d)}</span>
+          <div class="card-head-main">
+            <h2 class="card-name">${d.name}</h2>
+            <div class="card-state">${d.state} · ${d.tagline}</div>
+          </div>
         </div>
-      </div>
-      <div class="badge-row">${statusBadge}${festBadge}${lwBadge}</div>
-      <div class="card-dist">${icon('pin')} ${travelText(roadKm, hours)} from ${S.origin.name}</div>
-      <div class="why">${why}</div>
-      <div class="facts">
-        <span class="fact">${icon('calendar')} ${d.days}${d.days === 1 ? ' day' : '+ days'}</span>
-        <span class="fact">${'₹'.repeat(d.budget || 2)}</span>
-        <span class="fact">${icon('backpack')} solo ${d.solo}/5</span>
-        ${d.crowd ? `<span class="fact">${icon('users')} ${['quiet', 'moderate', 'packed'][d.crowd - 1] || 'moderate'}</span>` : ''}
-        ${d.alt > 500 ? `<span class="fact">${icon('peak')} ${d.alt.toLocaleString('en-IN')} m</span>` : ''}
-        ${modeFacts(d)}
+        <div class="badge-row">${statusBadge}${festBadge}${lwBadge}</div>
+        <div class="card-dist">${icon('pin')} ${travelText(roadKm, hours)} from ${S.origin.name}</div>
+        <div class="why">${why}</div>
+        <div class="facts">
+          <span class="fact">${icon('calendar')} ${d.days}${d.days === 1 ? ' day' : '+ days'}</span>
+          <span class="fact">${'₹'.repeat(d.budget || 2)}</span>
+          <span class="fact">${icon('backpack')} solo ${d.solo}/5</span>
+          ${d.crowd ? `<span class="fact">${icon('users')} ${['quiet', 'moderate', 'packed'][d.crowd - 1] || 'moderate'}</span>` : ''}
+          ${d.alt > 500 ? `<span class="fact">${icon('peak')} ${d.alt.toLocaleString('en-IN')} m</span>` : ''}
+          ${modeFacts(d)}
+        </div>
       </div>
 
       <div class="sheet-actions">
@@ -466,7 +479,7 @@ function renderSheet(item) {
 
       <div class="sheet-alts">
         <div class="alt-head"><h3>Also in reach</h3><span class="alt-count">${S.ranked.length} in range</span></div>
-        <div class="alt-list" id="altList"></div>
+        <div class="alt-grid" id="altList"></div>
       </div>
     </div>`;
 
@@ -496,14 +509,13 @@ function renderSheet(item) {
     const it = S.ranked[j];
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'alt-row';
+    b.className = 'alt-card';
+    b.style.background = cardBackground(it.d);
     b.innerHTML = `
-      ${catBadge(it.d)}
-      <span class="alt-main">
-        <span class="alt-name">${it.d.name}</span>
-        <span class="alt-sub">${it.roadKm} km · ${it.d.state}</span>
-      </span>
-      <i class="alt-status" style="background:${STATUS_VAR[it.status] || 'var(--off)'}"></i>`;
+      <i class="alt-status" style="background:${STATUS_VAR[it.status] || 'var(--off)'}"></i>
+      <span class="alt-glyph">${catIcon(it.d)}</span>
+      <span class="alt-name">${it.d.name}</span>
+      <span class="alt-sub">${it.roadKm} km · ${it.d.state}</span>`;
     b.onclick = () => { S.pinned = null; S.idx = j; toggleSheet(false); render(true); };
     list.appendChild(b);
   }
@@ -761,6 +773,11 @@ function toggleTheme() {
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
   if (document.documentElement.getAttribute('data-theme')) return;
   applyTheme(e.matches ? 'dark' : 'light');
+});
+
+// even the flat map can't draw on this GPU: the picks themselves still work
+window.addEventListener('mns:map-stalled', () => {
+  toast('This device can’t draw the map, but your picks below still work.');
 });
 
 let toastTimer = null;

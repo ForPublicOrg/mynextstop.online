@@ -3,6 +3,13 @@
 // selected pick's route arc and dashed onward arcs, plus HTML markers for the
 // origin dot, the route distance pill and the selected place name.
 //
+// Globe safety net: some Windows GPU drivers wedge the compositor on the
+// globe pipeline (main thread keeps running, requestAnimationFrame stops,
+// canvas freezes). A heartbeat watchdog spots the stall and redirects once
+// to the flat map, then remembers via localStorage. URL overrides for
+// support: ?flat forces mercator, ?globe retries globe, ?nosky drops the
+// atmosphere.
+//
 // India-compliant borders: raster tiles bake in the international depiction of
 // J&K / Aksai Chin / Arunachal, not the Survey of India one. We can't repaint
 // tile pixels, so India's official national boundary (data/india-border.geojson)
@@ -25,12 +32,24 @@ const DOT_STROKE = { light: '#ffffff', dark: '#23262b' };
 const SPACE_COLOR = { light: '#dfe6ec', dark: '#07090c' };
 
 const EMPTY = { type: 'FeatureCollection', features: [] };
+const FLAT_KEY = 'mns-flat';
 
-let map = null, loading = null, onSelect = null;
+let map = null, loading = null, onSelect = null, containerEl = null;
 let theme = 'light';
 let byId = new Map();         // dest id -> destination (for click handling)
 let dotsSig = '';             // month|selectedId the dots source was built for
 let originMarker = null, labelMarker = null, nameMarker = null, hoverPopup = null;
+let pendingState = null;      // state pushed before the style was ready
+let lastMonth = 0;            // carried through the stall redirect
+
+const qs = new URLSearchParams(location.search);
+if (qs.has('globe')) { try { localStorage.removeItem(FLAT_KEY); } catch { /* private mode */ } }
+const NO_SKY = qs.has('nosky');
+function wantFlat() {
+  if (qs.has('flat')) return true;
+  if (qs.has('globe')) return false;
+  try { return localStorage.getItem(FLAT_KEY) === '1'; } catch { return false; }
+}
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -83,11 +102,10 @@ const SEL = ['boolean', ['get', 'sel'], false];
 const dotRadius = (sel, peak, other) => ['case', SEL, sel,
   ['match', ['get', 'status'], 'peak', peak, other]];
 
-function baseStyle() {
-  return {
+function baseStyle(projection) {
+  const style = {
     version: 8,
-    projection: { type: 'globe' },
-    sky: skyFor(theme),
+    projection: { type: projection },
     sources: {
       'carto-light': { type: 'raster', tiles: tileUrls(TILE_STYLES.light), tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap © CARTO' },
       'carto-dark': { type: 'raster', tiles: tileUrls(TILE_STYLES.dark), tileSize: 256, maxzoom: 19, attribution: '© OpenStreetMap © CARTO' },
@@ -123,7 +141,7 @@ function baseStyle() {
             ['match', ['get', 'status'], 'peak', 2, 'shoulder', 1, 0]],
         },
         paint: {
-          // dots grow with zoom so the zoomed-out globe stays readable
+          // dots grow with zoom so the zoomed-out view stays readable
           'circle-radius': ['interpolate', ['linear'], ['zoom'],
             3, dotRadius(7, 3.6, 3),
             6, dotRadius(11, 6.5, 5.5),
@@ -138,6 +156,8 @@ function baseStyle() {
       },
     ],
   };
+  if (projection === 'globe' && !NO_SKY) style.sky = skyFor(theme);
+  return style;
 }
 
 // India's official boundary, under the route arcs. Failure is non-fatal:
@@ -175,7 +195,7 @@ export function setMapTheme(t) {
   map.setPaintProperty('route-onward', 'line-color', ROUTE_COLOR[theme]);
   map.setPaintProperty('dots', 'circle-stroke-color', DOT_STROKE[theme]);
   if (map.getLayer('india-border')) map.setPaintProperty('india-border', 'line-color', BORDER_COLOR[theme]);
-  map.setSky(skyFor(theme));
+  if (map.getProjection && map.getProjection().type === 'globe' && !NO_SKY) map.setSky(skyFor(theme));
 }
 
 export async function initMap(el, selectCallback, initialTheme = 'light') {
@@ -183,14 +203,20 @@ export async function initMap(el, selectCallback, initialTheme = 'light') {
   onSelect = selectCallback;
   theme = initialTheme === 'dark' ? 'dark' : 'light';
   if (map) return;
+  containerEl = el;
+  createMap(wantFlat() ? 'mercator' : 'globe');
+}
+
+function createMap(projection) {
   const ml = window.maplibregl;
+  const globe = projection === 'globe';
 
   map = new ml.Map({
-    container: el,
-    style: baseStyle(),
+    container: containerEl,
+    style: baseStyle(projection),
     center: [80.5, 22.5],
-    zoom: 3.2,
-    minZoom: 1.5,
+    zoom: globe ? 3.2 : 4.1,
+    minZoom: globe ? 1.5 : 3.4,
     maxZoom: 13,
     attributionControl: false,
   });
@@ -225,9 +251,67 @@ export async function initMap(el, selectCallback, initialTheme = 'light') {
   map.on('load', flushPending);
   map.once('load', addIndiaBorder);
   if (location.hostname === 'localhost') window.__map = map;  // dev-only probe
+
+  watchRendering(globe);
 }
 
-let pendingState = null;
+// GPU hangs leave JS running while requestAnimationFrame never fires,
+// sometimes only after the first frame (the wedge hits when tiles reach the
+// globe pipeline). Heartbeat on raf; if a visible tab goes 4s without a
+// frame, the compositor is stuck. It cannot be revived in-page (a fresh map
+// on a new context stays frozen too, verified), so recovery needs a fresh
+// document: on globe, redirect once to ?flat=1 (loop-proof: ?flat skips
+// straight to mercator) and remember in localStorage. If even the flat map
+// stalls, tell the app so the UI can say the picks still work without it.
+function watchRendering(globe) {
+  let healthyMs = 0;                      // accumulated visible-and-beating time
+  let lastTick = performance.now();       // last raf heartbeat
+  let lastInterval = performance.now();   // last watchdog tick
+  let rafId = requestAnimationFrame(function beat() {
+    lastTick = performance.now();
+    rafId = requestAnimationFrame(beat);
+  });
+  // raf legitimately pauses while hidden: restart the clock on return
+  const onVis = () => { lastTick = performance.now(); };
+  document.addEventListener('visibilitychange', onVis);
+  const stop = () => {
+    clearInterval(timer);
+    cancelAnimationFrame(rafId);
+    document.removeEventListener('visibilitychange', onVis);
+  };
+  const timer = setInterval(() => {
+    if (!map) { stop(); return; }
+    const now = performance.now();
+    const gap = now - lastInterval;
+    lastInterval = now;
+    // the interval froze too: that was a main-thread pause (breakpoint,
+    // long task, timer throttling), not a compositor stall: don't judge
+    if (gap > 2500) { lastTick = now; return; }
+    if (document.visibilityState !== 'visible') return;
+    if (now - lastTick > 4000) {
+      stop();
+      if (globe) {
+        console.warn('globe rendering stalled on this GPU; switching to the flat map');
+        try { localStorage.setItem(FLAT_KEY, '1'); } catch { /* private mode */ }
+        try { sessionStorage.setItem('mns-stall-redirect', '1'); } catch { /* private mode */ }
+        const u = new URL(location.href);
+        u.searchParams.delete('globe');   // would re-clear the flag on load
+        u.searchParams.set('flat', '1');
+        if (lastMonth) u.searchParams.set('m', String(lastMonth));
+        location.replace(u);
+      } else {
+        console.warn('map rendering stalled on this GPU');
+        window.dispatchEvent(new CustomEvent('mns:map-stalled'));
+      }
+      return;
+    }
+    // retire only after 45s of PROVEN healthy rendering while visible;
+    // wall-clock time proves nothing for hidden or still-loading tabs
+    if (now - lastTick < 2000) healthyMs += gap;
+    if (healthyMs > 45000) stop();
+  }, 1000);
+}
+
 function styleReady() {
   try { return !!(map.getSource('dests') && map.getSource('route')); }
   catch { return false; }
@@ -270,6 +354,7 @@ function htmlMarker(className, html) {
  */
 export function updateMap(state) {
   if (!map) return;
+  lastMonth = state.month;
   if (!styleReady()) { pendingState = state; return; }
   const ml = window.maplibregl;
   const { dests, month, origin, selected, onward = [], fit = false } = state;
