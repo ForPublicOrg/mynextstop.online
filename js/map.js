@@ -25,6 +25,13 @@ const CASING_OPACITY = { light: 0.85, dark: 0.5 };
 let map = null, dotsLayer = null, routeLayer = null, tiles = null, borderLayer = null;
 let loading = null, onSelect = null;
 let theme = 'light';
+// season dots are cached and patched in place — rebuilding 200 markers on
+// every "Next" tap was DOM/GC churn for a change that touches two dots
+let dotMarkers = new Map();   // dest id → { marker, status }
+let dotsSig = '';             // month|theme the cache was built for
+let selectedId = null;
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function loadLeaflet() {
   if (window.L) return Promise.resolve();
@@ -84,6 +91,7 @@ export function setMapTheme(t) {
   if (!map) return;
   setTiles();
   if (borderLayer) borderLayer.setStyle({ color: BORDER_COLOR[theme] });
+  dotsSig = '';  // dot ring colour is theme-dependent — next update rebuilds
 }
 
 export async function initMap(el, selectCallback, initialTheme = 'light') {
@@ -92,7 +100,9 @@ export async function initMap(el, selectCallback, initialTheme = 'light') {
   theme = initialTheme === 'dark' ? 'dark' : 'light';
   if (map) return;
   const L = window.L;
-  map = L.map(el, { zoomControl: false, attributionControl: true, minZoom: 4, maxZoom: 13 });
+  // canvas renderer: 200 season dots are strokes on one canvas instead of
+  // 200 SVG nodes — pans/zooms stay smooth and updates don't touch the DOM
+  map = L.map(el, { zoomControl: false, attributionControl: true, minZoom: 4, maxZoom: 13, preferCanvas: true });
   L.control.zoom({ position: 'topright' }).addTo(map);
   map.attributionControl.setPrefix(false);
   map.setView([22.5, 80], 5);
@@ -119,6 +129,51 @@ function arcPoints(a, b, curvature = 0.15) {
   return pts;
 }
 
+function dotStyle(status) {
+  return {
+    radius: status === 'peak' ? 7.5 : 6,
+    color: theme === 'dark' ? '#2a2a2a' : '#fff', weight: 1.5,
+    fillColor: STATUS_COLOR[status],
+    fillOpacity: status === 'avoid' ? 0.5 : 0.95,
+  };
+}
+
+// season dots — every destination, always visible: the map is the catalogue.
+// Built once per (month, theme); selection changes just restyle two markers.
+function drawDots(dests, month) {
+  const L = window.L;
+  const sig = month + '|' + theme;
+  if (sig === dotsSig && dotMarkers.size) return;
+  dotMarkers.clear();
+  dotsLayer.clearLayers();
+  for (const d of dests) {
+    const status = seasonStatus(d, month);
+    const m = L.circleMarker([d.lat, d.lng], dotStyle(status));
+    m.bindTooltip(d.name, { direction: 'top', offset: [0, -8], opacity: 0.94 });
+    m.on('click', () => onSelect && onSelect(d));
+    m.addTo(dotsLayer);
+    dotMarkers.set(d.id, { marker: m, status });
+  }
+  dotsSig = sig;
+  selectedId = null;
+}
+
+function setSelectedDot(id) {
+  if (id === selectedId) return;
+  const prev = dotMarkers.get(selectedId);
+  if (prev) {
+    prev.marker.setStyle({ weight: 1.5 });
+    prev.marker.setRadius(dotStyle(prev.status).radius);
+  }
+  const next = dotMarkers.get(id);
+  if (next) {
+    next.marker.setStyle({ weight: 3 });
+    next.marker.setRadius(11);
+    next.marker.bringToFront();
+  }
+  selectedId = id;
+}
+
 /**
  * Redraw everything. state:
  *  { dests, month, origin, selected: {d, roadKm, hours, status} | null,
@@ -128,30 +183,15 @@ export function updateMap(state) {
   if (!map) return;
   const L = window.L;
   const { dests, month, origin, selected, onward = [], fit = false } = state;
-  const selId = selected ? selected.d.id : null;
 
   // cancel any in-flight fly animation and explicitly unbind tooltips —
   // permanent tooltips can survive clearLayers() mid-animation
   map.stop();
-  for (const layer of [dotsLayer, routeLayer]) {
-    layer.eachLayer(l => { if (l.getTooltip && l.getTooltip()) l.unbindTooltip(); });
-    layer.clearLayers();
-  }
+  routeLayer.eachLayer(l => { if (l.getTooltip && l.getTooltip()) l.unbindTooltip(); });
+  routeLayer.clearLayers();
 
-  // season dots — every destination, always visible: the map is the catalogue
-  for (const d of dests) {
-    const status = seasonStatus(d, month);
-    const isSel = d.id === selId;
-    const m = L.circleMarker([d.lat, d.lng], {
-      radius: isSel ? 11 : (status === 'peak' ? 7.5 : 6),
-      color: theme === 'dark' ? '#2a2a2a' : '#fff', weight: isSel ? 3 : 1.5,
-      fillColor: STATUS_COLOR[status],
-      fillOpacity: status === 'avoid' ? 0.5 : 0.95,
-    });
-    m.bindTooltip(d.name, { direction: 'top', offset: [0, -8], opacity: 0.94 });
-    m.on('click', () => onSelect && onSelect(d));
-    m.addTo(dotsLayer);
-  }
+  drawDots(dests, month);
+  setSelectedDot(selected ? selected.d.id : null);
 
   // origin: you are here
   if (origin) {
@@ -183,17 +223,32 @@ export function updateMap(state) {
     if (fit) {
       const bounds = L.latLngBounds([a, b]);
       for (const o of onward) bounds.extend([o.d.lat, o.d.lng]);
-      map.flyToBounds(bounds, {
+      const pads = {
         paddingTopLeft: [36, 76],
         paddingBottomRight: [36, Math.min(window.innerHeight * 0.3, 240)],
-        duration: 0.8, maxZoom: 9,
+        maxZoom: 9,
+      };
+      safeFit(() => {
+        if (reducedMotion()) map.fitBounds(bounds, { ...pads, animate: false });
+        else map.flyToBounds(bounds, { ...pads, duration: 0.7 });
       });
     }
   } else if (fit && origin) {
-    map.flyTo([origin.lat, origin.lng], 6, { duration: 0.8 });
+    safeFit(() => {
+      if (reducedMotion()) map.setView([origin.lat, origin.lng], 6, { animate: false });
+      else map.flyTo([origin.lat, origin.lng], 6, { duration: 0.7 });
+    });
   }
+}
 
-  setTimeout(() => map.invalidateSize(), 80);
+// A camera move is cosmetic — it must never break a render. Leaflet's fly
+// math can NaN when the container size is degenerate (first paint racing
+// layout, mid-rotation resizes); state is already correct, so skip the move
+// and let the next interaction re-fit.
+function safeFit(run) {
+  const size = map.getSize();
+  if (!size.x || !size.y) return;
+  try { run(); } catch { /* skip the animation, keep the state */ }
 }
 
 export function nudgeMap() {

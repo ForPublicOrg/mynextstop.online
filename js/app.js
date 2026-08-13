@@ -200,7 +200,7 @@ function wireDlgFallback(dlg) {
   });
 }
 function dialogOpen() {
-  return $('originDlg').hasAttribute('open') || $('savedDlg').hasAttribute('open');
+  return $('originDlg').hasAttribute('open') || $('savedDlg').hasAttribute('open') || $('filterDlg').hasAttribute('open');
 }
 
 // ————— screens —————
@@ -350,16 +350,16 @@ function render(fit = false) {
 
 function renderSheet(item) {
   const body = $('sheetBody');
-  const sheet = $('sheet');
 
   if (!item) {
-    sheet.classList.remove('is-expanded');
     body.innerHTML = `
       <div class="sheet-empty">
         <b>Nothing honest to suggest in this range.</b>
         Everything within reach is off-limits in ${MONTHS[S.month - 1]} or filtered out —
         open <b>Filters</b> to widen the range, or tap any dot to inspect it.
       </div>`;
+    setSheetState(false, true);
+    measurePeek();
     return;
   }
 
@@ -489,6 +489,8 @@ function renderSheet(item) {
     grid.appendChild(b);
   }
   if (!grid.children.length) grid.innerHTML = '<p class="saved-empty">Nothing else in this range — widen it or change the month.</p>';
+
+  measurePeek();
 }
 
 function nextPick() {
@@ -506,44 +508,141 @@ function prevPick() {
   render(true);
 }
 
-// ————— bottom sheet expand/collapse —————
+// ————— bottom sheet: transform-only, finger-driven —————
+// The sheet is a fixed-height panel slid via translateY, so every frame of a
+// toggle or drag is compositor work only. Two classes with different lifetimes:
+// .is-expanded is the target position; .show-full is the content, kept on
+// through a collapse so the card is still visible while it slides away.
+let sheetSettleTimer = null;
+let sheetCollapsedY = 0;  // px the sheet sits below translateY(0) when collapsed
+
+// Collapsed offset = sheet height − peek height. Measured after each render
+// (content-dependent). The resting transform is applied inline in px — the
+// CSS transition animates it; a calc(var()) transform is not reliably
+// re-resolved by Chrome when the variable changes.
+function measurePeek() {
+  const sheet = $('sheet'), body = $('sheetBody');
+  if (!sheet.clientHeight) return;  // map screen hidden — keep last value
+  const hadFull = sheet.classList.contains('show-full');
+  if (hadFull) sheet.classList.remove('show-full');
+  const ref = $('sheetPeek') || body.firstElementChild;
+  if (ref) {
+    const pad = parseFloat(getComputedStyle(body).paddingBottom) || 12;
+    let h = ref.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top + pad;
+    h = Math.min(Math.round(h), Math.round(sheet.clientHeight * 0.45));
+    sheetCollapsedY = Math.max(0, sheet.offsetHeight - h);
+  }
+  if (hadFull) sheet.classList.add('show-full');
+  // apply immediately — retargeting an in-flight snap keeps it one smooth
+  // motion; only an active finger drag owns the transform exclusively
+  if (!sheet.classList.contains('is-dragging')) applySheetTransform();
+}
+
+function applySheetTransform() {
+  const sheet = $('sheet');
+  sheet.style.transform = sheet.classList.contains('is-expanded')
+    ? 'translateY(0px)' : `translateY(${sheetCollapsedY}px)`;
+}
+
+function setSheetState(expand, instant = false) {
+  const sheet = $('sheet');
+  clearTimeout(sheetSettleTimer);
+  if (expand) sheet.classList.add('show-full');
+  sheet.classList.toggle('is-expanded', expand);
+  applySheetTransform();
+  $('sheetHandle').setAttribute('aria-label', expand ? 'Collapse details' : 'Expand details');
+  // reduced motion kills the transition, so the move IS instant — settle now
+  // rather than leaving the full card cropped in the peek strip for 400ms
+  if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { settleSheet(); return; }
+  sheet.classList.add('is-moving');
+  // transitionend is the normal path; the timer is a safety net
+  sheetSettleTimer = setTimeout(settleSheet, 400);
+}
+function settleSheet() {
+  const sheet = $('sheet');
+  sheet.classList.remove('is-moving');
+  if (!sheet.classList.contains('is-expanded')) sheet.classList.remove('show-full');
+  applySheetTransform();  // pick up any re-measure that happened mid-flight
+}
+
 function toggleSheet(force) {
   const sheet = $('sheet');
-  const on = force !== undefined ? force : !sheet.classList.contains('is-expanded');
-  sheet.classList.toggle('is-expanded', on);
-  $('sheetHandle').setAttribute('aria-label', on ? 'Collapse details' : 'Expand details');
+  setSheetState(force !== undefined ? force : !sheet.classList.contains('is-expanded'));
 }
 
 function wireSheetDrag() {
-  // Whole-sheet drag with bottom-sheet physics:
-  // - collapsed: drag up anywhere on the sheet expands it
-  // - expanded: drag down collapses it ONLY when the content is scrolled to
-  //   the top — otherwise the gesture is a scroll and we stay out of its way
-  // Taps are unaffected (46px movement threshold), so buttons keep working.
+  // Real bottom-sheet physics: the sheet follows the finger 1:1 and snaps on
+  // release by position + velocity. The first ~9px decide whether the gesture
+  // is a sheet drag or a content scroll; scrolls are left entirely native.
   const sheet = $('sheet');
   const body = $('sheetBody');
-  const y = e => (e.touches ? e.touches[0] : e).clientY;
-  let startY = null, startScrollTop = 0;
-  const onDown = e => {
-    startY = y(e);
-    startScrollTop = body.scrollTop;
+  const pt = e => (e.touches && e.touches.length ? e.touches[0] : e);
+  let sy = 0, sx = 0, mode = null;            // null | 'drag' | 'scroll'
+  let base = 0, range = 0, cur = 0;
+  let lastY = 0, lastT = 0, vel = 0, raf = 0, mouseOn = false;
+
+  sheet.addEventListener('transitionend', e => {
+    if (e.target === sheet && e.propertyName === 'transform') { clearTimeout(sheetSettleTimer); settleSheet(); }
+  });
+
+  const start = e => {
+    const p = pt(e);
+    sy = p.clientY; sx = p.clientX;
+    lastY = sy; lastT = e.timeStamp; vel = 0; mode = null;
   };
-  const onMove = e => {
-    if (startY === null) return;
-    const dy = y(e) - startY;
-    if (Math.abs(dy) < 46) return;
-    const expanded = sheet.classList.contains('is-expanded');
-    if (!expanded && dy < 0) toggleSheet(true);
-    else if (expanded && dy > 0 && startScrollTop <= 1 && body.scrollTop <= 1) toggleSheet(false);
-    startY = null; // one decision per gesture; anything else is a scroll
+  const move = e => {
+    if (mode === 'scroll') return;
+    const p = pt(e);
+    const dy = p.clientY - sy, dx = p.clientX - sx;
+    if (mode === null) {
+      if (Math.abs(dy) < 9 && Math.abs(dx) < 9) return;
+      const expanded = sheet.classList.contains('is-expanded');
+      const vertical = Math.abs(dy) > Math.abs(dx) * 1.2;
+      // expanded + content scrolled (or an upward pull) = a scroll, not a drag
+      if (!vertical || (expanded && !(dy > 0 && body.scrollTop <= 0))) { mode = 'scroll'; return; }
+      mode = 'drag';
+      range = Math.max(1, sheetCollapsedY);
+      base = expanded ? 0 : range;
+      // if grabbed mid-animation, pick up from the actual current position
+      const t = getComputedStyle(sheet).transform;
+      if (t && t !== 'none') { try { base = new DOMMatrixReadOnly(t).m42; } catch { /* keep class-based base */ } }
+      clearTimeout(sheetSettleTimer);
+      sheet.classList.add('is-dragging', 'is-moving', 'show-full');
+      sy = p.clientY;  // re-anchor so the sheet doesn't jump to the slop distance
+    }
+    if (e.cancelable) e.preventDefault();
+    cur = Math.min(range, Math.max(0, base + (p.clientY - sy)));
+    const dt = e.timeStamp - lastT;
+    if (dt > 0) { vel = (p.clientY - lastY) / dt; lastY = p.clientY; lastT = e.timeStamp; }
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; sheet.style.transform = `translateY(${cur}px)`; });
   };
-  const onUp = () => { startY = null; };
-  sheet.addEventListener('touchstart', onDown, { passive: true });
-  sheet.addEventListener('touchmove', onMove, { passive: true });
-  sheet.addEventListener('touchend', onUp);
-  sheet.addEventListener('mousedown', onDown);
-  window.addEventListener('mousemove', onMove);
-  window.addEventListener('mouseup', onUp);
+  const swallowClick = ev => { ev.stopPropagation(); ev.preventDefault(); };
+  const end = () => {
+    const wasDrag = mode === 'drag';
+    mode = null;
+    if (!wasDrag) return;
+    if (raf) { cancelAnimationFrame(raf); raf = 0; sheet.style.transform = `translateY(${cur}px)`; }
+    sheet.classList.remove('is-dragging');
+    // a mouse drag released over a button must not count as a click on it
+    sheet.addEventListener('click', swallowClick, { capture: true, once: true });
+    setTimeout(() => sheet.removeEventListener('click', swallowClick, { capture: true }), 120);
+    // a flick wins over position; otherwise snap to the nearer state
+    setSheetState(Math.abs(vel) > 0.35 ? vel < 0 : cur < range / 2);
+  };
+
+  sheet.addEventListener('touchstart', start, { passive: true });
+  sheet.addEventListener('touchmove', move, { passive: false });
+  sheet.addEventListener('touchend', end);
+  sheet.addEventListener('touchcancel', end);
+  sheet.addEventListener('mousedown', e => { if (e.button === 0) { mouseOn = true; start(e); } });
+  window.addEventListener('mousemove', e => { if (mouseOn) move(e); });
+  window.addEventListener('mouseup', () => { if (mouseOn) { mouseOn = false; end(); } });
+
+  let rsTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(rsTimer);
+    rsTimer = setTimeout(() => { if (!$('screen-map').hidden) measurePeek(); }, 150);
+  });
 }
 
 // ————— long weekends —————
