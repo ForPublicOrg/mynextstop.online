@@ -1,15 +1,15 @@
 import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js';
-import { CATEGORY_THEME, themeOf, cardBackground, catIcon, catBadge } from './themes.js';
+import { CATEGORY_LABEL, catBadge } from './themes.js';
 import { icon } from './icons.js';
 import { CITIES, nearestCity } from './cities.js';
 import { locate, inIndia } from './geo.js';
 import { store } from './store.js';
 import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js';
 
-// ————— state —————
+// ----- state -----
 let DESTS = [];
 let HOLIDAYS = [];
-// IST "today", regardless of device timezone — the whole product (season
+// IST "today", regardless of device timezone: the whole product (season
 // windows, holidays.json dates) is defined in Indian time.
 const now = (() => { const d = new Date(); return new Date(d.getTime() + (330 + d.getTimezoneOffset()) * 60000); })();
 const S = {
@@ -32,12 +32,21 @@ const DIST_LABEL = [
 
 const $ = id => document.getElementById(id);
 
-// ————— boot —————
+// The curated data is written elsewhere; keep its em-dashes out of the UI
+// at render time instead of editing the catalogue.
+const deDash = s => typeof s === 'string' ? s.replace(/\s*—\s*/g, ', ') : s;
+function cleanDest(d) {
+  for (const k of ['name', 'tagline', 'vibe', 'festival', 'hub']) if (d[k]) d[k] = deDash(d[k]);
+  if (d.why) for (const k of Object.keys(d.why)) d.why[k] = deDash(d.why[k]);
+  return d;
+}
+
+// ----- boot -----
 init();
 async function init() {
+  paintThemeBtns();
   buildMonthSel();
   buildDistChips();
-  buildHeroStrip();
   wireEvents();
 
   try {
@@ -46,15 +55,15 @@ async function init() {
       fetch('data/holidays.json').then(r => r.json()).catch(() => []),
     ]);
     if (!Array.isArray(d) || !d.length) throw 0;
-    DESTS = d;
+    DESTS = d.map(cleanDest);
     HOLIDAYS = h;
   } catch {
-    // persistent error state — distinct from "no results for these filters"
+    // persistent error state, distinct from "no results for these filters"
     $('btnLocate').disabled = true;
-    $('btnManual').disabled = true;
+    $('homeSearch').disabled = true;
     $('heroNote').innerHTML =
-      '⚠️ Couldn’t load the destination catalogue — check your connection. ' +
-      '<button id="btnRetry" class="btn btn-ghost">Try again</button>';
+      'Couldn’t load destinations. Check your connection. ' +
+      '<button id="btnRetry" class="btn-link">Retry</button>';
     $('btnRetry').onclick = () => location.reload();
     $('screen-map').hidden = true;
     $('screen-home').hidden = false;
@@ -63,10 +72,10 @@ async function init() {
 
   buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
 
-  // CTAs stay disabled until the catalogue is in memory — a cached GPS fix
+  // CTAs stay disabled until the catalogue is in memory: a cached GPS fix
   // can resolve faster than the fetch and would rank an empty list
   $('btnLocate').disabled = false;
-  $('btnManual').disabled = false;
+  $('homeSearch').disabled = false;
 
   // keep the origin dialog's input above the iOS keyboard: the keyboard
   // shrinks only the visual viewport, not the layout viewport fixed
@@ -86,7 +95,7 @@ async function init() {
   if (S.origin) enterMap();
 }
 
-// ————— UI scaffolding —————
+// ----- UI scaffolding -----
 function buildMonthSel() {
   const sel = $('monthSel');
   for (let i = 0; i < 12; i++) {
@@ -104,6 +113,7 @@ function buildDistChips() {
   const row = $('distChips');
   for (const [key, label, sub] of DIST_LABEL) {
     const b = document.createElement('button');
+    b.type = 'button';
     b.className = 'chip' + (S.dist === key ? ' is-on' : '');
     b.dataset.k = key;
     b.setAttribute('role', 'radio');
@@ -120,18 +130,20 @@ function buildDistChips() {
 function buildMoodChips() {
   const row = $('moodChips');
   const used = new Set(DESTS.flatMap(d => d.category || []));
-  for (const c of used) if (!CATEGORY_THEME[c]) console.warn(`destination category "${c}" has no theme/chip — check data/destinations.json`);
+  for (const c of used) if (!CATEGORY_LABEL[c]) console.warn(`destination category "${c}" has no label/chip, check data/destinations.json`);
   const all = document.createElement('button');
+  all.type = 'button';
   all.className = 'chip' + (S.moods.size === 0 ? ' is-on' : '');
   all.dataset.k = '';
   all.textContent = 'All';
   all.onclick = () => { S.moods.clear(); syncMoods(); };
   row.appendChild(all);
-  for (const [key, t] of Object.entries(CATEGORY_THEME).filter(([k]) => used.has(k))) {
+  for (const [key, label] of Object.entries(CATEGORY_LABEL).filter(([k]) => used.has(k))) {
     const b = document.createElement('button');
+    b.type = 'button';
     b.className = 'chip' + (S.moods.has(key) ? ' is-on' : '');
     b.dataset.k = key;
-    b.innerHTML = `${icon(key)}${t.label}`;
+    b.innerHTML = `${icon(key)}${label}`;
     b.onclick = () => {
       S.moods.has(key) ? S.moods.delete(key) : S.moods.add(key);
       syncMoods();
@@ -147,16 +159,6 @@ function buildMoodChips() {
   }
 }
 
-function buildHeroStrip() {
-  $('heroStrip').innerHTML = [
-    'every place is a live season dot on one map',
-    'your route is drawn before you decide',
-    'knows when monsoon closes mountain roads',
-    'spots your next long weekend',
-    'ranks places by how solo-friendly they are',
-  ].map(s => `<span>${s}</span>`).join('');
-}
-
 function wireEvents() {
   wireDlgFallback($('originDlg'));
   wireDlgFallback($('savedDlg'));
@@ -164,22 +166,40 @@ function wireEvents() {
   $('filterBtn').onclick = () => openDlg($('filterDlg'));
   $('btnLocate').onclick = doLocate;
   $('dlgLocate').onclick = () => { closeDlg($('originDlg')); doLocate(); };
-  $('btnManual').onclick = openOriginDlg;
   $('originBtn').onclick = openOriginDlg;
   $('themeBtn').onclick = toggleTheme;
+  $('themeBtnMap').onclick = toggleTheme;
   $('savedBtn').onclick = openSavedDlg;
-  $('originSearch').oninput = e => renderOriginResults(e.target.value);
+  $('originSearch').oninput = e => renderResults(e.target.value, $('originResults'));
   $('sheetHandle').onclick = () => toggleSheet();
   wireSheetDrag();
-  document.querySelector('.brand').onclick = e => {
+  wireHomeSearch();
+  const goHome = e => {
     e.preventDefault();
     $('screen-map').hidden = true;
     $('screen-home').hidden = false;
   };
+  $('homeBtn').onclick = goHome;
+  document.querySelector('.brand').onclick = goHome;
   document.addEventListener('keydown', e => {
     if ($('screen-map').hidden || dialogOpen()) return;
     if (e.key === 'ArrowRight') nextPick();
     if (e.key === 'ArrowLeft') prevPick();
+  });
+}
+
+function wireHomeSearch() {
+  const input = $('homeSearch');
+  const box = $('homeResults');
+  const show = () => {
+    renderResults(input.value, box);
+    box.hidden = false;
+  };
+  input.addEventListener('focus', show);
+  input.addEventListener('input', show);
+  // hide when tapping anywhere outside the search area
+  document.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.home-search-wrap')) box.hidden = true;
   });
 }
 
@@ -203,33 +223,33 @@ function dialogOpen() {
   return $('originDlg').hasAttribute('open') || $('savedDlg').hasAttribute('open') || $('filterDlg').hasAttribute('open');
 }
 
-// ————— screens —————
+// ----- screens -----
 async function enterMap() {
   $('screen-home').hidden = true;
   $('screen-map').hidden = false;
   try {
     await initMap($('mapEl'), d => { S.pinned = d; S.idx = 0; render(true); }, effectiveTheme());
   } catch {
-    // don't strand the user on a blank map screen — back to home, retryable
+    // don't strand the user on a blank map screen: back to home, retryable
     $('screen-map').hidden = true;
     $('screen-home').hidden = false;
-    toast('Map failed to load — check your connection and tap Find again.');
+    toast('Map failed to load. Check your connection and try again.');
     return;
   }
   nudgeMap();
   render(true);
 }
 
-// ————— origin —————
+// ----- origin -----
 async function doLocate() {
   const btn = $('btnLocate');
-  const old = btn.textContent;
-  btn.textContent = '📡 Finding you…';
+  const old = btn.innerHTML;
+  btn.textContent = 'Finding you…';
   btn.disabled = true;
   try {
     const pos = await locate();
     if (!inIndia(pos)) {
-      toast("You seem to be outside India — type where you'll start instead.");
+      toast('You seem to be outside India. Type where you’ll start instead.');
       openOriginDlg();
       return;
     }
@@ -237,10 +257,10 @@ async function doLocate() {
     const label = here.near ? `near ${here.name}` : here.name;
     setOrigin({ name: label, lat: pos.lat, lng: pos.lng });
   } catch {
-    toast("Couldn't get your location — type where you are instead.");
+    toast('Couldn’t get your location. Type where you are instead.');
     openOriginDlg();
   } finally {
-    btn.textContent = old;
+    btn.innerHTML = old;
     btn.disabled = false;
   }
 }
@@ -249,22 +269,30 @@ function setOrigin(o) {
   S.origin = o;
   store.origin = o;
   S.idx = 0; S.pinned = null;
+  $('homeResults').hidden = true;
   enterMap();
 }
 
 function openOriginDlg() {
   $('originSearch').value = '';
-  renderOriginResults('');
+  renderResults('', $('originResults'));
   openDlg($('originDlg'));
   setTimeout(() => $('originSearch').focus(), 60);
 }
 
-function renderOriginResults(q) {
-  const box = $('originResults');
+// "Indore" is both a city in the origin list and a destination in the
+// catalogue. Same place, so the search must not offer it twice. Matched on
+// the name before any bracketed alias: "Visakhapatnam (Vizag)" === "Visakhapatnam".
+const originKey = name => name.split('(')[0].trim().toLowerCase();
+
+// shared search over cities + destinations; fills any results container
+function renderResults(q, box) {
   q = q.trim().toLowerCase();
+  const cityNames = new Set(CITIES.map(([name]) => originKey(name)));
   const pool = [
     ...CITIES.map(([name, lat, lng]) => ({ name, lat, lng, type: 'city' })),
-    ...DESTS.map(d => ({ name: d.name, lat: d.lat, lng: d.lng, type: d.state })),
+    ...DESTS.filter(d => !cityNames.has(originKey(d.name)))
+      .map(d => ({ name: d.name, lat: d.lat, lng: d.lng, type: d.state })),
   ];
   let hits;
   if (!q) {
@@ -283,10 +311,10 @@ function renderOriginResults(q) {
     b.onclick = () => { closeDlg($('originDlg')); setOrigin({ name: h.name, lat: h.lat, lng: h.lng }); };
     box.appendChild(b);
   }
-  if (!hits.length) box.innerHTML = '<p class="saved-empty">No match — try a bigger city nearby.</p>';
+  if (!hits.length) box.innerHTML = '<p class="search-empty">No match. Try a bigger city nearby.</p>';
 }
 
-// ————— the answer —————
+// ----- the answer -----
 function currentItem() {
   if (S.pinned) {
     const d = S.pinned;
@@ -297,17 +325,17 @@ function currentItem() {
   return S.ranked.length ? S.ranked[S.idx % S.ranked.length] : null;
 }
 
-// Practical arrival modes → icon row. d.modes ⊆ ["flight","train","road"].
+// Practical arrival modes as compact fact pills. d.modes ⊆ ["flight","train","road"].
 const MODE_META = { flight: ['plane', 'flight'], train: ['train', 'train'], road: ['car', 'road'] };
-function modesHtml(d, withLabels = false) {
+function modeFacts(d) {
   if (!Array.isArray(d.modes) || !d.modes.length) return '';
   return d.modes.filter(m => MODE_META[m]).map(m => {
     const [ic, label] = MODE_META[m];
-    return withLabels ? `<span class="mode">${icon(ic)}${label}</span>` : icon(ic);
+    return `<span class="fact">${icon(ic)} ${label}</span>`;
   }).join('');
 }
 
-// Where would you go next FROM the pick — the dashed onward arcs.
+// Where would you go next FROM the pick: the dashed onward arcs.
 function onwardHops(d) {
   return rank(DESTS, { lat: d.lat, lng: d.lng }, S.month, {
     maxKm: 500,
@@ -348,15 +376,17 @@ function render(fit = false) {
   });
 }
 
+const STATUS_WORD = { peak: 'in season', shoulder: 'shoulder', off: 'off-season', avoid: 'avoid now' };
+const STATUS_VAR = { peak: 'var(--peak)', shoulder: 'var(--shoulder)', off: 'var(--off)', avoid: 'var(--avoid)' };
+
 function renderSheet(item) {
   const body = $('sheetBody');
 
   if (!item) {
     body.innerHTML = `
       <div class="sheet-empty">
-        <b>Nothing honest to suggest in this range.</b>
-        Everything within reach is off-limits in ${MONTHS[S.month - 1]} or filtered out —
-        open <b>Filters</b> to widen the range, or tap any dot to inspect it.
+        <b>Nothing in range for ${MONTHS[S.month - 1]}.</b>
+        Widen the filters, pick another month, or tap any dot.
       </div>`;
     setSheetState(false, true);
     measurePeek();
@@ -364,34 +394,30 @@ function renderSheet(item) {
   }
 
   const { d, roadKm, hours, status } = item;
-  const t = themeOf(d);
   const season = seasonOf(S.month);
   const why = (d.why && d.why[season]) || d.tagline;
   const pos = S.pinned ? null : S.idx % S.ranked.length;
 
   const statusBadge = {
-    peak: '<span class="badge badge-season-peak">● In season now</span>',
-    shoulder: '<span class="badge badge-season-shoulder">◐ Shoulder — fewer crowds</span>',
-    off: '<span class="badge badge-season-off">○ Off-season</span>',
-    avoid: '<span class="badge badge-season-avoid">✕ Not the time</span>',
+    peak: '<span class="badge badge-season-peak">In season now</span>',
+    shoulder: '<span class="badge badge-season-shoulder">Shoulder season</span>',
+    off: '<span class="badge badge-season-off">Off-season</span>',
+    avoid: '<span class="badge badge-season-avoid">Not the time</span>',
   }[status];
 
   const fm = festivalMonth(d);
   const festBadge = fm && (fm === S.month || fm === (S.month % 12) + 1)
-    ? `<span class="badge badge-festival">🎪 ${d.festival}</span>` : '';
+    ? `<span class="badge badge-festival">${d.festival}</span>` : '';
 
   const lwRun = matchingLongWeekend(d);
-  const lwBadge = lwRun ? `<span class="badge badge-lw">🗓️ Fits ${fmtRange(lwRun.start, lwRun.end)}</span>` : '';
+  const lwBadge = lwRun ? `<span class="badge badge-lw">Fits ${fmtRange(lwRun.start, lwRun.end)}</span>` : '';
 
-  const onward = onwardHops(d);
-  const rupee = '₹'.repeat(d.budget || 2);
-  const statusDot = { peak: 'var(--peak)', shoulder: 'var(--shoulder)', off: 'var(--off)', avoid: 'var(--avoid)' }[status];
-  const statusWord = { peak: 'in season', shoulder: 'shoulder', off: 'off-season', avoid: 'avoid now' }[status];
+  const statusDot = STATUS_VAR[status];
+  const statusWord = STATUS_WORD[status];
 
   body.innerHTML = `
     <div class="sheet-peek" id="sheetPeek" role="button" aria-label="Expand details">
       <div class="peek-row1">
-        ${catBadge(d)}
         <span class="peek-name">${d.name}</span>
         <i class="peek-dot" style="background:${statusDot}" title="${statusWord}"></i>
         <span class="peek-btns">
@@ -399,36 +425,27 @@ function renderSheet(item) {
           <button class="btn btn-primary peek-next" id="btnAnotherPeek">${S.pinned ? 'My picks' : `Next ${icon('arrowRight')}`}</button>
         </span>
       </div>
-      <div class="peek-row2">${S.pinned ? '' : `<b>#${pos + 1}</b> · `}${travelText(roadKm, hours)} · <span class="peek-season">${statusWord}</span>${modesHtml(d) ? `<span class="peek-modes">${modesHtml(d)}</span>` : ''}</div>
-      <div class="peek-why">${why}</div>
+      <div class="peek-row2">${S.pinned ? '' : `<b>#${pos + 1}</b> · `}${travelText(roadKm, hours)} · <span class="peek-season" style="color:${statusDot}">${statusWord}</span></div>
     </div>
 
     <div class="sheet-full">
-      <div class="sheet-card" style="background:${cardBackground(d)}">
-        <div class="sheet-kicker">${S.pinned
-          ? 'from the map'
-          : `<span class="rank-pill">#${pos + 1}</span> your next stop`}</div>
-        <div class="sheet-headline">
-          <span class="card-glyph">${catIcon(d)}</span>
-          <div>
-            <h2 class="card-name">${d.name}</h2>
-            <div class="card-state">${d.state} · ${d.tagline}</div>
-          </div>
+      <div class="card-head">
+        ${catBadge(d)}
+        <div class="card-head-main">
+          <h2 class="card-name">${d.name}</h2>
+          <div class="card-state">${d.state} · ${d.tagline}</div>
         </div>
-        <div class="card-dist">${icon('pin')} ${travelText(roadKm, hours)} from ${S.origin.name}</div>
-        <div class="why-now"><b>Why now —</b> ${why}</div>
-        <div class="badge-row">${statusBadge}${festBadge}${lwBadge}</div>
-        <div class="card-meta">
-          <span>${icon('calendar')} <b>${d.days}${d.days === 1 ? ' day' : '+ days'}</b></span>
-          <span class="rupee"><b>${rupee}</b></span>
-          <span>${icon('backpack')} solo <b>${d.solo}/5</b></span>
-          ${d.crowd ? `<span>${icon('users')} <b>${['quiet', 'moderate', 'packed'][d.crowd - 1] || 'moderate'}</b> in peak</span>` : ''}
-          ${d.alt > 500 ? `<span>${icon('peak')} <b>${d.alt.toLocaleString('en-IN')} m</b></span>` : ''}
-        </div>
-        ${modesHtml(d, true) ? `<div class="card-meta modes-meta">${modesHtml(d, true)}</div>` : ''}
-        <div class="card-meta"><span class="vibe-line">${d.vibe}</span></div>
-        <div class="card-meta"><span>${icon('bus')} ${d.hub}</span></div>
-        ${onward.length ? `<div class="card-meta onward-meta"><span>${icon('route')} from here, next: ${onward.map(o => `<b>${o.d.name}</b> (${o.roadKm} km)`).join(' or ')}</span></div>` : ''}
+      </div>
+      <div class="badge-row">${statusBadge}${festBadge}${lwBadge}</div>
+      <div class="card-dist">${icon('pin')} ${travelText(roadKm, hours)} from ${S.origin.name}</div>
+      <div class="why">${why}</div>
+      <div class="facts">
+        <span class="fact">${icon('calendar')} ${d.days}${d.days === 1 ? ' day' : '+ days'}</span>
+        <span class="fact">${'₹'.repeat(d.budget || 2)}</span>
+        <span class="fact">${icon('backpack')} solo ${d.solo}/5</span>
+        ${d.crowd ? `<span class="fact">${icon('users')} ${['quiet', 'moderate', 'packed'][d.crowd - 1] || 'moderate'}</span>` : ''}
+        ${d.alt > 500 ? `<span class="fact">${icon('peak')} ${d.alt.toLocaleString('en-IN')} m</span>` : ''}
+        ${modeFacts(d)}
       </div>
 
       <div class="sheet-actions">
@@ -448,8 +465,8 @@ function renderSheet(item) {
       </div>
 
       <div class="sheet-alts">
-        <div class="alt-head"><h3>Also in reach</h3><span class="alt-count">${S.ranked.length} place${S.ranked.length === 1 ? '' : 's'} in range</span></div>
-        <div class="alt-grid" id="altGrid"></div>
+        <div class="alt-head"><h3>Also in reach</h3><span class="alt-count">${S.ranked.length} in range</span></div>
+        <div class="alt-list" id="altList"></div>
       </div>
     </div>`;
 
@@ -461,34 +478,36 @@ function renderSheet(item) {
   $('actShare').onclick = () => shareDest(d, item);
   $('actSave').onclick = () => {
     const on = store.toggleSaved(d.id);
-    toast(on ? `Saved ${d.name} for later` : `Removed ${d.name} from saved`);
+    toast(on ? `Saved ${d.name}` : `Removed ${d.name} from saved`);
     renderSheet(item);
   };
   $('actBeen').onclick = () => {
     store.toggleBeen(d.id);
-    toast(`Done — ${d.name} won't be suggested again`);
+    toast(`${d.name} won’t be suggested again`);
     S.pinned = null;
     S.idx = 0;  // ranked list just shrank; restart from the top pick
     render(true);
   };
 
   // alternates inside the expanded sheet
-  const grid = $('altGrid');
+  const list = $('altList');
   const start = S.pinned ? 0 : (S.idx % Math.max(S.ranked.length, 1)) + 1;
-  for (let j = start; j < S.ranked.length && grid.children.length < 6; j++) {
+  for (let j = start; j < S.ranked.length && list.children.length < 6; j++) {
     const it = S.ranked[j];
     const b = document.createElement('button');
-    b.className = 'alt-card';
+    b.type = 'button';
+    b.className = 'alt-row';
     b.innerHTML = `
-      <div class="card-bg" style="background:${cardBackground(it.d)}"></div>
-      <span class="alt-status" style="background:${{ peak: 'var(--peak)', shoulder: 'var(--shoulder)', off: 'var(--off)' }[it.status] || 'var(--off)'}"></span>
-      <span class="alt-glyph">${catIcon(it.d)}</span>
-      <span class="alt-name">${it.d.name}</span>
-      <span class="alt-sub">${it.roadKm} km · ${it.d.state}</span>`;
+      ${catBadge(it.d)}
+      <span class="alt-main">
+        <span class="alt-name">${it.d.name}</span>
+        <span class="alt-sub">${it.roadKm} km · ${it.d.state}</span>
+      </span>
+      <i class="alt-status" style="background:${STATUS_VAR[it.status] || 'var(--off)'}"></i>`;
     b.onclick = () => { S.pinned = null; S.idx = j; toggleSheet(false); render(true); };
-    grid.appendChild(b);
+    list.appendChild(b);
   }
-  if (!grid.children.length) grid.innerHTML = '<p class="saved-empty">Nothing else in this range — widen it or change the month.</p>';
+  if (!list.children.length) list.innerHTML = '<p class="saved-empty">Nothing else in range. Widen it or change the month.</p>';
 
   measurePeek();
 }
@@ -497,7 +516,7 @@ function nextPick() {
   if (S.pinned) { S.pinned = null; render(true); return; }
   if (!S.ranked.length) return;
   S.idx++;
-  if (S.idx % S.ranked.length === 0) { S.idx = 0; toast('That was everything in range — back to the top pick'); }
+  if (S.idx % S.ranked.length === 0) { S.idx = 0; toast('That was everything in range. Back to the top pick.'); }
   render(true);
 }
 
@@ -508,7 +527,7 @@ function prevPick() {
   render(true);
 }
 
-// ————— bottom sheet: transform-only, finger-driven —————
+// ----- bottom sheet: transform-only, finger-driven -----
 // The sheet is a fixed-height panel slid via translateY, so every frame of a
 // toggle or drag is compositor work only. Two classes with different lifetimes:
 // .is-expanded is the target position; .show-full is the content, kept on
@@ -516,13 +535,13 @@ function prevPick() {
 let sheetSettleTimer = null;
 let sheetCollapsedY = 0;  // px the sheet sits below translateY(0) when collapsed
 
-// Collapsed offset = sheet height − peek height. Measured after each render
-// (content-dependent). The resting transform is applied inline in px — the
-// CSS transition animates it; a calc(var()) transform is not reliably
+// Collapsed offset = sheet height minus peek height. Measured after each
+// render (content-dependent). The resting transform is applied inline in px;
+// the CSS transition animates it. A calc(var()) transform is not reliably
 // re-resolved by Chrome when the variable changes.
 function measurePeek() {
   const sheet = $('sheet'), body = $('sheetBody');
-  if (!sheet.clientHeight) return;  // map screen hidden — keep last value
+  if (!sheet.clientHeight) return;  // map screen hidden, keep last value
   const hadFull = sheet.classList.contains('show-full');
   if (hadFull) sheet.classList.remove('show-full');
   const ref = $('sheetPeek') || body.firstElementChild;
@@ -533,7 +552,7 @@ function measurePeek() {
     sheetCollapsedY = Math.max(0, sheet.offsetHeight - h);
   }
   if (hadFull) sheet.classList.add('show-full');
-  // apply immediately — retargeting an in-flight snap keeps it one smooth
+  // apply immediately: retargeting an in-flight snap keeps it one smooth
   // motion; only an active finger drag owns the transform exclusively
   if (!sheet.classList.contains('is-dragging')) applySheetTransform();
 }
@@ -551,7 +570,7 @@ function setSheetState(expand, instant = false) {
   sheet.classList.toggle('is-expanded', expand);
   applySheetTransform();
   $('sheetHandle').setAttribute('aria-label', expand ? 'Collapse details' : 'Expand details');
-  // reduced motion kills the transition, so the move IS instant — settle now
+  // reduced motion kills the transition, so the move IS instant: settle now
   // rather than leaving the full card cropped in the peek strip for 400ms
   if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { settleSheet(); return; }
   sheet.classList.add('is-moving');
@@ -645,7 +664,7 @@ function wireSheetDrag() {
   });
 }
 
-// ————— long weekends —————
+// ----- long weekends -----
 let lwRuns = null;
 function getLongWeekends() {
   if (!lwRuns) lwRuns = longWeekends(HOLIDAYS, now);
@@ -659,29 +678,29 @@ function matchingLongWeekend(d) {
   return runs.find(r => r.start.getMonth() + 1 === S.month || r.end.getMonth() + 1 === S.month) || null;
 }
 
-// ————— share —————
+// ----- share -----
 async function shareDest(d, item) {
-  const seasonLine = { peak: 'peak season right now', shoulder: 'shoulder season — fewer crowds', off: 'off-season', avoid: 'not the season' }[item.status];
-  const text = `My next stop: ${d.name}, ${d.state} 🧭 ${item.roadKm} km away — ${seasonLine}. Find yours at mynextstop.online`;
+  const seasonLine = { peak: 'peak season right now', shoulder: 'shoulder season, fewer crowds', off: 'off-season', avoid: 'not the season' }[item.status];
+  const text = `My next stop: ${d.name}, ${d.state}. ${item.roadKm} km away, ${seasonLine}. Find yours at mynextstop.online`;
   try {
     if (navigator.share) { await navigator.share({ title: 'my next stop', text, url: 'https://mynextstop.online' }); return; }
     throw 0;
   } catch {
-    try { await navigator.clipboard.writeText(text); toast('Copied — paste it anywhere'); }
+    try { await navigator.clipboard.writeText(text); toast('Copied. Paste it anywhere.'); }
     catch { toast(text); }
   }
 }
 
-// ————— saved dialog —————
+// ----- saved dialog -----
 function openSavedDlg() {
   renderSaved();
   openDlg($('savedDlg'));
 }
 function renderSaved() {
-  fillList($('savedList'), store.saved, 'Nothing saved yet — tap ♡ Save on any pick.', id => {
+  fillList($('savedList'), store.saved, 'Nothing saved yet. Tap Save on any pick.', id => {
     store.toggleSaved(id); renderSaved();
   });
-  fillList($('beenList'), store.been, 'Nothing here yet — tap ✓ Been there on a pick and it stops being suggested.', id => {
+  fillList($('beenList'), store.been, 'Tap Been there on a pick and it stops being suggested.', id => {
     store.toggleBeen(id); renderSaved(); if (S.origin) render();
   });
 }
@@ -711,15 +730,23 @@ function fillList(el, ids, emptyMsg, onRemove) {
   }
 }
 
-// ————— theme / toast —————
+// ----- theme / toast -----
 function effectiveTheme() {
   return document.documentElement.getAttribute('data-theme') ||
     (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 }
 
+function paintThemeBtns() {
+  // the button shows the theme you'd switch to
+  const html = icon(effectiveTheme() === 'dark' ? 'sun' : 'moon');
+  $('themeBtn').innerHTML = html;
+  $('themeBtnMap').innerHTML = html;
+}
+
 function applyTheme(next) {
-  setMapTheme(next);                       // basemap + India-border colour
-  if (S.origin && !$('screen-map').hidden) render(false);  // arcs pick up themed colours
+  paintThemeBtns();
+  setMapTheme(next);                       // basemap + border + arc colors
+  if (S.origin && !$('screen-map').hidden) render(false);
 }
 
 function toggleTheme() {

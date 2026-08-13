@@ -1,4 +1,4 @@
-// localStorage wrapper — prefs, saved places, been-there list. Fails soft.
+// localStorage wrapper: prefs, saved places, been-there list. Fails soft.
 const KEY = 'mns-v1';
 
 function load() {

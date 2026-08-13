@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>my next stop — where should you travel next, from right here, right now</title>
-  <meta name="description" content="Open it anywhere in India and it answers one question: where should I go next? A live season map of ~200 destinations, your best next stop picked for you, with the route drawn from where you stand. Built for solo travellers. No login, no lists, no planning spiral." />
+  <title>my next stop · where to travel next in India</title>
+  <meta name="description" content="Open it anywhere in India and it answers one question: where should I go next? A live season map of curated destinations picks your best next stop and draws the route from where you stand. No login, no planning spiral." />
   <meta name="theme-color" content="#0e7a6c" />
 
   <!-- Applies saved theme before first paint; kept external so CSP stays hash-free -->
@@ -12,7 +12,7 @@
 
   <link rel="canonical" href="https://mynextstop.online/" />
 
-  <meta property="og:title" content="my next stop — where next, from right here, right now" />
+  <meta property="og:title" content="my next stop · where to travel next in India" />
   <meta property="og:description" content="A live season map of India that picks your best next stop and draws the route from where you stand. Built for solo travellers." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://mynextstop.online/" />
@@ -21,9 +21,9 @@
   <meta property="og:image" content="https://mynextstop.online/og-image.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="my next stop — a live season map of India that picks your best next destination" />
+  <meta property="og:image:alt" content="my next stop: a live season map of India that picks your best next destination" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="my next stop — where next, from right here, right now" />
+  <meta name="twitter:title" content="my next stop · where to travel next in India" />
   <meta name="twitter:description" content="One tap. Your best next destination in India on a season map, with the route drawn from where you stand." />
   <meta name="twitter:image" content="https://mynextstop.online/og-image.png" />
 
@@ -34,15 +34,15 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="manifest" href="site.webmanifest" />
 
-  <!-- Leaflet is on the critical path of the map-first UI: preload it -->
+  <!-- MapLibre is on the critical path of the map-first UI: preload it -->
   <link rel="preconnect" href="https://a.basemaps.cartocdn.com" />
   <link rel="preconnect" href="https://b.basemaps.cartocdn.com" />
   <link rel="preconnect" href="https://c.basemaps.cartocdn.com" />
   <link rel="preconnect" href="https://d.basemaps.cartocdn.com" />
-  <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" as="script"
-        crossorigin="anonymous" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" />
-  <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
-        crossorigin="anonymous" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" />
+  <link rel="preload" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" as="script"
+        crossorigin="anonymous" integrity="sha256-RamwepGJzlYFTGIKlHzPQeKR5YyV6bYVM7dAqqZe5cs=" />
+  <link rel="preload" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" as="style"
+        crossorigin="anonymous" integrity="sha256-qx5w1Z7EBGW65+cDDaLzzPKBM/1QLmK9WY7vut/XpzI=" />
 
   <link rel="stylesheet" href="css/style.css" />
   <link rel="modulepreload" href="js/app.js" />
@@ -63,71 +63,75 @@
     "applicationCategory": "TravelApplication",
     "operatingSystem": "Any",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
-    "description": "A season-aware map for solo travellers in India. It takes your location and today's date, shows every destination as a live season dot, picks your best next stop and draws the route to it — with honest reasons why now, or why not now."
+    "description": "A season-aware map for solo travellers in India. It takes your location and today's date, shows every destination as a live season dot, picks your best next stop and draws the route to it."
   }
   </script>
 </head>
 <body>
 
-  <header class="top" id="topBar">
-    <a class="brand" href="/" aria-label="my next stop — home">
-      <svg class="ic brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
-      <span class="brand-name">my next stop</span>
-    </a>
-    <div class="top-actions">
-      <label class="month-wrap" title="Plan for a different month">
-        <svg class="ic month-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg>
-        <select id="monthSel" aria-label="Travel month"></select>
-      </label>
-      <button id="savedBtn" class="icon-btn" aria-label="Saved places">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4 4.8 13a4.9 4.9 0 0 1 7-6.9l.2.2.2-.2a4.9 4.9 0 0 1 7 6.9z"/></svg>
-      </button>
-      <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a7 7 0 0 0 10 10z"/></svg>
-      </button>
-    </div>
-  </header>
-
   <main id="main">
 
-    <!-- ————— HOME ————— -->
+    <!-- home -->
     <section id="screen-home" class="screen screen-home">
-      <div class="hero">
-        <div class="hero-compass" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/><path d="M12 2v1.6M12 20.4V22M2 12h1.6M20.4 12H22" stroke-width="1.2"/></svg>
-        </div>
+      <header class="home-top">
+        <a class="brand" href="/" aria-label="my next stop, home">
+          <svg class="ic brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
+          <span class="brand-name">my next stop</span>
+        </a>
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"></button>
+      </header>
+
+      <div class="home">
         <h1>Where next?</h1>
-        <p class="hero-sub">You're somewhere in India. It's a certain time of year. Somewhere near you is <em>at its best right now.</em> One tap and you'll see it on the map — route and all.</p>
-        <div class="hero-cta">
-          <button id="btnLocate" class="btn btn-primary btn-big" disabled>
-            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg>
-            Find my next stop</button>
-          <button id="btnManual" class="btn btn-ghost" disabled>I'll type where I am</button>
+        <p class="home-sub">The best place to travel right now, from wherever you are.</p>
+
+        <div class="home-search-wrap">
+          <div class="home-search">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
+            <input id="homeSearch" type="search" placeholder="Where are you now?" autocomplete="off" enterkeyhint="search" disabled />
+          </div>
+          <div id="homeResults" class="search-results" role="listbox" hidden></div>
         </div>
-        <p class="hero-note" id="heroNote">Works mid-trip too — open it <em>from</em> Manali and it finds your next hop. Nothing to sign up for. Your location never leaves this page.</p>
+
+        <button id="btnLocate" class="btn btn-primary btn-big" disabled>
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg>
+          Use my location</button>
+
+        <p class="home-hint" id="heroNote">Free · no sign-up · your location never leaves this page</p>
       </div>
-      <div class="hero-strip" aria-hidden="true" id="heroStrip"></div>
-      <footer class="foot">
-        <p>Made for solo travellers in India · data is curated &amp; season-honest · <a href="https://mynextstop.online">mynextstop.online</a></p>
-      </footer>
     </section>
 
-    <!-- ————— MAP (primary) ————— -->
+    <!-- map (primary) -->
     <section id="screen-map" class="screen screen-map" hidden>
       <div id="mapEl" class="map-el" aria-label="Season map of destinations"></div>
 
       <div class="map-overlay-top">
-        <div class="overlay-row">
-          <button id="originBtn" class="origin-btn" title="Change starting point">
-            <span id="originLabel">…</span>
-            <span class="origin-edit" aria-hidden="true">change</span>
+        <div class="overlay-bar">
+          <button id="homeBtn" class="bar-home" aria-label="Home">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
           </button>
-          <button id="filterBtn" class="filter-btn" aria-label="Filters">
+          <button id="originBtn" class="bar-origin" title="Change starting point">
+            <span id="originLabel">…</span>
+          </button>
+          <svg class="ic bar-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
+        </div>
+        <div class="chip-row">
+          <label class="chip chip-month" title="Plan for a different month">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg>
+            <select id="monthSel" aria-label="Travel month"></select>
+          </label>
+          <button id="filterBtn" class="chip" aria-label="Filters">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21v-6M5 9V3M12 21v-9M12 6V3M19 21v-3M19 12V3"/><path d="M2.5 15h5M9.5 8.5h5M16.5 18h5"/></svg>
             Filters<span id="filterCount" class="filter-count" hidden></span>
           </button>
+          <button id="savedBtn" class="chip" aria-label="Saved places">
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4 4.8 13a4.9 4.9 0 0 1 7-6.9l.2.2.2-.2a4.9 4.9 0 0 1 7 6.9z"/></svg>
+            Saved
+          </button>
         </div>
       </div>
+
+      <button id="themeBtnMap" class="icon-btn map-theme-btn" aria-label="Toggle theme"></button>
 
       <aside id="sheet" class="sheet" aria-live="polite">
         <button class="sheet-handle" id="sheetHandle" aria-label="Expand details"><span></span></button>
@@ -138,55 +142,55 @@
   </main>
 
   <!-- origin picker -->
-  <dialog id="originDlg" class="origin-dlg">
-    <form method="dialog" class="origin-form">
-      <div class="origin-dlg-head">
-        <h2>Where are you right now?</h2>
+  <dialog id="originDlg" class="dlg">
+    <form method="dialog" class="dlg-form">
+      <div class="dlg-head">
+        <h2>Where are you?</h2>
         <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
       </div>
       <button type="button" id="dlgLocate" class="btn btn-primary btn-wide">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/></svg>
         Use my location</button>
-      <div class="origin-sep"><span>or</span></div>
-      <input id="originSearch" type="search" placeholder="Type a city or place… e.g. Indore, Manali" autocomplete="off" enterkeyhint="search" />
-      <div id="originResults" class="origin-results" role="listbox"></div>
+      <div class="dlg-sep"><span>or</span></div>
+      <input id="originSearch" class="dlg-input" type="search" placeholder="City or place, e.g. Indore" autocomplete="off" enterkeyhint="search" />
+      <div id="originResults" class="search-results" role="listbox"></div>
     </form>
   </dialog>
 
   <!-- filters -->
-  <dialog id="filterDlg" class="origin-dlg">
-    <form method="dialog" class="origin-form">
-      <div class="origin-dlg-head">
-        <h2>Tune your picks</h2>
+  <dialog id="filterDlg" class="dlg">
+    <form method="dialog" class="dlg-form">
+      <div class="dlg-head">
+        <h2>Filters</h2>
         <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
       </div>
-      <h3 class="f-label">How far will you go?</h3>
-      <div class="chip-wrap" id="distChips" role="radiogroup" aria-label="How far will you go?"></div>
+      <h3 class="f-label">Distance</h3>
+      <div class="chip-wrap" id="distChips" role="radiogroup" aria-label="Distance"></div>
       <h3 class="f-label">Mood</h3>
       <div class="chip-wrap" id="moodChips" aria-label="Mood filters"></div>
-      <h3 class="f-label">Dots on the map</h3>
+      <h3 class="f-label">Map dots</h3>
       <div class="legend-inline">
         <span><i class="dot dot-peak"></i> in season</span>
         <span><i class="dot dot-shoulder"></i> shoulder</span>
         <span><i class="dot dot-off"></i> off-season</span>
         <span><i class="dot dot-avoid"></i> avoid now</span>
       </div>
-      <button value="ok" class="btn btn-primary btn-wide">Show my picks</button>
+      <button value="ok" class="btn btn-primary btn-wide">Done</button>
     </form>
   </dialog>
 
   <!-- saved places -->
-  <dialog id="savedDlg" class="origin-dlg">
-    <form method="dialog" class="origin-form">
-      <div class="origin-dlg-head">
+  <dialog id="savedDlg" class="dlg">
+    <form method="dialog" class="dlg-form">
+      <div class="dlg-head">
         <h2>Your places</h2>
         <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
       </div>
       <div class="saved-wrap">
-        <h3>Saved for later</h3>
+        <h3>Saved</h3>
         <div id="savedList" class="saved-list"></div>
         <h3>Been there</h3>
-        <p class="saved-hint">Places you mark “been there” stop showing up as suggestions.</p>
+        <p class="saved-hint">Marked places stop showing up as picks.</p>
         <div id="beenList" class="saved-list"></div>
       </div>
     </form>

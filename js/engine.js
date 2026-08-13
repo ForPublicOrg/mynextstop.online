@@ -1,4 +1,4 @@
-// Pure ranking logic — no DOM. Everything the "answer" is made of lives here.
+// Pure ranking logic, no DOM. Everything the "answer" is made of lives here.
 
 export const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -47,7 +47,7 @@ function jitter(id, seed) {
   return (h % 7) - 3;
 }
 
-// Crow-flies → realistic road estimate.
+// Crow-flies to realistic road estimate.
 export function roadEstimate(km, alt) {
   const hilly = (alt || 0) > 900;
   const roadKm = Math.round((km * (hilly ? 1.5 : 1.32)) / 10) * 10;
@@ -122,7 +122,7 @@ export function longWeekends(holidays, today, horizon = 150) {
   const off = [];
   for (let i = 0; i <= horizon; i++) {
     const dt = new Date(t0.getTime() + i * dayMs);
-    // local-date ISO — toISOString() is UTC and shifts IST back a day
+    // local-date ISO: toISOString() is UTC and shifts IST back a day
     const iso = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
     const wd = dt.getDay();
     off.push({ dt, isOff: wd === 0 || wd === 6 || hol.has(iso), holName: hol.get(iso) });

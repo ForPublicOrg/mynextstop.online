@@ -1,9 +1,9 @@
-// mynextstop icon set — single-weight line icons, 24px grid, currentColor.
+// mynextstop icon set: single-weight line icons, 24px grid, currentColor.
 // Hand-kept so every glyph shares stroke weight, caps and corner language.
 // Usage: icon('pin') → inline <svg class="ic">…</svg>; icon('pin','ic-lg') to size.
 
 const P = {
-  // ————— UI —————
+  // ----- UI -----
   compass: '<circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/>',
   pin: '<path d="M12 21s-7-5.4-7-11a7 7 0 1 1 14 0c0 5.6-7 11-7 11z"/><circle cx="12" cy="10" r="2.4"/>',
   crosshair: '<circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/>',
@@ -20,6 +20,7 @@ const P = {
   peak: '<path d="m2.5 19.5 6.5-12 4.5 8 2.5-4 5.5 8z"/>',
   bus: '<rect x="4" y="4" width="16" height="13" rx="2.5"/><path d="M4 11h16M8 21v-4M16 21v-4"/><circle cx="8.5" cy="14.5" r=".2"/><circle cx="15.5" cy="14.5" r=".2"/>',
   moon: '<path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a7 7 0 0 0 10 10z"/>',
+  sun: '<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M18.7 5.3l-1.8 1.8M7.1 16.9l-1.8 1.8"/>',
   close: '<path d="M6 6l12 12M18 6 6 18"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/>',
   arrowRight: '<path d="M4 12h15M13 6l6 6-6 6"/>',
@@ -31,7 +32,7 @@ const P = {
   train: '<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9.5 17.5 7 21M14.5 17.5 17 21M7.5 21h9"/><path d="M9.5 14.2h.01M14.5 14.2h.01"/>',
   car: '<path d="M4.5 15.5 6.2 10a2 2 0 0 1 1.9-1.4h7.8a2 2 0 0 1 1.9 1.4l1.7 5.5"/><path d="M3.5 15.5h17V19h-17z"/><path d="M6.5 19v1.8M17.5 19v1.8M7 12.7h10" stroke-opacity=".55"/>',
 
-  // ————— categories (field-guide glyphs) —————
+  // ----- categories (field-guide glyphs) -----
   mountains: '<path d="m2.5 19 6-11.5 4.3 7.6 2.4-3.6 6.3 7.5z"/><path d="m7 12.5 1.5-1.5 1.5 1.5"/>',
   beach: '<path d="M12 3.5a8.5 8.5 0 0 1 8.5 8H3.5a8.5 8.5 0 0 1 8.5-8z"/><path d="M12 11.5V20M7.5 21c2.5-1.6 6.5-1.6 9 0"/>',
   heritage: '<path d="M4 20.5h16M6.5 20.5V13M17.5 20.5V13M4.5 13h15M7 13a5 5 0 0 1 10 0"/><path d="M12 4.5c1.3 1 1.8 2 1.8 3.5h-3.6c0-1.5.5-2.5 1.8-3.5z"/>',
