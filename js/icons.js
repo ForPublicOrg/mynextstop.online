@@ -23,6 +23,7 @@ const P = {
   close: '<path d="M6 6l12 12M18 6 6 18"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/>',
   arrowRight: '<path d="M4 12h15M13 6l6 6-6 6"/>',
+  chevronLeft: '<path d="M14.5 5.5 8 12l6.5 6.5"/>',
   city: '<path d="M3 21h18M5 21V9h5v12M10 21V4h6v17M16 21v-9h3v9"/><path d="M7 12h1M7 15h1M12.5 8h1M12.5 12h1"/>',
   route: '<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5" stroke-dasharray="3.2 2.6"/>',
   refresh: '<path d="M20 8A8.5 8.5 0 1 0 21 12"/><path d="M21 3v5h-5"/>',

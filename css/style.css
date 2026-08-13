@@ -332,7 +332,21 @@ body { -webkit-tap-highlight-color: transparent; }
 }
 .peek-dot { width: 9px; height: 9px; border-radius: 99px; display: inline-block; flex: 0 0 auto; }
 .peek-season { font-weight: 700; color: var(--ink); }
-.peek-next { margin-left: auto; flex: 0 0 auto; padding: 8px 14px; font-size: 13.5px; border-radius: 11px; }
+.peek-btns { margin-left: auto; display: inline-flex; gap: 7px; flex: 0 0 auto; }
+.peek-next { flex: 0 0 auto; padding: 8px 14px; font-size: 13.5px; border-radius: 11px; }
+.btn-back {
+  display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 11px;
+  background: var(--panel); border: 1px solid var(--line); color: var(--ink);
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 1px 2px rgba(24,20,15,.06);
+  transition: background .12s ease, transform .12s ease;
+}
+.btn-back:hover { background: var(--panel-2); }
+.btn-back:active { transform: scale(.92); }
+.btn-back .ic { width: 17px; height: 17px; }
+.sheet-next-row { display: flex; gap: 8px; }
+.btn-back-lg { width: 47px; height: auto; flex: 0 0 auto; }
+.sheet-next-row .sheet-next { flex: 1; }
 .peek-row2 { font-size: 13px; color: var(--muted); font-weight: 600; }
 .peek-row2 b { color: var(--accent); }
 .peek-why {

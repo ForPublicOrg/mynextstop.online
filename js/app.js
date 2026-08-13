@@ -177,7 +177,9 @@ function wireEvents() {
     $('screen-home').hidden = false;
   };
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' && !$('screen-map').hidden && !dialogOpen()) nextPick();
+    if ($('screen-map').hidden || dialogOpen()) return;
+    if (e.key === 'ArrowRight') nextPick();
+    if (e.key === 'ArrowLeft') prevPick();
   });
 }
 
@@ -392,7 +394,10 @@ function renderSheet(item) {
         ${catBadge(d)}
         <span class="peek-name">${d.name}</span>
         <i class="peek-dot" style="background:${statusDot}" title="${statusWord}"></i>
-        <button class="btn btn-primary peek-next" id="btnAnotherPeek">${S.pinned ? 'My picks' : `Next ${icon('arrowRight')}`}</button>
+        <span class="peek-btns">
+          ${!S.pinned && pos > 0 ? `<button class="btn-back" id="btnPrevPeek" aria-label="Previous pick">${icon('chevronLeft')}</button>` : ''}
+          <button class="btn btn-primary peek-next" id="btnAnotherPeek">${S.pinned ? 'My picks' : `Next ${icon('arrowRight')}`}</button>
+        </span>
       </div>
       <div class="peek-row2">${S.pinned ? '' : `<b>#${pos + 1}</b> · `}${travelText(roadKm, hours)} · <span class="peek-season">${statusWord}</span>${modesHtml(d) ? `<span class="peek-modes">${modesHtml(d)}</span>` : ''}</div>
       <div class="peek-why">${why}</div>
@@ -427,7 +432,10 @@ function renderSheet(item) {
       </div>
 
       <div class="sheet-actions">
-        <button class="btn btn-primary sheet-next" id="btnAnother">${S.pinned ? 'Back to my picks' : `Show me another ${icon('arrowRight')}`}</button>
+        <div class="sheet-next-row">
+          ${!S.pinned && pos > 0 ? `<button class="btn-back btn-back-lg" id="btnPrev" aria-label="Previous pick">${icon('chevronLeft')}</button>` : ''}
+          <button class="btn btn-primary sheet-next" id="btnAnother">${S.pinned ? 'Back to my picks' : `Show me another ${icon('arrowRight')}`}</button>
+        </div>
         <div class="sheet-acts">
           <a class="card-act" target="_blank" rel="noopener"
              href="https://www.google.com/maps/dir/?api=1&origin=${S.origin.lat},${S.origin.lng}&destination=${encodeURIComponent(d.name + ', ' + d.state)}">
@@ -445,9 +453,11 @@ function renderSheet(item) {
       </div>
     </div>`;
 
-  $('sheetPeek').onclick = e => { if (!e.target.closest('.btn')) toggleSheet(true); };
+  $('sheetPeek').onclick = e => { if (!e.target.closest('.btn, .btn-back')) toggleSheet(true); };
   $('btnAnotherPeek').onclick = nextPick;
   $('btnAnother').onclick = nextPick;
+  const bp = $('btnPrevPeek'); if (bp) bp.onclick = prevPick;
+  const bp2 = $('btnPrev'); if (bp2) bp2.onclick = prevPick;
   $('actShare').onclick = () => shareDest(d, item);
   $('actSave').onclick = () => {
     const on = store.toggleSaved(d.id);
@@ -485,7 +495,14 @@ function nextPick() {
   if (S.pinned) { S.pinned = null; render(true); return; }
   if (!S.ranked.length) return;
   S.idx++;
-  if (S.idx % S.ranked.length === 0) toast('That was everything in range — back to the top pick');
+  if (S.idx % S.ranked.length === 0) { S.idx = 0; toast('That was everything in range — back to the top pick'); }
+  render(true);
+}
+
+function prevPick() {
+  if (S.pinned) { S.pinned = null; render(true); return; }
+  if (!S.ranked.length || S.idx === 0) return;
+  S.idx--;
   render(true);
 }
 
@@ -498,24 +515,27 @@ function toggleSheet(force) {
 }
 
 function wireSheetDrag() {
+  // Whole-sheet drag with bottom-sheet physics:
+  // - collapsed: drag up anywhere on the sheet expands it
+  // - expanded: drag down collapses it ONLY when the content is scrolled to
+  //   the top — otherwise the gesture is a scroll and we stay out of its way
+  // Taps are unaffected (46px movement threshold), so buttons keep working.
   const sheet = $('sheet');
-  let startY = null, startExpanded = false;
+  const body = $('sheetBody');
+  const y = e => (e.touches ? e.touches[0] : e).clientY;
+  let startY = null, startScrollTop = 0;
   const onDown = e => {
-    // drag ONLY from the handle or the collapsed peek — the expanded body
-    // scrolls, and a drag gesture there must scroll, not collapse the sheet
-    if (!e.target.closest('#sheetHandle, .sheet-peek')) return;
-    if (e.target.closest('.btn, a')) return;
-    startY = (e.touches ? e.touches[0] : e).clientY;
-    startExpanded = sheet.classList.contains('is-expanded');
+    startY = y(e);
+    startScrollTop = body.scrollTop;
   };
   const onMove = e => {
     if (startY === null) return;
-    const y = (e.touches ? e.touches[0] : e).clientY;
-    const dy = y - startY;
-    if (Math.abs(dy) > 46) {
-      toggleSheet(dy < 0);
-      startY = null;
-    }
+    const dy = y(e) - startY;
+    if (Math.abs(dy) < 46) return;
+    const expanded = sheet.classList.contains('is-expanded');
+    if (!expanded && dy < 0) toggleSheet(true);
+    else if (expanded && dy > 0 && startScrollTop <= 1 && body.scrollTop <= 1) toggleSheet(false);
+    startY = null; // one decision per gesture; anything else is a scroll
   };
   const onUp = () => { startY = null; };
   sheet.addEventListener('touchstart', onDown, { passive: true });
