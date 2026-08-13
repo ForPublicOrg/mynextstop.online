@@ -44,21 +44,10 @@ function cleanDest(d) {
 // ----- boot -----
 init();
 async function init() {
-  // the GPU-stall redirect carries the month so a December browse survives it
-  const qm = +new URLSearchParams(location.search).get('m');
-  if (qm >= 1 && qm <= 12) S.month = qm;
-
   paintThemeBtns();
   buildMonthSel();
   buildDistChips();
   wireEvents();
-
-  try {
-    if (sessionStorage.getItem('mns-stall-redirect')) {
-      sessionStorage.removeItem('mns-stall-redirect');
-      toast('This device has trouble drawing the 3D globe, so you get the flat map.');
-    }
-  } catch { /* private mode */ }
 
   try {
     const [d, h] = await Promise.all([
@@ -773,11 +762,6 @@ function toggleTheme() {
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
   if (document.documentElement.getAttribute('data-theme')) return;
   applyTheme(e.matches ? 'dark' : 'light');
-});
-
-// even the flat map can't draw on this GPU: the picks themselves still work
-window.addEventListener('mns:map-stalled', () => {
-  toast('This device can’t draw the map, but your picks below still work.');
 });
 
 let toastTimer = null;
