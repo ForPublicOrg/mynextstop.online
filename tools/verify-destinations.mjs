@@ -7,8 +7,8 @@
 //
 // Offline it checks the schema and the season logic. Online it also asks
 // two public APIs whether the data is telling the truth about the map:
-//   · BigDataCloud reverse geocoding: does the coordinate sit in the state
-//     the record claims?
+//   · Reverse geocoding (cached BigDataCloud answers, Photon for fresh
+//     lookups): does the coordinate sit in the state the record claims?
 //   · Photon / OpenStreetMap forward geocoding. How far is the named place
 //     from the coordinate we ship?
 //   · Open-Meteo elevation (Copernicus DEM). Is `alt` the real ground height
@@ -135,7 +135,7 @@ function offlineChecks(data) {
         }
         // a season the engine will never offer must read as a clear "not now"
         if (SEASON_MONTHS[s].every(m => av.has(m))) {
-          const warns = /avoid|skip|don't|do not|shut|clos|cancel|unreliab|dangerous|risk|brutal|not the time|stay away|washed|landslide|unbearable|punishing|miserable|rough|suspend|off-limits|flood|waterlog|steam|worst|swelter|bake|slick|mud|leech|humid|drench|downpour|deluge|snowbound|cut off|inaccessible|furnace|no shade|stifling|nothing to|nothing here|dead season|lethal|guesswork|slips|spate|buried|unreachable|impassable|dry rock|bare|stranded|no point|off the table|thin out|sees nothing|grimy|sticky|useless|barefoot-only|blistering/i.test(t);
+          const warns = /avoid|skip|don't|do not|shut|clos|cancel|unreliab|dangerous|risk|brutal|not the time|stay away|washed|landslide|unbearable|punishing|miserable|rough|suspend|off-limits|flood|waterlog|steam|worst|swelter|bake|slick|mud|leech|humid|drench|downpour|deluge|snowbound|cut off|inaccessible|furnace|no shade|stifling|nothing to|nothing here|dead season|lethal|guesswork|slips|spate|buried|unreachable|impassable|dry rock|bare|stranded|no point|off the table|thin out|sees nothing|grimy|sticky|useless|barefoot-only|blistering|slush|lottery|sit this season out|sit it out|pointless|red flag/i.test(t);
           if (!warns) add(id, 'MED', 'season-logic', `${s} is entirely in avoidMonths but why.${s} does not read as a warning`);
         }
       }
@@ -201,7 +201,20 @@ async function onlineChecks(data) {
   let n = 0;
   for (const d of data) {
     if (typeof d.lat !== 'number') continue;
-    const j = await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${d.lat}&longitude=${d.lng}&localityLanguage=en`, 150);
+    // BigDataCloud's client endpoint refuses server-side callers (HTTP 402);
+    // answers already in the cache stay trusted, fresh lookups use Photon's
+    // reverse geocoder instead.
+    const bdcUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${d.lat}&longitude=${d.lng}&localityLanguage=en`;
+    let j = cache[bdcUrl];
+    if (j === undefined) {
+      const p = await getJSON(`https://photon.komoot.io/reverse?lat=${d.lat}&lon=${d.lng}&limit=1`, 350);
+      const pr = p?.features?.[0]?.properties;
+      j = pr ? {
+        principalSubdivision: pr.state || '',
+        countryName: pr.country || '',
+        locality: pr.city || pr.county || pr.name || '',
+      } : null;
+    }
     process.stderr.write(`state check ${++n}/${data.length}\r`);
     if (n % 25 === 0) saveCache();
     if (!j) continue;

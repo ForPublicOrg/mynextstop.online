@@ -10,7 +10,7 @@ backend, no planning spiral.
 ## How it works
 
 1. **📍 One tap**: browser GPS (or type your city; your location never leaves the page).
-2. **The engine ranks 507 curated Indian destinations**, every state and union
+2. **The engine ranks 589 curated Indian destinations**, every state and union
    territory covered, by:
    - **Season honesty**: every place has peak / shoulder / avoid months. Places in
      `avoidMonths` (landslide season, 45 °C plains, closed parks, rough seas) are *never*
@@ -49,11 +49,12 @@ Zero-framework static frontend: the same pattern as
 - `index.html` + `css/style.css` + vanilla ES modules in `js/`
 - `js/engine.js`: pure ranking logic (season scoring, haversine, road estimates,
   long-weekend detection). No DOM, unit-testable.
-- `data/destinations.json`: 507 curated destinations across all 36 states and union
+- `data/destinations.json`: 589 curated destinations across all 36 states and union
   territories: coordinates, peak/shoulder/avoid months, four season-specific "why now"
-  lines, solo score, budget, transport hub, altitude, signature festival. Big cities
-  and one-bus-a-day villages both, because the answer has to work from wherever you
-  open it.
+  lines, solo score, budget, transport hub, altitude, signature festival. Beauty first:
+  hill stations, valleys, waterfalls, beaches, gorges and one-bus-a-day villages. A
+  city earns an entry only when the trip IS its heritage (Jaipur, Varanasi, Amritsar);
+  plain metros are deliberately absent.
 - `js/cities.js`: 238 cities for the "type where I am" search: every state capital,
   every city over ~200k, and the regional hubs people set out from. Renamed cities keep
   the old name in brackets so "Bangalore" and "Vizag" still find them.
