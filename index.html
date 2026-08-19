@@ -137,6 +137,13 @@
         <button class="sheet-handle" id="sheetHandle" aria-label="Expand details"><span></span></button>
         <div class="sheet-body" id="sheetBody"></div>
       </aside>
+
+      <!-- "my location", the corner everyone's thumb already knows. Sits after
+           the sheet in the DOM so CSS can step it aside when the sheet is
+           expanded over this corner. -->
+      <button id="mapLocateBtn" class="icon-btn map-locate-btn" title="Use my location" aria-label="Use my location">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><path d="M12 2v3.5M12 18.5V22M2 12h3.5M18.5 12H22"/><circle cx="12" cy="12" r="2.3" fill="currentColor" stroke="none"/></svg>
+      </button>
     </section>
 
   </main>

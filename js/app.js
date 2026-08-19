@@ -164,8 +164,13 @@ function wireEvents() {
   wireDlgFallback($('savedDlg'));
   wireDlgFallback($('filterDlg'));
   $('filterBtn').onclick = () => openDlg($('filterDlg'));
-  $('btnLocate').onclick = doLocate;
-  $('dlgLocate').onclick = () => { closeDlg($('originDlg')); doLocate(); };
+  $('btnLocate').onclick = () => doLocate($('btnLocate'));
+  $('mapLocateBtn').onclick = () => doLocate($('mapLocateBtn'));
+  // the dialog opens from either screen: spin the control the user can see
+  $('dlgLocate').onclick = () => {
+    closeDlg($('originDlg'));
+    doLocate($('screen-map').hidden ? $('btnLocate') : $('mapLocateBtn'));
+  };
   $('originBtn').onclick = openOriginDlg;
   $('themeBtn').onclick = toggleTheme;
   $('themeBtnMap').onclick = toggleTheme;
@@ -241,10 +246,13 @@ async function enterMap() {
 }
 
 // ----- origin -----
-async function doLocate() {
-  const btn = $('btnLocate');
+// Any of the three locate controls can drive this. The labelled buttons swap
+// their text for the wait; the icon-only map button spins in place.
+async function doLocate(btn = $('btnLocate')) {
+  const iconOnly = btn.classList.contains('map-locate-btn');
   const old = btn.innerHTML;
-  btn.textContent = 'Finding you…';
+  if (iconOnly) btn.classList.add('is-busy');
+  else btn.textContent = 'Finding you…';
   btn.disabled = true;
   try {
     const pos = await locate();
@@ -260,7 +268,8 @@ async function doLocate() {
     toast('Couldn’t get your location. Type where you are instead.');
     openOriginDlg();
   } finally {
-    btn.innerHTML = old;
+    if (iconOnly) btn.classList.remove('is-busy');
+    else btn.innerHTML = old;
     btn.disabled = false;
   }
 }
@@ -551,6 +560,8 @@ function measurePeek() {
     let h = ref.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top + pad;
     h = Math.min(Math.round(h), Math.round(sheet.clientHeight * 0.45));
     sheetCollapsedY = Math.max(0, sheet.offsetHeight - h);
+    // the map's locate button is anchored to the peek strip
+    document.documentElement.style.setProperty('--peek-h', h + 'px');
   }
   if (hadFull) sheet.classList.add('show-full');
   // apply immediately: retargeting an in-flight snap keeps it one smooth

@@ -268,6 +268,24 @@ body { -webkit-tap-highlight-color: transparent; }
   box-shadow: var(--elev-1); border: 0;
 }
 
+/* "my location" over the map. Rides just above the collapsed sheet: JS keeps
+   --peek-h in sync with the peek strip, so the button glides with it. An
+   expanded sheet owns that whole corner on phones, so the button steps aside
+   (desktop docks the sheet to the right, and the override below keeps it). */
+.map-locate-btn {
+  position: absolute; z-index: 1040;
+  right: 12px; bottom: calc(var(--peek-h, 130px) + 12px);
+  width: 46px; height: 46px; color: var(--accent);
+  box-shadow: var(--elev-1); border: 0;
+  transition: background .12s ease, transform .12s ease, opacity .2s ease,
+              visibility .2s ease, bottom .3s cubic-bezier(.32,.72,.25,1);
+}
+.map-locate-btn .ic { width: 22px; height: 22px; }
+.map-locate-btn.is-busy { pointer-events: none; }
+.map-locate-btn.is-busy .ic { animation: locate-spin 1s linear infinite; opacity: .6; }
+.sheet.is-expanded ~ .map-locate-btn { opacity: 0; visibility: hidden; }
+@keyframes locate-spin { to { transform: rotate(360deg); } }
+
 /* filter dialog bits */
 .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
 .f-label { font-size: 12px; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); font-weight: 600; margin-top: 4px; }
@@ -557,6 +575,9 @@ dialog[open] { display: block; }
   }
   .map-overlay-top { padding: 16px 16px 0; max-width: 480px; }
   .map-theme-btn { right: 432px; top: 16px; }
+  /* clear of the docked sheet, so it never has to hide */
+  .map-locate-btn { right: 432px; bottom: 16px; }
+  .sheet.is-expanded ~ .map-locate-btn { opacity: 1; visibility: visible; }
   .screen-map .leaflet-top.leaflet-right { top: 64px; right: 424px; }
   .home { padding-top: 20vh; }
 }
