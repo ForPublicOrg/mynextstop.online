@@ -149,7 +149,7 @@ body { -webkit-tap-highlight-color: transparent; }
 
 .home {
   width: 100%; max-width: 440px; margin: 0 auto;
-  padding: 16vh 20px 40px;
+  padding: 10vh 20px 24px;
   display: flex; flex-direction: column; align-items: center; gap: 14px;
   text-align: center;
 }
@@ -177,6 +177,28 @@ body { -webkit-tap-highlight-color: transparent; }
 }
 .home-hint { font-size: 12.5px; color: var(--muted); margin: 4px 0 0; }
 .btn-link { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; font-size: inherit; }
+
+/* The home screen's way into the written guides. Without real links here the
+   657 generated pages are only reachable through the sitemap, and "/" reads
+   to a crawler as a dead end. margin-top:auto parks it at the foot of the
+   100dvh column so the hero keeps its position. */
+.home-browse {
+  margin-top: auto; width: 100%; max-width: 680px;
+  margin-inline: auto; padding: 0 20px calc(var(--sab) + 18px);
+  text-align: center; font-size: 12.5px; color: var(--muted);
+}
+.home-browse a { color: var(--muted); text-decoration: none; }
+.home-browse a:hover { color: var(--accent); }
+.hb-lead { margin: 0 0 14px; font-size: 13px; }
+.hb-lead a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.hb-title {
+  margin: 0 0 7px; font-size: 11px; font-weight: 620;
+  letter-spacing: .06em; text-transform: uppercase; opacity: .75;
+}
+.hb-row { margin: 0 0 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; }
+.hb-row:last-child { margin-bottom: 0; }
+.hb-row a { padding: 4px 10px; border-radius: 999px; background: var(--panel-2); }
+.hb-row a:hover { background: var(--accent-soft); }
 
 /* shared search results list */
 .search-results {

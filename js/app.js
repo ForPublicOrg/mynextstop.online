@@ -22,6 +22,12 @@ const S = {
   pinned: null,                    // destination tapped on the map / saved list
   seed: now.getDate() + (now.getMonth() + 1) * 31,
 };
+// A generated guide page links here as /?to=<id>: land on the map with that
+// place already open. Ranking needs an origin, so when there isn't one yet
+// the pin waits in `pendingPin` until the "where are you?" answer arrives.
+const WANT_ID = new URLSearchParams(location.search).get('to');
+let pendingPin = null;
+
 const DIST_KM = { nearby: 150, weekend: 450, long: 900, anywhere: Infinity };
 const DIST_LABEL = [
   ['nearby', 'Quick hop', '≤150 km'],
@@ -71,6 +77,7 @@ async function init() {
   }
 
   buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
+  if (WANT_ID) pendingPin = DESTS.find(d => d.id === WANT_ID) || null;
 
   // CTAs stay disabled until the catalogue is in memory: a cached GPS fix
   // can resolve faster than the fetch and would rank an empty list
@@ -92,7 +99,12 @@ async function init() {
     dlg.addEventListener('close', () => { dlg.style.bottom = ''; });
   }
 
-  if (S.origin) enterMap();
+  if (S.origin) {
+    if (pendingPin) { S.pinned = pendingPin; pendingPin = null; }
+    enterMap();
+  } else if (pendingPin) {
+    openOriginDlg();   // nothing to draw a route from yet, so ask first
+  }
 }
 
 // ----- UI scaffolding -----
@@ -277,7 +289,9 @@ async function doLocate(btn = $('btnLocate')) {
 function setOrigin(o) {
   S.origin = o;
   store.origin = o;
-  S.idx = 0; S.pinned = null;
+  S.idx = 0;
+  S.pinned = pendingPin;   // a /?to= deep link survives the detour through this dialog
+  pendingPin = null;
   $('homeResults').hidden = true;
   enterMap();
 }

@@ -1,4 +1,18 @@
+# mynextstop.online
+# Everything a reader can see is meant to be indexed: 589 destination guides,
+# 36 state guides, 12 month guides and 16 theme guides, all generated from
+# the open catalogue in /data.
+
 User-agent: *
 Allow: /
+
+# Contributor tooling and its 2 MB geocoding cache. Nothing a reader wants,
+# and nothing that should compete for crawl budget.
+Disallow: /tools/
+
+# Note: the guide pages link to the map as /?to=<id>. That is deliberately
+# NOT blocked here: it serves the same page as "/" and carries a canonical
+# back to it, and a crawler has to be allowed to fetch a URL before it can
+# read the canonical that folds it away.
 
 Sitemap: https://mynextstop.online/sitemap.xml

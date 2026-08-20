@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://mynextstop.online/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://mynextstop.online/sitemaps/core.xml</loc>
+    <lastmod>2026-08-14</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://mynextstop.online/sitemaps/hubs.xml</loc>
+    <lastmod>2026-08-14</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://mynextstop.online/sitemaps/places.xml</loc>
+    <lastmod>2026-08-14</lastmod>
+  </sitemap>
+</sitemapindex>

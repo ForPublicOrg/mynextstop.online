@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>my next stop · where to travel next in India</title>
-  <meta name="description" content="Open it anywhere in India and it answers one question: where should I go next? A live season map of curated destinations picks your best next stop and draws the route from where you stand. No login, no planning spiral." />
+  <meta name="description" content="Where to travel next in India. A live season map of 589 curated destinations takes your location and today's date and names your best next stop." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="theme-color" content="#0e7a6c" />
 
   <!-- Applies saved theme before first paint; kept external so CSP stays hash-free -->
@@ -66,6 +67,30 @@
     "description": "A season-aware map for solo travellers in India. It takes your location and today's date, shows every destination as a live season dot, picks your best next stop and draws the route to it."
   }
   </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "my next stop",
+    "url": "https://mynextstop.online/",
+    "inLanguage": "en-IN",
+    "description": "A season-aware travel guide to 589 curated destinations across every Indian state and union territory, with honest peak, shoulder and avoid months for each one.",
+    "publisher": { "@id": "https://mynextstop.online/#org" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://mynextstop.online/#org",
+    "name": "my next stop",
+    "url": "https://mynextstop.online/",
+    "logo": "https://mynextstop.online/icon-512.png",
+    "sameAs": ["https://github.com/ForPublicOrg/mynextstop.online"]
+  }
+  </script>
 </head>
 <body>
 
@@ -99,6 +124,18 @@
 
         <p class="home-hint" id="heroNote">Free · no sign-up · your location never leaves this page</p>
       </div>
+
+      <nav class="home-browse" aria-label="Browse destinations">
+        <p class="hb-lead">Or just read: <a href="/places">all 589 destinations</a>, <a href="/india">state by state</a>, <a href="/themes">by theme</a>.</p>
+        <p class="hb-title">Best time to visit India</p>
+        <p class="hb-row">
+          <a href="/best-time-to-visit/january">January</a><a href="/best-time-to-visit/february">February</a><a href="/best-time-to-visit/march">March</a><a href="/best-time-to-visit/april">April</a><a href="/best-time-to-visit/may">May</a><a href="/best-time-to-visit/june">June</a><a href="/best-time-to-visit/july">July</a><a href="/best-time-to-visit/august">August</a><a href="/best-time-to-visit/september">September</a><a href="/best-time-to-visit/october">October</a><a href="/best-time-to-visit/november">November</a><a href="/best-time-to-visit/december">December</a>
+        </p>
+        <p class="hb-title">Popular states</p>
+        <p class="hb-row">
+          <a href="/india/himachal-pradesh">Himachal Pradesh</a><a href="/india/rajasthan">Rajasthan</a><a href="/india/kerala">Kerala</a><a href="/india/karnataka">Karnataka</a><a href="/india/uttarakhand">Uttarakhand</a><a href="/india/goa">Goa</a><a href="/india/ladakh">Ladakh</a><a href="/india/meghalaya">Meghalaya</a><a href="/india/tamil-nadu">Tamil Nadu</a><a href="/india/maharashtra">Maharashtra</a>
+        </p>
+      </nav>
     </section>
 
     <!-- map (primary) -->

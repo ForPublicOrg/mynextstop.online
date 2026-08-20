@@ -63,7 +63,13 @@ Zero-framework static frontend: the same pattern as
   16 category glyphs + transport modes), all `currentColor` SVG. No emoji, no icon fonts.
 - Leaflet + CARTO basemap tiles (theme-aware light/dark), with India's official boundary
   drawn as a corrective overlay (see DATA-LICENSE.md).
-- No analytics, no cookies, no accounts. Geolocation is used in-page only.
+- `tools/build-seo.mjs`: generates the readable half of the site, 657 static pages
+  (589 destination guides, 36 state guides, 12 month guides, 16 theme guides, four
+  browse indexes) plus the sitemaps, straight out of `data/destinations.json`. Output
+  is committed, so deploy is still "upload the folder". See **Search & indexing**.
+- `css/pages.css` + `js/page.js`: the guide pages' thin layer on top of the app's
+  design tokens. The app's CSS is untouched by them.
+- No cookies, no accounts. Geolocation is used in-page only.
 
 ## Deploy
 
@@ -73,6 +79,44 @@ Static: deploys as-is on Vercel (`vercel.json` carries CSP/security headers,
 ```bash
 npx vercel --prod
 ```
+
+## Search & indexing
+
+The app is one URL with a map in it, and a map is not something Google can rank. So
+every fact the catalogue already holds is also written out as a plain page a crawler
+can read:
+
+| URL | What it is | Count |
+| --- | --- | --- |
+| `/places/<id>` | One destination: season strip, the four season-specific "why now" lines, vibe, how to get there, trip facts, nearby places | 589 |
+| `/india/<state>` | Best places in a state, with the months it is actually strong | 36 |
+| `/best-time-to-visit/<month>` | Best places in India that month, **and where not to go** | 12 |
+| `/themes/<category>` | Best beaches / treks / heritage / offbeat, and so on | 16 |
+| `/places` `/india` `/best-time-to-visit` `/themes` | Browse indexes | 4 |
+
+Nothing on those pages is invented: every sentence is a field from
+`data/destinations.json`, and every number is computed from it. The month pages show
+each place's own season line for that month, so December and July are genuinely
+different pages, not one template with the month swapped.
+
+Each page carries a unique title and description, a canonical, `BreadcrumbList` and
+either `TouristAttraction` (with real coordinates) or `ItemList`, plus a `FAQPage`
+whose answers are visible on the page. Every destination links to its state, its
+themes, its peak months and its eight nearest neighbours, so the catalogue is one
+connected graph rather than 589 orphans, and `/` links into it so the front door is
+not a dead end. A guide page's call to action opens `/?to=<id>`, which drops you on
+the live map with that place selected.
+
+Rebuild after any edit to the catalogue, and commit the diff:
+
+```bash
+node tools/build-seo.mjs
+```
+
+`--check` exits 1 if the committed pages no longer match the data (CI can gate on
+it); `--clean` starts from scratch. Stale pages from a renamed or dropped
+destination are swept automatically, because a stale page is a 200 that Google
+will happily keep in its index.
 
 ## Data
 
@@ -90,7 +134,8 @@ cancelled ferries, 45 °C. Not for "it's a bit less nice then".
 Everything that can be checked by machine, is:
 
 ```bash
-node tools/verify-destinations.mjs
+node tools/verify-destinations.mjs   # is the data telling the truth?
+node tools/build-seo.mjs --check     # are the generated pages in sync with it?
 ```
 
 It validates the schema and the season logic, then asks OpenStreetMap whether
