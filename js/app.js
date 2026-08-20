@@ -27,6 +27,9 @@ const S = {
 // the pin waits in `pendingPin` until the "where are you?" answer arrives.
 const WANT_ID = new URLSearchParams(location.search).get('to');
 let pendingPin = null;
+// True until an origin is settled. The launch fix arrives late, so it must
+// check this before overruling a city the user typed while it was in flight.
+let booting = true;
 
 const DIST_KM = { nearby: 150, weekend: 450, long: 900, anywhere: Infinity };
 const DIST_LABEL = [
@@ -37,6 +40,14 @@ const DIST_LABEL = [
 ];
 
 const $ = id => document.getElementById(id);
+// A labelled button keeps its label as a bare text node so the accessible name
+// is still computed from the button's contents. Swapping that node is how the
+// wait states retitle a button without disturbing its icon.
+const btnLabel = btn => [...btn.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+// resting copy for the two lines the launch wait borrows, so the wording
+// itself stays in index.html
+const HERO_NOTE = $('heroNote').textContent;
+const LOCATE_LABEL = btnLabel($('btnLocate')).textContent;
 
 // The curated data is written elsewhere; keep its em-dashes out of the UI
 // at render time instead of editing the catalogue.
@@ -55,6 +66,13 @@ async function init() {
   buildDistChips();
   wireEvents();
 
+  // Every launch asks the browser where the phone is now: a saved origin is
+  // the fallback, not the default. Someone who used the site from Delhi last
+  // month and opens it in Goa should get Goa. Fired before the catalogue
+  // fetch so the prompt (or a cached fix) overlaps the download.
+  setLocating(true);
+  const fix = requestFix();
+
   try {
     const [d, h] = await Promise.all([
       fetch('data/destinations.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
@@ -65,6 +83,7 @@ async function init() {
     HOLIDAYS = h;
   } catch {
     // persistent error state, distinct from "no results for these filters"
+    setLocating(false);
     $('btnLocate').disabled = true;
     $('homeSearch').disabled = true;
     $('heroNote').innerHTML =
@@ -79,9 +98,9 @@ async function init() {
   buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
   if (WANT_ID) pendingPin = DESTS.find(d => d.id === WANT_ID) || null;
 
-  // CTAs stay disabled until the catalogue is in memory: a cached GPS fix
-  // can resolve faster than the fetch and would rank an empty list
-  $('btnLocate').disabled = false;
+  // The catalogue is in memory, so typing a city can now rank something. The
+  // locate CTA stays disabled a little longer: it is mid-wait, and setLocating
+  // releases it if that wait comes back empty.
   $('homeSearch').disabled = false;
 
   // keep the origin dialog's input above the iOS keyboard: the keyboard
@@ -99,12 +118,7 @@ async function init() {
     dlg.addEventListener('close', () => { dlg.style.bottom = ''; });
   }
 
-  if (S.origin) {
-    if (pendingPin) { S.pinned = pendingPin; pendingPin = null; }
-    enterMap();
-  } else if (pendingPin) {
-    openOriginDlg();   // nothing to draw a route from yet, so ask first
-  }
+  settleOrigin(await fix);
 }
 
 // ----- UI scaffolding -----
@@ -258,13 +272,67 @@ async function enterMap() {
 }
 
 // ----- origin -----
-// Any of the three locate controls can drive this. The labelled buttons swap
-// their text for the wait; the icon-only map button spins in place.
+// The launch fix. Resolves to a position or to null: "the browser won't say"
+// is an ordinary outcome on this path, not an error, so it never rejects.
+async function requestFix() {
+  if (!('geolocation' in navigator)) return null;
+  try {
+    // A blocked site rejects instantly and noisily in the console. When the
+    // Permissions API can tell us that for free, skip the pointless ask.
+    const p = await navigator.permissions?.query({ name: 'geolocation' });
+    if (p && p.state === 'denied') return null;
+  } catch { /* no Permissions API, or it doesn't know the name: just ask */ }
+  try { return await locate(); } catch { return null; }
+}
+
+// Where the launch lands. The fresh fix wins; the last start point is what's
+// left when the browser won't say; the home screen is what's left after that.
+function settleOrigin(pos) {
+  setLocating(false);
+  if (!booting) return;   // a city was typed while the fix was in flight: it stands
+
+  if (pos && inIndia(pos)) { setOrigin(originFrom(pos)); return; }
+
+  const why = pos
+    ? 'You seem to be outside India. '
+    : 'Couldn’t get your location. ';
+  if (S.origin) {
+    // say it, or a stale start point silently passes for the current one
+    toast(why + 'Showing your last start point.');
+    if (pendingPin) { S.pinned = pendingPin; pendingPin = null; }
+    enterMap();
+  } else if (pendingPin) {
+    toast(why + 'Type where you’ll start instead.');
+    openOriginDlg();       // nothing to draw a route from yet, so ask
+  } else {
+    $('heroNote').textContent = why + 'Type where you are, or try again.';
+  }
+}
+
+// The wait, held on the home screen rather than a splash: if the fix never
+// lands this is already the screen the user needs, so there's nothing to undo.
+function setLocating(on) {
+  const btn = $('btnLocate');
+  btn.classList.toggle('is-busy', on);
+  btn.disabled = on;
+  btnLabel(btn).textContent = on ? 'Locating…' : LOCATE_LABEL;
+  $('heroNote').textContent = on ? 'Locating you…' : HERO_NOTE;
+}
+
+// Coordinates read back as a place name: the catalogue first (standing in a
+// destination should say so), then the nearest big city.
+function originFrom(pos) {
+  const here = whereAmI(DESTS, pos) || nearestCity(pos.lat, pos.lng);
+  return { name: here.near ? `near ${here.name}` : here.name, lat: pos.lat, lng: pos.lng };
+}
+
+// Any of the three locate controls can drive this: each spins its icon, and
+// the labelled ones say "Locating…" while they wait.
 async function doLocate(btn = $('btnLocate')) {
-  const iconOnly = btn.classList.contains('map-locate-btn');
-  const old = btn.innerHTML;
-  if (iconOnly) btn.classList.add('is-busy');
-  else btn.textContent = 'Finding you…';
+  const label = btnLabel(btn);   // the icon-only map control has none
+  const old = label && label.textContent;
+  btn.classList.add('is-busy');
+  if (label) label.textContent = 'Locating…';
   btn.disabled = true;
   try {
     const pos = await locate();
@@ -273,20 +341,19 @@ async function doLocate(btn = $('btnLocate')) {
       openOriginDlg();
       return;
     }
-    const here = whereAmI(DESTS, pos) || nearestCity(pos.lat, pos.lng);
-    const label = here.near ? `near ${here.name}` : here.name;
-    setOrigin({ name: label, lat: pos.lat, lng: pos.lng });
+    setOrigin(originFrom(pos));
   } catch {
     toast('Couldn’t get your location. Type where you are instead.');
     openOriginDlg();
   } finally {
-    if (iconOnly) btn.classList.remove('is-busy');
-    else btn.innerHTML = old;
+    btn.classList.remove('is-busy');
+    if (label) label.textContent = old;
     btn.disabled = false;
   }
 }
 
 function setOrigin(o) {
+  booting = false;
   S.origin = o;
   store.origin = o;
   S.idx = 0;
