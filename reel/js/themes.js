@@ -70,7 +70,6 @@ export const THEMES = {
     pin: { fill: '#0e7a6c', ring: '#ffffff' },
     chip: { bg: '#ffffff', ink: '#1b1e22', serif: false },
     card: { bg: 'rgba(255,255,255,.94)', ink: '#12161a', sub: '#5b6470', glow: null },
-    watermark: { bg: 'rgba(255,255,255,.80)', ink: '#3d464f' },
     attribution: CARTO_ATTRIBUTION,
     swatch: { top: '#eef2f1', bottom: '#dbe4e2' }
   },
@@ -96,7 +95,6 @@ export const THEMES = {
     pin: { fill: '#f5b42a', ring: '#f8fafc' },
     chip: { bg: '#1e2126', ink: '#f3f4f6', serif: false },
     card: { bg: 'rgba(20,23,26,.94)', ink: '#f8fafc', sub: '#a3aab4', glow: null },
-    watermark: { bg: 'rgba(30,33,38,.82)', ink: '#d5dae0' },
     attribution: CARTO_ATTRIBUTION,
     swatch: { top: '#23272c', bottom: '#101315' }
   },
@@ -122,7 +120,6 @@ export const THEMES = {
     pin: { fill: '#b3382c', ring: '#fffaee' },
     chip: { bg: '#f7efdd', ink: '#41321f', serif: true },
     card: { bg: 'rgba(247,239,221,.94)', ink: '#3a2c1a', sub: '#7a6647', glow: null },
-    watermark: { bg: 'rgba(247,239,221,.82)', ink: '#5b4a30' },
     attribution: CARTO_ATTRIBUTION,
     swatch: { top: '#f4ecdb', bottom: '#e2d3b4' }
   },
@@ -156,7 +153,6 @@ export const THEMES = {
     pin: { fill: '#ffffff', ring: 'rgba(0,0,0,.55)' },
     chip: { bg: 'rgba(10,14,20,.82)', ink: '#ffffff', serif: false },
     card: { bg: 'rgba(10,14,20,.94)', ink: '#ffffff', sub: '#c4cdd6', glow: null },
-    watermark: { bg: 'rgba(10,14,20,.78)', ink: '#e8eef4' },
     attribution: ESRI_ATTRIBUTION,
     swatch: { top: '#23343f', bottom: '#0b0e12' }
   },
@@ -183,7 +179,6 @@ export const THEMES = {
     pin: { fill: '#22d3ee', ring: '#f0f9ff' },
     chip: { bg: 'rgba(11,16,32,.88)', ink: '#e0f2fe', serif: false },
     card: { bg: 'rgba(11,16,32,.94)', ink: '#e0f2fe', sub: '#7dd3fc', glow: 'rgba(103,232,249,.9)' },
-    watermark: { bg: 'rgba(11,16,32,.82)', ink: '#a5f3fc' },
     attribution: CARTO_ATTRIBUTION,
     swatch: { top: '#1a1e46', bottom: '#0b1020' }
   }

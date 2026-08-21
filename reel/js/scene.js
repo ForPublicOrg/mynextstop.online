@@ -60,7 +60,6 @@ const D_FREEZE = 0.4;
 const D_POP = 0.45;
 const D_CHIP_FADE = 0.3;
 const D_PULSE = 0.6;
-const D_WATERMARK_PULSE = 0.9;
 const D_VEHICLE_IN = 0.15;
 const D_VEHICLE_OUT = 0.25;
 
@@ -696,7 +695,6 @@ export function buildTimeline(project) {
     popDur: D_POP * speed,
     chipFade: D_CHIP_FADE * speed,
     pulseDur: D_PULSE * speed,
-    wmPulseDur: D_WATERMARK_PULSE * speed,
     vehicleIn: D_VEHICLE_IN * speed,
     vehicleOut: D_VEHICLE_OUT * speed
   };
@@ -1726,76 +1724,31 @@ function drawTitleCard(ctx, tl, alpha) {
 }
 
 /**
- * Layer 10: the brand pill.
+ * Layer 10: the brand credit.
+ *
+ * Quiet corner text in the bottom left, on the same baseline and in the same
+ * register as the map data credit opposite it, so the two corners mirror each
+ * other. It borrows that credit's ink and contrast shadow, which keeps it
+ * legible over light and dark imagery on every theme.
+ *
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
- * @param {number} t Seconds.
  * @returns {void}
  */
-function drawWatermark(ctx, tl, t) {
+function drawWatermark(ctx, tl) {
   const u = tl.u;
   const dims = tl.dims;
-  const wm = tl.theme.watermark;
-  const fs = 26 * u;
-  const text = 'mynextstop.online';
+  const ink = tl.theme.chip.ink;
 
   ctx.save();
-  ctx.font = '600 ' + fs + 'px ' + SANS;
-  const textW = ctx.measureText(text).width;
-
-  const glyph = 24 * u;
-  const innerGap = 10 * u;
-  const padX = 16 * u;
-  const padY = 9 * u;
-  const contentW = glyph + innerGap + textW;
-  const pillW = contentW + padX * 2;
-  const pillH = Math.max(fs * 1.05, glyph) + padY * 2;
-
-  const baseline = dims.h - 96 * u;
-  const midY = baseline - fs * 0.35;
-  const left = dims.w / 2 - pillW / 2;
-  const top = midY - pillH / 2;
-
-  let scale = 1;
-  const p0 = tl.outro.move1;
-  if (t >= p0 && t <= p0 + tl.wmPulseDur) {
-    scale = 1 + 0.06 * Math.sin(Math.PI * ((t - p0) / tl.wmPulseDur));
-  }
-
-  ctx.globalAlpha = 0.92;
-  ctx.translate(dims.w / 2, midY);
-  ctx.scale(scale, scale);
-  ctx.translate(-dims.w / 2, -midY);
-
-  ctx.beginPath();
-  roundRectPath(ctx, left, top, pillW, pillH, pillH / 2);
-  ctx.fillStyle = wm.bg;
-  ctx.fill();
-
-  // Compass glyph: a ring with a needle across it.
-  const gcx = left + padX + glyph / 2;
-  const gr = glyph / 2 - 1.5 * u;
-  ctx.strokeStyle = wm.ink;
-  ctx.lineWidth = 2.5 * u;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.arc(gcx, midY, gr, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(gcx - gr * 0.5, midY + gr * 0.5);
-  ctx.lineTo(gcx + gr * 0.52, midY - gr * 0.52);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(gcx, midY, 1.7 * u, 0, Math.PI * 2);
-  ctx.fillStyle = wm.ink;
-  ctx.fill();
-
+  ctx.globalAlpha = 0.55;
+  ctx.font = '500 ' + (20 * u) + 'px ' + SANS;
   ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = wm.ink;
-  ctx.font = '600 ' + fs + 'px ' + SANS;
-  ctx.fillText(text, left + padX + glyph + innerGap, midY + 0.5 * u);
-
+  ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = isLightColor(ink) ? 'rgba(0,0,0,.7)' : 'rgba(255,255,255,.7)';
+  setShadow(ctx, 0, u, u);
+  ctx.fillStyle = ink;
+  ctx.fillText('mynextstop.online', 20 * u, dims.h - 20 * u);
   ctx.restore();
 }
 
@@ -1875,7 +1828,7 @@ export function renderFrame(ctx, timeline, t, tiles) {
   const ta = titleAlpha(tl, time);
   if (ta > 0.001) drawTitleCard(ctx, tl, ta);
 
-  drawWatermark(ctx, tl, time);
+  drawWatermark(ctx, tl);
   drawAttribution(ctx, tl);
 
   ctx.restore();

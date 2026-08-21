@@ -25,6 +25,8 @@ import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const STORAGE_KEY = 'mns-reel-draft-v1';
+/** Where the draft waits when a trip handed over from the map takes its place. */
+const PREV_KEY = 'mns-reel-draft-prev';
 const THEME_KEY = 'mns-theme';
 const MAX_STOPS = 12;
 const PREVIEW_MAX_W = 380;
@@ -853,6 +855,146 @@ function startFresh() {
   if (dom.routeSeg) syncRadio(dom.routeSeg, state.routeStyle);
   commit();
   announce('Draft cleared');
+}
+
+/* ------------------------------------------------------------------ *
+ * hand-off from the map
+ *
+ * The map links here with ?stops=lat,lng,label|... One bad part drops the
+ * whole parameter, so a mangled link quietly falls through to the draft
+ * instead of loading half a trip.
+ * ------------------------------------------------------------------ */
+
+/**
+ * Pull one parameter out of a query string without decoding it: the labels
+ * carry their own percent-encoding and must survive until the split is done.
+ * @param {string} search location.search
+ * @param {string} name parameter name
+ * @returns {string} the raw value, empty when absent
+ */
+function rawParam(search, name) {
+  const parts = search.replace(/^\?/, '').split('&');
+  for (let i = 0; i < parts.length; i++) {
+    const at = parts[i].indexOf('=');
+    if (at > 0 && parts[i].slice(0, at) === name) return parts[i].slice(at + 1);
+  }
+  return '';
+}
+
+/**
+ * @param {string} raw the stops parameter, still encoded
+ * @returns {Array<Object>|null} seed places, or null when the link is unusable
+ */
+function parseSeed(raw) {
+  if (!raw) return null;
+  // Some browsers hand back the separator percent-encoded, so accept both.
+  // Latent edge accepted: a label containing a literal pipe would arrive as
+  // %7C and mis-split, dropping the whole seed to the draft fallback. No
+  // catalogue or geocoder name carries one.
+  const parts = raw.split(/\||%7C/i);
+  if (parts.length < 2 || parts.length > MAX_STOPS) return null;
+
+  const seed = [];
+  for (let i = 0; i < parts.length; i++) {
+    // Only the first two commas delimit: the label keeps its own, encoded.
+    const first = parts[i].indexOf(',');
+    if (first < 0) return null;
+    const second = parts[i].indexOf(',', first + 1);
+    if (second < 0) return null;
+    const latText = parts[i].slice(0, first).trim();
+    const lngText = parts[i].slice(first + 1, second).trim();
+    if (!latText || !lngText) return null;
+    const lat = Number(latText);
+    const lng = Number(lngText);
+    if (!validCoords(lat, lng)) return null;
+
+    let label = '';
+    try { label = decodeURIComponent(parts[i].slice(second + 1)); } catch (err) { return null; }
+    label = label.trim().slice(0, MAX_LABEL);
+    if (!label) return null;
+    seed.push({ label: label, lat: lat, lng: normLng(lng) });
+  }
+  return seed;
+}
+
+
+/**
+ * Set the saved draft aside when a map link is about to write over real work.
+ * @param {Array<Object>} seed the trip about to be loaded
+ * @returns {boolean} true when a draft was moved to the previous slot
+ */
+function stashDraft(seed) {
+  let raw = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (err) { return false; }
+  if (!raw) return false;
+
+  let data = null;
+  try { data = JSON.parse(raw); } catch (err) { return false; }
+  if (!data || typeof data !== 'object' || !Array.isArray(data.stops)) return false;
+
+  const kept = data.stops.filter(validStop);
+  // Anything shorter than a route is not worth keeping. The same trip IS:
+  // seeding resets title, theme, format, speed and leg modes, so re-tapping
+  // the map link must still leave the customized draft one toast tap away.
+  if (kept.length < 2) return false;
+
+  try { localStorage.setItem(PREV_KEY, raw); } catch (err) { return false; }
+  return true;
+}
+
+/**
+ * Replace the project with the trip from the link. Modes come from the same
+ * distance rule a hand-built trip gets, and the roads follow from commit().
+ * @param {Array<Object>} seed seed places
+ */
+function applySeed(seed) {
+  state.stops = seed.map(function (s) {
+    return {
+      id: nextId(), name: s.label, label: s.label, lat: s.lat, lng: s.lng,
+      region: '', country: '', source: 'photon', tagline: ''
+    };
+  });
+  state.routeStyle = 'roads';
+  recomputeModes();
+}
+
+/** Put the draft the map link displaced back in place of the seeded trip. */
+function restorePrevious() {
+  let raw = null;
+  try { raw = localStorage.getItem(PREV_KEY); } catch (err) { return; }
+  if (!raw) return;
+  let swapped = false;
+  try {
+    localStorage.setItem(STORAGE_KEY, raw);
+    localStorage.removeItem(PREV_KEY);
+    swapped = true;
+  } catch (err) { /* storage closed on us between the stash and the click */ }
+  // Without the swap the reader below would only find the seeded trip again.
+  if (!swapped) {
+    toast('That draft could not be restored');
+    return;
+  }
+
+  state.stops = [];
+  state.modes = [];
+  state.roads = {};
+  modeMemory.clear();
+  restoreDraft();
+  dom.title.value = state.title;
+  syncRadio(dom.formatSeg, state.format);
+  syncRadio(dom.speedSeg, state.speed);
+  syncRadio(dom.styleRow, state.themeId);
+  if (dom.routeSeg) syncRadio(dom.routeSeg, state.routeStyle);
+  commit();
+  announce('Previous draft restored');
+}
+
+/** Drop the seed parameter so a refresh keeps the user's edits. */
+function stripSeedQuery() {
+  if (!location.search) return;
+  try {
+    history.replaceState(null, '', location.pathname + location.hash);
+  } catch (err) { /* nothing important rides on the address bar */ }
 }
 
 /* ------------------------------------------------------------------ *
@@ -2289,7 +2431,19 @@ function init() {
   addRoutingCredit();
   wire();
 
-  const restored = restoreDraft();
+  const rawSeed = rawParam(location.search, 'stops');
+  const seed = parseSeed(rawSeed);
+  // Strip only our own parameter's query so unrelated params (utm and the
+  // like) survive a plain visit.
+  if (rawSeed !== null) stripSeedQuery();
+  let stashed = false;
+  let restored = false;
+  if (seed) {
+    stashed = stashDraft(seed);
+    applySeed(seed);
+  } else {
+    restored = restoreDraft();
+  }
   dom.title.value = state.title;
   syncRadio(dom.formatSeg, state.format);
   syncRadio(dom.speedSeg, state.speed);
@@ -2298,7 +2452,10 @@ function init() {
   syncPlayButton();
   commit();
 
-  if (restored) {
+  if (seed) {
+    toast('Trip loaded from the map',
+      stashed ? { label: 'Restore previous', onAction: restorePrevious } : undefined);
+  } else if (restored) {
     toast('Restored your draft', { label: 'Start fresh', onAction: startFresh });
   }
 

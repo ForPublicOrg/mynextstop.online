@@ -502,6 +502,10 @@ function renderSheet(item) {
   const lwRun = matchingLongWeekend(d);
   const lwBadge = lwRun ? `<span class="badge badge-lw">Fits ${fmtRange(lwRun.start, lwRun.end)}</span>` : '';
 
+  // seeds the reel maker with this trip: where you are, then the pick
+  const reelHref = '/reel?stops=' + [S.origin, d]
+    .map(p => `${p.lat.toFixed(4)},${p.lng.toFixed(4)},${encodeURIComponent(p.name)}`).join('|');
+
   const statusDot = STATUS_VAR[status];
   const statusWord = STATUS_WORD[status];
 
@@ -549,6 +553,7 @@ function renderSheet(item) {
           <a class="card-act" target="_blank" rel="noopener"
              href="https://www.google.com/maps/dir/?api=1&origin=${S.origin.lat},${S.origin.lng}&destination=${encodeURIComponent(d.name + ', ' + d.state)}">
             ${icon('navigation')}Directions</a>
+          <a class="card-act" id="actReel" href="${reelHref}">${icon('film')}Reel</a>
           <button class="card-act" id="actShare">${icon('share')}Share</button>
           <button class="card-act ${store.isSaved(d.id) ? 'is-done' : ''}" id="actSave">
             ${icon(store.isSaved(d.id) ? 'heartFill' : 'heart')}Save</button>

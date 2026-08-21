@@ -28,6 +28,7 @@ const P = {
   city: '<path d="M3 21h18M5 21V9h5v12M10 21V4h6v17M16 21v-9h3v9"/><path d="M7 12h1M7 15h1M12.5 8h1M12.5 12h1"/>',
   route: '<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5" stroke-dasharray="3.2 2.6"/>',
   refresh: '<path d="M20 8A8.5 8.5 0 1 0 21 12"/><path d="M21 3v5h-5"/>',
+  film: '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M8 4.5v15M16 4.5v15M3.5 9h4.5M3.5 15h4.5M16 9h4.5M16 15h4.5"/>',
   plane: '<path d="M21 15.5 13.5 11V5a1.5 1.5 0 0 0-3 0v6L3 15.5v2.2l7.5-2.3v4l-2 1.6v1.5l3.5-1 3.5 1V21l-2-1.6v-4l7.5 2.3z"/>',
   train: '<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9.5 17.5 7 21M14.5 17.5 17 21M7.5 21h9"/><path d="M9.5 14.2h.01M14.5 14.2h.01"/>',
   car: '<path d="M4.5 15.5 6.2 10a2 2 0 0 1 1.9-1.4h7.8a2 2 0 0 1 1.9 1.4l1.7 5.5"/><path d="M3.5 15.5h17V19h-17z"/><path d="M6.5 19v1.8M17.5 19v1.8M7 12.7h10" stroke-opacity=".55"/>',

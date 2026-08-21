@@ -33,6 +33,9 @@ let theme = 'light';
 let dotMarkers = new Map();   // dest id -> { marker, status }
 let dotsSig = '';             // month|theme the cache was built for
 let selectedId = null;
+// the live route line and its permanent label: kept so a zoom change can
+// decide whether the label still has a route under it (updateRouteLabel)
+let routeLine = null, routeEnds = null;
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -116,6 +119,8 @@ export async function initMap(el, selectCallback, initialTheme = 'light') {
   addIndiaBorder();
   dotsLayer = L.layerGroup().addTo(map);
   routeLayer = L.layerGroup().addTo(map);
+  // bound once: this is the only place a map is ever created
+  map.on('zoomend', updateRouteLabel);
   if (location.hostname === 'localhost') window.__map = map;  // dev-only probe
 }
 
@@ -181,6 +186,38 @@ function setSelectedDot(id) {
   selectedId = id;
 }
 
+// The route label is ~150 px wide. At the national view the whole route can
+// be 40 px, leaving the label orphaned over an invisible line, and the sheet
+// already states the same km/time. So the label only shows when the route is
+// comfortably wider than its own label. Safe to call at any time: it no-ops
+// once the route layer has been cleared.
+function updateRouteLabel() {
+  if (!map || !routeLine || !routeEnds || !map.hasLayer(routeLine)) return;
+  const tip = routeLine.getTooltip && routeLine.getTooltip();
+  const el = tip && tip.getElement();
+  if (!el) return;
+  const routePx = map.latLngToContainerPoint(routeEnds[0])
+    .distanceTo(map.latLngToContainerPoint(routeEnds[1]));
+  const labelWidth = el.offsetWidth || 160;
+  el.classList.toggle('route-label-hidden', routePx < labelWidth * 1.15);
+}
+
+// Frame the trip: origin, pick and its onward hops, under the top bar and
+// the sheet. Used by the render's own fit and by a tap on the route.
+function fitRoute(a, b, onward) {
+  const bounds = window.L.latLngBounds([a, b]);
+  for (const o of onward) bounds.extend([o.d.lat, o.d.lng]);
+  const pads = {
+    paddingTopLeft: [36, 130],
+    paddingBottomRight: [36, Math.min(window.innerHeight * 0.32, 260)],
+    maxZoom: 9,
+  };
+  safeFit(() => {
+    if (reducedMotion()) map.fitBounds(bounds, { ...pads, animate: false });
+    else map.flyToBounds(bounds, { ...pads, duration: 0.7 });
+  });
+}
+
 /**
  * Redraw everything. state:
  *  { dests, month, origin, selected: {d, roadKm, hours, status} | null,
@@ -196,6 +233,7 @@ export function updateMap(state) {
   map.stop();
   routeLayer.eachLayer(l => { if (l.getTooltip && l.getTooltip()) l.unbindTooltip(); });
   routeLayer.clearLayers();
+  routeLine = null; routeEnds = null;
 
   drawDots(dests, month);
   setSelectedDot(selected ? selected.d.id : null);
@@ -219,8 +257,20 @@ export function updateMap(state) {
     L.polyline(pts, { color: '#ffffff', weight: 7, opacity: CASING_OPACITY[theme], interactive: false }).addTo(routeLayer);
     const line = L.polyline(pts, { color: ROUTE_COLOR[theme], weight: 3.5, opacity: 0.95, interactive: false }).addTo(routeLayer);
     line.bindTooltip(`≈ ${travelText(selected.roadKm, selected.hours)}`, {
-      permanent: true, direction: 'center', className: 'route-label', opacity: 1,
+      permanent: true, direction: 'center', className: 'route-label', opacity: 1, interactive: true,
     });
+    routeLine = line; routeEnds = [a, b];
+
+    // a fat invisible line over the arc: when the route is a hairline at the
+    // national view, tapping it (or its label) frames the trip instead.
+    // Sent to the back so the canvas renderer still hands clicks and hovers
+    // to any season dot sitting inside the corridor (topmost layer wins).
+    const frame = () => fitRoute(a, b, onward);
+    L.polyline(pts, { weight: 24, opacity: 0.001, interactive: true, className: 'route-hit' })
+      .addTo(routeLayer).on('click', frame).bringToBack();
+    const tipEl = line.getTooltip() && line.getTooltip().getElement();
+    if (tipEl) tipEl.addEventListener('click', frame);
+    updateRouteLabel();
 
     // onward hints: where you'd go NEXT from there: the "next stop" chain.
     // Unlabelled dashed arcs; their names live in the card, so the map
@@ -232,19 +282,7 @@ export function updateMap(state) {
       }).addTo(routeLayer);
     }
 
-    if (fit) {
-      const bounds = L.latLngBounds([a, b]);
-      for (const o of onward) bounds.extend([o.d.lat, o.d.lng]);
-      const pads = {
-        paddingTopLeft: [36, 130],
-        paddingBottomRight: [36, Math.min(window.innerHeight * 0.32, 260)],
-        maxZoom: 9,
-      };
-      safeFit(() => {
-        if (reducedMotion()) map.fitBounds(bounds, { ...pads, animate: false });
-        else map.flyToBounds(bounds, { ...pads, duration: 0.7 });
-      });
-    }
+    if (fit) fitRoute(a, b, onward);
   } else if (fit && origin) {
     safeFit(() => {
       if (reducedMotion()) map.setView([origin.lat, origin.lng], 6, { animate: false });
