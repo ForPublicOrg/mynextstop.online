@@ -1119,6 +1119,9 @@ function build() {
     { ...statesIndex(all), priority: '0.9', changefreq: 'weekly' },
     { ...monthsIndex(all), priority: '0.9', changefreq: 'weekly' },
     { ...themesIndex(all), priority: '0.9', changefreq: 'weekly' },
+    // /reel is a hand-built page (reel/index.html), listed here so sitemap
+    // regeneration keeps it; no html property, so nothing is emitted for it
+    { url: '/reel', lastmod, changefreq: 'weekly', priority: '0.9' },
   ];
 
   for (const p of [...built, ...hubs, ...core]) {

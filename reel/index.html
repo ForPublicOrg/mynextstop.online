@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+  <!-- Applies the saved theme before first paint; kept external so CSP stays hash-free -->
+  <script src="/js/theme-init.js"></script>
+
+  <title>Trip Route Video Maker, free animated travel map for Reels | my next stop</title>
+  <meta name="description" content="Turn your trip into a share-ready animated map video. Add your stops, pick a style, and download a vertical MP4 for Instagram Reels, TikTok or Shorts. Free, no sign-up, runs in your browser." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="theme-color" content="#0e7a6c" />
+
+  <link rel="canonical" href="https://mynextstop.online/reel" />
+
+  <meta property="og:title" content="Trip Route Video Maker, free animated travel map for Reels" />
+  <meta property="og:description" content="Add your stops, pick a style, download a vertical MP4 of your route animating across the map. Free, no sign-up, runs in your browser." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://mynextstop.online/reel" />
+  <meta property="og:site_name" content="my next stop" />
+  <meta property="og:locale" content="en_IN" />
+  <meta property="og:image" content="https://mynextstop.online/reel/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="An animated travel map video being built from a list of trip stops" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Trip Route Video Maker, free animated travel map for Reels" />
+  <meta name="twitter:description" content="Your trip, drawn stop by stop across the map and exported as a vertical MP4 for Reels, TikTok or Shorts." />
+  <meta name="twitter:image" content="https://mynextstop.online/reel/og-image.png" />
+
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <!-- Map tiles are the heaviest thing this page pulls: warm the sockets early -->
+  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://d.basemaps.cartocdn.com" crossorigin="anonymous" />
+
+  <link rel="stylesheet" href="/reel/css/reel.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Trip Route Video Maker",
+    "url": "https://mynextstop.online/reel",
+    "applicationCategory": "TravelApplication",
+    "operatingSystem": "Any",
+    "browserRequirements": "Requires a modern browser with canvas support",
+    "inLanguage": "en-IN",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+    "description": "Turn a trip into a share-ready animated map video. Add your stops, pick a style, and download a vertical MP4 for Instagram Reels, TikTok or Shorts. Free, no sign-up, runs entirely in the browser.",
+    "publisher": { "@id": "https://mynextstop.online/#org" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://mynextstop.online/" },
+      { "@type": "ListItem", "position": 2, "name": "Reel maker", "item": "https://mynextstop.online/reel" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <a class="skip-link" href="#builder">Skip to the trip builder</a>
+
+  <div class="wrap">
+
+    <header class="reel-top">
+      <a class="brand" href="/" aria-label="my next stop, home">
+        <svg class="ic brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
+        <span class="brand-name">my next stop</span>
+      </a>
+      <span class="pill-accent">reel maker</span>
+      <button id="themeBtn" class="icon-btn top-theme" type="button" aria-label="Toggle theme"></button>
+    </header>
+
+    <main class="grid">
+
+      <div class="intro">
+        <h1>Turn your route into a Reel</h1>
+        <p class="intro-sub">Add your stops, pick a style, download an animated map video. Free, no sign-up.</p>
+      </div>
+
+      <!-- preview column -->
+      <section class="col-right" aria-label="Video preview">
+        <div class="preview-hold" id="previewHold">
+
+          <div class="empty" id="emptyState">
+            <p class="empty-title">Three steps to a reel</p>
+            <ol class="empty-steps">
+              <li><span class="step-n">1</span> Add your stops</li>
+              <li><span class="step-n">2</span> Pick a style</li>
+              <li><span class="step-n">3</span> Export for Reels</li>
+            </ol>
+            <button id="sampleBtn" class="btn btn-ghost" type="button">Load a sample trip</button>
+          </div>
+
+          <div class="phone" id="phoneFrame" hidden>
+            <canvas id="previewCanvas" aria-label="Animated map preview" role="img"></canvas>
+          </div>
+
+          <div class="playbar" id="playBar" hidden>
+            <button id="playBtn" class="icon-btn play-btn" type="button" aria-label="Play"></button>
+            <input id="seek" class="seek" type="range" min="0" max="1" step="0.01" value="0" aria-label="Seek" />
+            <span id="timecode" class="timecode">0:00 / 0:00</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- controls column -->
+      <div class="col-left">
+
+        <section class="card" id="builder" aria-labelledby="stopsHead">
+          <h2 class="card-head" id="stopsHead">Your stops</h2>
+
+          <div class="field">
+            <label class="lbl" for="stopSearch">Add a stop</label>
+            <div class="combo">
+              <div class="combo-box">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
+                <input id="stopSearch" type="text" role="combobox" aria-expanded="false" aria-controls="stopResults"
+                       aria-autocomplete="list" aria-haspopup="listbox" autocomplete="off" spellcheck="false"
+                       enterkeyhint="done" placeholder="Search any city or place" />
+              </div>
+              <div id="stopResults" class="combo-list" role="listbox" aria-label="Search results" hidden></div>
+            </div>
+          </div>
+
+          <ul class="stops" id="stopList"></ul>
+          <p class="stops-empty" id="stopsEmpty">No stops yet. Search above, or load the sample trip.</p>
+        </section>
+
+        <section class="card" aria-labelledby="styleHead">
+          <h2 class="card-head" id="styleHead">Style</h2>
+          <div class="style-row" id="styleRow" role="radiogroup" aria-labelledby="styleHead"></div>
+        </section>
+
+        <section class="card" aria-labelledby="optionsHead">
+          <h2 class="card-head" id="optionsHead">Options</h2>
+
+          <div class="field">
+            <span class="lbl" id="formatLbl">Format</span>
+            <div class="seg" id="formatSeg" role="radiogroup" aria-labelledby="formatLbl">
+              <button class="seg-btn" type="button" role="radio" aria-checked="true" data-value="9x16" tabindex="0">
+                <svg class="ic seg-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/></svg>
+                <span data-fmt-label>9:16</span>
+              </button>
+              <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="1x1" tabindex="-1">
+                <svg class="ic seg-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                <span data-fmt-label>1:1</span>
+              </button>
+              <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="16x9" tabindex="-1">
+                <svg class="ic seg-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="2"/></svg>
+                <span data-fmt-label>16:9</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <span class="lbl" id="speedLbl">Speed</span>
+            <div class="seg" id="speedSeg" role="radiogroup" aria-labelledby="speedLbl">
+              <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="relaxed" tabindex="-1"><span>Relaxed</span></button>
+              <button class="seg-btn" type="button" role="radio" aria-checked="true" data-value="normal" tabindex="0"><span>Normal</span></button>
+              <button class="seg-btn" type="button" role="radio" aria-checked="false" data-value="fast" tabindex="-1"><span>Fast</span></button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl" for="tripTitle">Trip title</label>
+            <input id="tripTitle" class="txt" type="text" maxlength="48" autocomplete="off"
+                   placeholder="Golden Triangle" aria-describedby="titleHint" />
+            <p class="hint" id="titleHint">Optional, shown on the opening card.</p>
+          </div>
+
+          <button id="exportBtn" class="btn btn-primary btn-wide" type="button" aria-describedby="exportHint"></button>
+          <p class="hint" id="exportHint">Add at least 2 stops</p>
+        </section>
+
+      </div>
+    </main>
+
+    <footer class="reel-foot">
+      <p>Map data &#169; OpenStreetMap contributors, style &#169; CARTO, imagery &#169; Esri.</p>
+      <p>Videos you export are yours to post.</p>
+      <p class="foot-links"><a href="/">map</a><a href="/places">places</a></p>
+    </footer>
+
+  </div>
+
+  <!-- mobile only: the export button always within thumb reach -->
+  <div class="export-bar" id="exportBar">
+    <button id="exportBtnMobile" class="btn btn-primary btn-wide" type="button"></button>
+  </div>
+
+  <dialog id="exportDlg" class="dlg reel-dlg" role="dialog" aria-modal="true" aria-labelledby="exTitle">
+    <div class="ex-wrap">
+      <h2 class="ex-title" id="exTitle">Exporting your reel</h2>
+
+      <div class="ex-pane" id="exProgress">
+        <p class="ex-stage" id="exStage">Preparing map tiles</p>
+        <div class="ex-bar" id="exBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Export progress"><i></i></div>
+        <p class="ex-count" id="exCount"></p>
+        <div class="ex-acts">
+          <button id="exCancel" class="btn btn-ghost btn-wide" type="button">Cancel</button>
+        </div>
+      </div>
+
+      <div class="ex-pane" id="exDone" hidden>
+        <video id="exVideo" class="ex-video" controls loop muted playsinline></video>
+        <p class="ex-meta" id="exMeta"></p>
+        <p class="ex-note">No audio track: add trending audio in Instagram or TikTok when you post.</p>
+        <p class="ex-note" id="exFallbackNote" hidden>Exported as WebM because this browser cannot write MP4. Chrome, Edge or Safari 16.4+ can.</p>
+        <p class="ex-note" id="exTileNote" hidden></p>
+        <div class="ex-acts">
+          <a id="exDownload" class="btn btn-primary btn-wide" download="mynextstop-reel.mp4" href="#">Download video</a>
+          <button id="exClose" class="btn btn-ghost btn-wide" type="button">Close</button>
+        </div>
+      </div>
+
+      <div class="ex-pane" id="exError" hidden>
+        <p class="ex-stage" id="exErrorMsg"></p>
+        <div class="ex-acts">
+          <button id="exRetry" class="btn btn-primary btn-wide" type="button">Try again</button>
+          <button id="exErrClose" class="btn btn-ghost btn-wide" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="live" class="live" role="status" aria-live="polite"></div>
+
+  <script type="module" src="/reel/js/main.js"></script>
+
+  <!-- Vercel Web Analytics. Served same-origin under /_vercel/. -->
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
