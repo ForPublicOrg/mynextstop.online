@@ -1,11 +1,13 @@
 /**
  * vehicles.js
- * Single path silhouettes for the five leg modes, shared between the canvas
+ * Single path silhouettes for the leg modes, shared between the canvas
  * renderer and the inline SVG icons in the UI.
  *
  * Every path is authored in a 24 x 24 box with the nose pointing right, along
  * positive x, so rotating by the path tangent angle is all the orientation the
- * renderer needs.
+ * renderer needs. The one exception is the walker, which is drawn upright and
+ * only mirrored to face the way it is going: a person tilted to the road
+ * gradient reads as falling over, a car does not.
  */
 
 /** The viewBox every MODE_META path is authored against. */
@@ -157,7 +159,7 @@ const BOAT_D = 'M1.6 12.9L6 12.9L6 8.8Q6 8 6.8 8L12.6 8Q13.4 8 13.7 8.7L15.3 12.
  * Bicycle: two wheel rings with tube and stay quads between them. Built from
  * primitives so the geometry stays exact, then frozen into one path string.
  */
-const BIKE_D = (function buildBike() {
+const CYCLE_D = (function buildCycle() {
   const rearX = 5.7;
   const frontX = 18.3;
   const hubY = 16;
@@ -188,19 +190,113 @@ const BIKE_D = (function buildBike() {
 }());
 
 /**
- * The five leg modes, in picker order. `d` is the shared silhouette path.
- * @type {Array<{id: string, label: string, d: string}>}
+ * Motorbike in side profile, front wheel right.
+ *
+ * What separates it from the bicycle at icon size: solid wheels instead of
+ * rings, one chunky body (seat, tank bulge, engine block) instead of a thin
+ * tube frame, a raked fork reaching forward to the front wheel, and a
+ * handlebar that kicks up past the tank.
+ */
+const MOTO_D = (function buildMoto() {
+  const rearX = 5.2;
+  const frontX = 18.8;
+  const hubY = 16.8;
+  const wheel = 3.2;
+  return [
+    discSub(rearX, hubY, wheel),
+    discSub(frontX, hubY, wheel),
+    // Engine block between the wheels, tank over it, seat slab running back
+    // over the rear wheel as the fender.
+    roundRectSub(8, 11.2, 7.4, 4.4, 1.2),
+    roundRectSub(9.6, 7.4, 6.2, 4.6, 2),
+    barSub(2.6, 9.9, 10.4, 9.9, 1.05),
+    // Swingarm to the rear hub, fork down to the front hub, handlebar and
+    // headlamp at the headstock.
+    barSub(rearX, hubY, 9.6, 14.2, 0.95),
+    barSub(16.2, 9.2, frontX, hubY, 1.15),
+    barSub(15.6, 9.4, 18.6, 7.4, 0.8),
+    discSub(17.3, 9.8, 1.45)
+  ].join('');
+}());
+
+/**
+ * Coach in side profile, front right: a long box on two wheels with a row of
+ * punched windows and a taller windscreen. The flat vertical front is what
+ * keeps it from reading as the train, whose nose rakes.
+ */
+const BUS_D = (function buildBus() {
+  return [
+    roundRectSub(1.6, 6.4, 20.8, 10.6, 1.8),
+    roundRectSub(3, 8.2, 4.4, 3.6, 0.7, false),
+    roundRectSub(8.4, 8.2, 4.4, 3.6, 0.7, false),
+    roundRectSub(13.8, 8.2, 4.4, 3.6, 0.7, false),
+    roundRectSub(19.2, 8, 2.2, 5, 0.6, false),
+    discSub(6, 17.4, 2.3),
+    discSub(18, 17.4, 2.3)
+  ].join('');
+}());
+
+/**
+ * Hiker mid stride, facing right: head, torso with a pack on the back, the
+ * front arm swinging forward, both legs in the air of a step. Drawn upright
+ * (see `upright` on its MODE_META entry) and sized smaller than the vehicles so
+ * its height matches theirs on screen.
+ */
+const WALK_D = (function buildWalk() {
+  const hipX = 11.6;
+  const hipY = 13;
+  return [
+    discSub(13.2, 4.4, 2),
+    barSub(12.8, 6.8, hipX, hipY, 1.5),
+    roundRectSub(8.6, 7.4, 3.2, 5.6, 1.2),
+    barSub(12.6, 8.2, 15.8, 11.4, 0.95),
+    barSub(hipX, hipY, 14.8, 16, 1.1),
+    barSub(14.8, 16, 15.6, 20.6, 1),
+    barSub(15.2, 20.6, 17.2, 20.6, 0.8),
+    barSub(hipX, hipY, 8.8, 16.4, 1.1),
+    barSub(8.8, 16.4, 7.2, 20.4, 1),
+    barSub(7.6, 20.4, 5.8, 20.4, 0.8)
+  ].join('');
+}());
+
+/**
+ * The leg modes, in picker order. `d` is the shared silhouette path. A mode
+ * with `upright` is never rotated to the path tangent, only mirrored to face
+ * the direction of travel.
+ * @type {Array<{id: string, label: string, d: string, upright?: boolean}>}
  */
 export const MODE_META = [
   { id: 'plane', label: 'Flight', d: PLANE_D },
-  { id: 'car', label: 'Drive', d: CAR_D },
+  { id: 'car', label: 'Car', d: CAR_D },
+  { id: 'moto', label: 'Bike', d: MOTO_D },
+  { id: 'cycle', label: 'Cycle', d: CYCLE_D },
+  { id: 'bus', label: 'Bus', d: BUS_D },
   { id: 'train', label: 'Train', d: TRAIN_D },
   { id: 'boat', label: 'Boat', d: BOAT_D },
-  { id: 'bike', label: 'Ride', d: BIKE_D }
+  { id: 'walk', label: 'Walk', d: WALK_D, upright: true }
 ];
 
+/**
+ * Ids that older drafts and links may still carry, mapped to the mode that
+ * replaced them. 'bike' used to be the bicycle; it is 'cycle' now, because
+ * 'bike' is the motorbike to most of the people this page is for.
+ * @type {Object<string, string>}
+ */
+const LEGACY_MODES = { bike: 'cycle' };
+
+/**
+ * The current id for a mode, or null when the id is not a mode at all.
+ * @param {*} id A mode id, possibly from an old draft.
+ * @returns {string|null} A MODE_META id, or null.
+ */
+export function normalizeMode(id) {
+  if (typeof id !== 'string') return null;
+  const mapped = Object.prototype.hasOwnProperty.call(LEGACY_MODES, id) ? LEGACY_MODES[id] : id;
+  return MODE_META.some(function (m) { return m.id === mapped; }) ? mapped : null;
+}
+
 /** Drawn height in pixels at unit scale, per mode. */
-const BASE_SIZE = { plane: 64, car: 52, train: 52, boat: 52, bike: 52 };
+const BASE_SIZE = { plane: 64, car: 52, moto: 52, cycle: 52, bus: 54, train: 52, boat: 52, walk: 40 };
 
 const PATH_CACHE = new Map();
 
@@ -211,10 +307,21 @@ const PATH_CACHE = new Map();
  */
 function pathFor(mode) {
   if (PATH_CACHE.has(mode)) return PATH_CACHE.get(mode);
-  const meta = MODE_META.find(function (m) { return m.id === mode; });
+  const meta = metaFor(mode);
   const p = meta ? new Path2D(meta.d) : null;
   PATH_CACHE.set(mode, p);
   return p;
+}
+
+/**
+ * The MODE_META entry for a mode id, legacy ids included.
+ * @param {string} mode Mode id.
+ * @returns {{id: string, label: string, d: string, upright?: boolean}|null} The entry, or null.
+ */
+function metaFor(mode) {
+  const id = normalizeMode(mode);
+  if (!id) return null;
+  return MODE_META.find(function (m) { return m.id === id; }) || null;
 }
 
 /**
@@ -224,35 +331,44 @@ function pathFor(mode) {
  * A halo is stroked first so the shape stays readable over busy imagery, then
  * the body is filled over it. Ground vehicles flip vertically when the heading
  * points left, so a car never travels wheels up. The plane is symmetric from
- * above and never flips.
+ * above and never flips. An upright mode (the walker) is not rotated at all,
+ * only mirrored to face the way it is heading.
  *
  * @param {CanvasRenderingContext2D} ctx Target context.
- * @param {string} mode One of 'plane', 'car', 'train', 'boat', 'bike'.
+ * @param {string} mode A MODE_META id.
  * @param {object} theme A member of THEMES, read for `vehicle.fill` and `vehicle.stroke`.
  * @param {number} x Centre x in drawing space.
  * @param {number} y Centre y in drawing space.
  * @param {number} angle Heading in radians, 0 pointing right.
  * @param {number} scale Multiplier on the mode's base drawn size. Pass the
  *   renderer unit scale `u`, times any per frame emphasis.
+ * @param {boolean} [faceLeft] Which way the vehicle faces, when the caller
+ *   knows better than the instantaneous heading: a heading hovering around
+ *   straight up would otherwise mirror the vehicle on every wobble.
  * @returns {void}
  */
-export function drawVehicle(ctx, mode, theme, x, y, angle, scale) {
-  const path = pathFor(mode);
-  if (!path) return;
+export function drawVehicle(ctx, mode, theme, x, y, angle, scale, faceLeft) {
+  const meta = metaFor(mode);
+  const path = meta ? pathFor(meta.id) : null;
+  if (!meta || !path) return;
 
-  const base = BASE_SIZE[mode] || 52;
+  const base = BASE_SIZE[meta.id] || 52;
   const k = (base / 24) * scale;
   if (!(k > 0)) return;
 
-  let a = angle;
+  let a = Number.isFinite(angle) ? angle : 0;
   while (a > Math.PI) a -= Math.PI * 2;
   while (a < -Math.PI) a += Math.PI * 2;
-  const upsideDown = mode !== 'plane' && Math.abs(a) > Math.PI / 2;
+  const facingLeft = typeof faceLeft === 'boolean' ? faceLeft : Math.abs(a) > Math.PI / 2;
 
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(a);
-  if (upsideDown) ctx.scale(1, -1);
+  if (meta.upright) {
+    if (facingLeft) ctx.scale(-1, 1);
+  } else {
+    ctx.rotate(a);
+    if (meta.id !== 'plane' && facingLeft) ctx.scale(1, -1);
+  }
   ctx.scale(k, k);
   ctx.translate(-12, -12);
 

@@ -34,6 +34,18 @@ const BITRATE_SQUARE = 10000000;
 /** Target bitrate for the MediaRecorder fallback, in bits per second. */
 const BITRATE_WEBM = 8000000;
 
+/**
+ * Ceiling on the encoded file. The muxer assembles the MP4 in memory, and
+ * holds every sample a second time to write the index first, so a ninety
+ * second reel at full rate would pin several hundred megabytes on a phone.
+ * Map animation compresses easily: a lower rate on a long reel costs nothing
+ * anyone can see.
+ */
+const MAX_FILE_BYTES = 90 * 1024 * 1024;
+
+/** Floor for the rate the cap can push an export down to. */
+const BITRATE_FLOOR = 4000000;
+
 /** Encode queue depth we allow before waiting for the encoder to drain. */
 const QUEUE_LIMIT = 6;
 
@@ -315,27 +327,32 @@ function paint(ctx, timeline, t, tiles) {
 /* ------------------------------------------------------------------ */
 
 /**
- * Bitrate for a given output size.
+ * Bitrate for a given output size and length: the shape's full rate, held
+ * down on a long reel so the file stays under MAX_FILE_BYTES.
  * @param {number} width
  * @param {number} height
+ * @param {number} [duration] seconds, omitted when probing support
  * @returns {number} bits per second
  */
-function bitrateFor(width, height) {
-  return width === height ? BITRATE_SQUARE : BITRATE_WIDE;
+function bitrateFor(width, height, duration) {
+  const base = width === height ? BITRATE_SQUARE : BITRATE_WIDE;
+  if (!(duration > 0)) return base;
+  return Math.max(BITRATE_FLOOR, Math.min(base, Math.floor((MAX_FILE_BYTES * 8) / duration)));
 }
 
 /**
  * Candidate H.264 encoder configs, best quality profile first.
  * @param {number} width
  * @param {number} height
+ * @param {number} [duration] seconds
  * @returns {Array<Object>} VideoEncoderConfig candidates
  */
-function buildEncoderConfigs(width, height) {
+function buildEncoderConfigs(width, height, duration) {
   return MP4_CODECS.map((codec) => ({
     codec,
     width,
     height,
-    bitrate: bitrateFor(width, height),
+    bitrate: bitrateFor(width, height, duration),
     framerate: FPS,
     latencyMode: 'quality',
     avc: { format: 'avc' },
@@ -346,12 +363,13 @@ function buildEncoderConfigs(width, height) {
  * Ask the browser which of our H.264 configs it can actually encode.
  * @param {number} width
  * @param {number} height
+ * @param {number} [duration] seconds
  * @returns {Promise<Object|null>} the first supported config, or null
  */
-async function pickEncoderConfig(width, height) {
+async function pickEncoderConfig(width, height, duration) {
   if (typeof VideoEncoder === 'undefined' || typeof VideoFrame === 'undefined') return null;
   if (typeof VideoEncoder.isConfigSupported !== 'function') return null;
-  const candidates = buildEncoderConfigs(width, height);
+  const candidates = buildEncoderConfigs(width, height, duration);
   for (let i = 0; i < candidates.length; i += 1) {
     try {
       const result = await VideoEncoder.isConfigSupported(candidates[i]);
@@ -691,48 +709,6 @@ function createFrameGate({ timeline, tiles, signal }) {
   };
 }
 
-/**
- * Warm the tile cache for a whole plan at once, pinned.
- * Used by the real time WebM path, which cannot pause to load anything.
- *
- * @param {Array<{z: number, x: number, y: number}>} list
- * @param {any} tiles TileCache instance, may be null
- * @param {(info: {stage: 'tiles'|'encode'|'finish', done?: number, total?: number}) => void} [onProgress]
- * @param {AbortSignal} [signal]
- * @returns {Promise<number>} number of tiles that could not be loaded
- */
-async function prefetchTiles(list, tiles, onProgress, signal) {
-  throwIfAborted(signal);
-
-  const total = list.length;
-  report(onProgress, 'tiles', 0, total);
-  if (!total || !tiles || typeof tiles.prefetch !== 'function') {
-    report(onProgress, 'tiles', total, total);
-    return 0;
-  }
-
-  let lastDone = 0;
-  try {
-    const result = await tiles.prefetch(list, {
-      concurrency: 10,
-      signal,
-      pin: true,
-      onProgress: (done, count) => {
-        lastDone = done;
-        report(onProgress, 'tiles', done, count || total);
-      },
-    });
-    report(onProgress, 'tiles', total, total);
-    const failed = result && Number.isFinite(result.failed) ? result.failed : 0;
-    return Math.max(0, failed);
-  } catch (err) {
-    if (isAbortError(err)) throw err;
-    // Non fatal. Everything we did not confirm as loaded counts as missing.
-    report(onProgress, 'tiles', total, total);
-    return Math.max(0, total - lastDone);
-  }
-}
-
 /* ------------------------------------------------------------------ */
 /* MP4 path, WebCodecs plus mp4-muxer                                  */
 /* ------------------------------------------------------------------ */
@@ -953,17 +929,24 @@ async function encodeMp4({
  * runs alongside requestAnimationFrame, so a throttled or suspended frame
  * callback cannot starve the render or leave the promise hanging forever.
  *
+ * Tiles are loaded a window ahead of the clock, the same windows the MP4 path
+ * uses, so a long trip is never asked to pin its whole plan at once: past the
+ * pin ceiling the cache would quietly let the later tiles go before the first
+ * frame was even drawn. Real time cannot stop to wait, so a window that is
+ * late simply draws from parent tiles, which is what it always did.
+ *
  * @param {Object} args
  * @param {any} args.timeline
  * @param {any} args.tiles
  * @param {HTMLCanvasElement} args.canvas
  * @param {CanvasRenderingContext2D} args.ctx
  * @param {number} args.duration seconds
+ * @param {any} args.tileWindows windowed tile loader from createTileWindows
  * @param {(info: {stage: 'tiles'|'encode'|'finish', done?: number, total?: number}) => void} [args.onProgress]
  * @param {AbortSignal} [args.signal]
  * @returns {Promise<{ blob: Blob, mimeType: string, ext: 'webm', seconds: number }>}
  */
-function recordWebm({ timeline, tiles, canvas, ctx, duration, onProgress, signal }) {
+function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onProgress, signal }) {
   const mimeType = pickWebmMime();
   if (!mimeType || typeof canvas.captureStream !== 'function') {
     return Promise.reject(new Error('export-unsupported'));
@@ -986,6 +969,7 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, onProgress, signal
     let pausedFor = 0;
     let hiddenAt = 0;
     let lastPaintAt = 0;
+    let windowIndex = 0;
 
     /** @type {MediaStream} */
     let stream;
@@ -1060,7 +1044,7 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, onProgress, signal
       stream = canvas.captureStream(FPS);
       recorder = new MediaRecorder(stream, {
         mimeType,
-        videoBitsPerSecond: BITRATE_WEBM,
+        videoBitsPerSecond: Math.min(BITRATE_WEBM, bitrateFor(canvas.width, canvas.height, duration)),
       });
 
       recorder.ondataavailable = (event) => {
@@ -1119,6 +1103,15 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, onProgress, signal
         if (settled || stopping) return;
         const elapsed = Math.max(0, now - startedAt - pausedFor) / 1000;
         const t = Math.min(elapsed, duration);
+        // Keep one window of tiles loading ahead of the clock and let go of
+        // the ones the clock has left behind.
+        const atWindow = Math.floor(Math.floor(t * FPS) / FRAMES_PER_WINDOW);
+        if (tileWindows && atWindow !== windowIndex) {
+          windowIndex = atWindow;
+          tileWindows.warm(atWindow);
+          tileWindows.warm(atWindow + 1);
+          tileWindows.release(atWindow - 2);
+        }
         try {
           paint(ctx, timeline, t, tiles);
         } catch (err) {
@@ -1241,7 +1234,7 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
   throwIfAborted(signal);
 
   const plan = planFor(timeline);
-  const config = await pickEncoderConfig(width, height);
+  const config = await pickEncoderConfig(width, height, duration);
   throwIfAborted(signal);
 
   const { canvas, ctx } = createRenderTarget(width, height);
@@ -1249,14 +1242,15 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
   let result;
   let failedTiles = 0;
 
+  const tileWindows = createTileWindows({
+    tiles,
+    windows: windowPlan(plan),
+    total: plan.length,
+    onProgress,
+    signal,
+  });
+
   if (config) {
-    const tileWindows = createTileWindows({
-      tiles,
-      windows: windowPlan(plan),
-      total: plan.length,
-      onProgress,
-      signal,
-    });
     report(onProgress, 'tiles', 0, plan.length);
     try {
       result = await encodeMp4({
@@ -1278,28 +1272,27 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
     failedTiles = tileWindows.failed();
   } else {
     if (!canRecordWebm()) throw new Error('export-unsupported');
+    report(onProgress, 'tiles', 0, plan.length);
     try {
-      // Real time playback cannot stop to load, so this path warms the whole plan.
-      failedTiles = await prefetchTiles(plan, tiles, onProgress, signal);
+      // Real time playback cannot stop to load, so the opening is made ready
+      // before the clock starts and the rest follows it a window ahead.
+      await tileWindows.ensure(0);
       throwIfAborted(signal);
+      tileWindows.warm(1);
       result = await recordWebm({
         timeline,
         tiles,
         canvas,
         ctx,
         duration,
+        tileWindows,
         onProgress,
         signal,
       });
     } finally {
-      if (tiles && typeof tiles.releasePins === 'function') {
-        try {
-          tiles.releasePins(plan);
-        } catch (err) {
-          // Releasing a pin can never be worth failing an export over.
-        }
-      }
+      tileWindows.releaseAll();
     }
+    failedTiles = tileWindows.failed();
   }
 
   return {

@@ -9,7 +9,7 @@
  */
 
 import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js';
-import { MODE_META } from './vehicles.js';
+import { MODE_META, normalizeMode } from './vehicles.js';
 import { TileCache } from './tiles.js';
 import { haversineKm } from './geo.js';
 import {
@@ -28,7 +28,7 @@ const STORAGE_KEY = 'mns-reel-draft-v1';
 /** Where the draft waits when a trip handed over from the map takes its place. */
 const PREV_KEY = 'mns-reel-draft-prev';
 const THEME_KEY = 'mns-theme';
-const MAX_STOPS = 12;
+const MAX_STOPS = 30;
 const PREVIEW_MAX_W = 380;
 /** Legs longer than this default to a flight. */
 const PLANE_KM = 600;
@@ -44,18 +44,31 @@ const SPEEDS = ['relaxed', 'normal', 'fast'];
 const ROUTE_STYLES = ['roads', 'arcs'];
 /** Fair use on the shared router: never more than two requests in the air. */
 const ROAD_CONCURRENCY = 2;
+/**
+ * Shortest gap between two request starts. The router throttles a burst by
+ * holding every connection open rather than answering 429, and a thirty stop
+ * trip fired as fast as two slots allow is exactly such a burst.
+ */
+const ROAD_MIN_GAP_MS = 500;
 /** Longest an export will wait for roads that are still on the wire. */
-const ROAD_EXPORT_WAIT = 6500;
-/** A failed key waits this long before its one further attempt. */
-const ROAD_RETRY_MS = 30000;
-/** Attempts per key per session, retry included. Never more. */
-const ROAD_MAX_TRIES = 2;
-/** First cooldown after the router says it is busy. */
+const ROAD_EXPORT_WAIT = 8000;
+/**
+ * Waits before each automatic retry of a transient miss (timeout, offline,
+ * busy router), widening so a throttled router is left alone long enough to
+ * forgive us. A key that misses more times than this is done until the user
+ * asks again.
+ */
+const ROAD_RETRY_WAITS = [8000, 45000, 180000];
+/** First cooldown for every key after the router stalls or says it is busy. */
 const ROAD_BACKOFF_MIN = 30000;
 /** The cooldown doubles per trip and stops here. */
 const ROAD_BACKOFF_MAX = 240000;
-/** Said on a leg that asked for a road route and did not get one. */
-const ROAD_FALLBACK_TITLE = 'Stylized path, road route unavailable';
+/**
+ * Router answers that will not change if asked again straight away: the leg
+ * is over the cap, there is no route, or the route does not fit the leg.
+ * These are shown on the leg rather than retried in the background.
+ */
+const ROAD_FINAL_CODES = { 'too-long': true, 'bad-route': true, 'router-error': true, 'no-profile': true };
 
 const ICONS = {
   pencil: ['M4 20.4h4.1L20.1 8.4a2 2 0 0 0 0-2.9l-1.6-1.6a2 2 0 0 0-2.9 0L3.6 16v4.4z', 'm14.6 5.4 4 4'],
@@ -331,11 +344,14 @@ function recomputeModes() {
  * ------------------------------------------------------------------ */
 
 /**
- * Keys the router refused, with what to do about it: key -> { tries, retryAt }.
- * A transient blip gets one more chance after a wait, so a page that loaded in
- * a tunnel heals itself; retryAt is Infinity once the attempts are spent, and
- * that key is done for the session.
- * @type {Map<string, { tries: number, retryAt: number }>}
+ * Keys the router refused, with what to do about it:
+ * key -> { tries, retryAt, code }.
+ * A transient miss is retried on the ROAD_RETRY_WAITS schedule, so a page
+ * that loaded in a tunnel heals itself. A final answer, or a key that has
+ * used up its retries, has retryAt at Infinity: the leg shows why, with a
+ * Retry control, and nothing more happens until the user or a route style
+ * toggle asks again.
+ * @type {Map<string, { tries: number, retryAt: number, code: string }>}
  */
 const roadFailed = new Map();
 /** In flight or waiting, keyed by roadKey. One job per key, so requests dedupe. */
@@ -343,8 +359,12 @@ const roadJobs = new Map();
 /** Keys waiting for a slot, oldest first. */
 const roadQueue = [];
 let roadActive = 0;
+/** When the last request went out, for the spacing rule. */
+let roadLastStart = 0;
 /** No job starts before this. Set when the router asks us to back off. */
 let roadPauseUntil = 0;
+/** When the breaker last tripped, so an older answer cannot close it. */
+let roadPausedAt = 0;
 /** How long the next 429 or 5xx will cost, doubling per trip. */
 let roadBackoff = ROAD_BACKOFF_MIN;
 /** The one timer that wakes the pump for a retry or the end of a cooldown. */
@@ -359,6 +379,32 @@ let roadWakeAt = 0;
 function roadBlocked(key, now) {
   const miss = roadFailed.get(key);
   return !!miss && now < miss.retryAt;
+}
+
+/**
+ * @param {string} code a routes.js failure code
+ * @returns {boolean} true when asking again would only get the same answer
+ */
+function roadFailureIsFinal(code) {
+  if (Object.prototype.hasOwnProperty.call(ROAD_FINAL_CODES, code)) return true;
+  // Any other client error is ours to fix, not the router's to forgive.
+  return /^http-4\d\d$/.test(code) && code !== 'http-429';
+}
+
+/**
+ * Forget the misses that were about the network or the router's mood, and
+ * open the breaker, so the next sync asks again. Final answers stay unless
+ * `all` is set, which is what an explicit user request does.
+ * @param {boolean} all drop the final answers too
+ */
+function forgiveRoadFailures(all) {
+  const drop = [];
+  roadFailed.forEach(function (miss, key) {
+    if (all || !roadFailureIsFinal(miss.code)) drop.push(key);
+  });
+  for (let i = 0; i < drop.length; i++) roadFailed.delete(drop[i]);
+  roadPauseUntil = 0;
+  roadBackoff = ROAD_BACKOFF_MIN;
 }
 
 /**
@@ -402,33 +448,59 @@ function wantedRoads() {
 
 /**
  * @param {number} i leg index
- * @returns {Object|null} the road for that leg, when one is being used
+ * @returns {string|null} the road key for that leg, when roads are on and
+ *   the leg's mode routes
  */
-function roadForLeg(i) {
+function legRoadKey(i) {
   if (state.routeStyle !== 'roads') return null;
   const a = state.stops[i];
   const b = state.stops[i + 1];
   if (!a || !b) return null;
-  const key = roadKey(a, b, state.modes[i]);
-  return key ? (state.roads[key] || null) : null;
+  return roadKey(a, b, state.modes[i]);
 }
 
 /**
  * @param {number} i leg index
- * @returns {'none'|'pending'|'failed'} what the router is doing for that leg
+ * @returns {Object|null} the road for that leg, when one is being used
+ */
+function roadForLeg(i) {
+  const key = legRoadKey(i);
+  return key ? (state.roads[key] || null) : null;
+}
+
+/**
+ * What the router is doing for a leg.
+ *
+ * 'pending' covers a job on the wire, one waiting for a slot, and one waiting
+ * for its automatic retry: from the user's side all three are "still trying".
+ * 'failed' is a leg that will stay an arc until somebody asks again.
+ *
+ * @param {number} i leg index
+ * @returns {{ status: 'none'|'pending'|'failed', code: string }}
  */
 function roadStateForLeg(i) {
-  if (state.routeStyle !== 'roads') return 'none';
-  const a = state.stops[i];
-  const b = state.stops[i + 1];
-  if (!a || !b) return 'none';
-  const key = roadKey(a, b, state.modes[i]);
-  if (!key || state.roads[key]) return 'none';
-  if (roadJobs.has(key)) return 'pending';
-  // A key waiting for its retry reads as failed, which is what it is until the
-  // second attempt lands: the leg is a stylized arc right now.
-  if (roadFailed.has(key)) return 'failed';
-  return 'none';
+  const key = legRoadKey(i);
+  if (!key || state.roads[key]) return { status: 'none', code: '' };
+  if (roadJobs.has(key)) return { status: 'pending', code: '' };
+  const miss = roadFailed.get(key);
+  if (!miss) return { status: 'none', code: '' };
+  if (miss.retryAt < Infinity) return { status: 'pending', code: miss.code };
+  return { status: 'failed', code: miss.code };
+}
+
+/**
+ * Ask the router again for one leg, at the user's request. Clears that key's
+ * record and the breaker: a person asking is a better signal than a guess
+ * about the router's mood.
+ * @param {number} i leg index
+ */
+function retryRoad(i) {
+  const key = legRoadKey(i);
+  if (!key) return;
+  roadFailed.delete(key);
+  roadPauseUntil = 0;
+  syncRoads();
+  refreshLegs();
 }
 
 /**
@@ -442,7 +514,10 @@ function legKmShown(i) {
   return road && Number.isFinite(road.km) ? road.km : legKm(i);
 }
 
-/** Start jobs until the two slots are full, unless the router said wait. */
+/**
+ * Start jobs until the two slots are full, unless the router said wait, and
+ * never two of them closer together than the spacing rule allows.
+ */
 function pumpRoads() {
   // Breaker open: a router answering 429 or 5xx in milliseconds would
   // otherwise get the whole remaining queue as one burst.
@@ -451,12 +526,21 @@ function pumpRoads() {
     return;
   }
   while (roadActive < ROAD_CONCURRENCY && roadQueue.length) {
-    const key = roadQueue.shift();
-    const job = roadJobs.get(key);
+    const job = roadJobs.get(roadQueue[0]);
     // Cancelled while it sat in the queue.
-    if (!job || job.started) continue;
+    if (!job || job.started) {
+      roadQueue.shift();
+      continue;
+    }
+    const now = Date.now();
+    if (now - roadLastStart < ROAD_MIN_GAP_MS) {
+      scheduleRoadWake(roadLastStart + ROAD_MIN_GAP_MS);
+      return;
+    }
+    roadQueue.shift();
     job.started = true;
     roadActive += 1;
+    roadLastStart = now;
     runRoadJob(job);
   }
 }
@@ -467,6 +551,7 @@ function pumpRoads() {
 function runRoadJob(job) {
   const ctrl = new AbortController();
   job.ctrl = ctrl;
+  job.issuedAt = Date.now();
   fetchRoad(job.a, job.b, job.mode, { signal: ctrl.signal }).then(function (road) {
     finishRoadJob(job, road, null);
   }, function (err) {
@@ -501,6 +586,20 @@ function flushRoadRebuild() {
 }
 
 /**
+ * Bring the timeline up to date with every road that has landed, queued or
+ * held, before an export takes it. A run that ends on the error pane keeps
+ * the dialog, and so the hold, open: without this a Retry would encode the
+ * timeline from before the road arrived and then forget the road for good.
+ */
+function applyLandedRoads() {
+  exportHoldsTiles = false;
+  flushRoadRebuild();
+  if (!roadRebuildHeld) return;
+  roadRebuildHeld = false;
+  rebuildTimeline();
+}
+
+/**
  * Give the preview back its cache once the export session is over, and show
  * whatever landed while it was running.
  */
@@ -524,9 +623,15 @@ function finishRoadJob(job, road, err) {
   job.settle();
 
   if (road) {
-    // The router is answering again, so the breaker starts over.
-    roadPauseUntil = 0;
-    roadBackoff = ROAD_BACKOFF_MIN;
+    // The router is answering again, so the breaker starts over. Only an
+    // answer to a request sent after the breaker tripped says that, though:
+    // with two requests in the air, the one accepted just before the limiter
+    // bit usually lands after the 429 that tripped it, and it must not send
+    // the rest of the queue straight into a router that just said no.
+    if (job.issuedAt >= roadPausedAt) {
+      roadPauseUntil = 0;
+      roadBackoff = ROAD_BACKOFF_MIN;
+    }
     roadFailed.delete(job.key);
     // Cache first: the answer is good even if this trip has moved on.
     try { storeRoad(job.key, road); } catch (cacheErr) { /* cache is a bonus */ }
@@ -537,21 +642,28 @@ function finishRoadJob(job, road, err) {
       rebuildTimelineSoon();
     }
   } else if (!err || err.name !== 'AbortError') {
-    // Anything that is not a cancellation counts as a miss: offline, router
-    // error, timeout, absurd detour, leg over the length cap. One further
-    // attempt after a wait, then the leg keeps its arc for the session.
+    // Anything that is not a cancellation counts as a miss. A final answer
+    // (no route, leg over the cap, route does not fit) is shown on the leg at
+    // once. A transient one (offline, timeout, busy router) is retried on the
+    // widening schedule, then shown the same way once that runs out.
     const now = Date.now();
+    const code = (err && typeof err.message === 'string' && err.message) || 'failed';
     const seen = roadFailed.get(job.key);
     const tries = (seen ? seen.tries : 0) + 1;
+    const wait = !roadFailureIsFinal(code) && tries <= ROAD_RETRY_WAITS.length
+      ? ROAD_RETRY_WAITS[tries - 1]
+      : null;
     roadFailed.set(job.key, {
       tries: tries,
-      retryAt: tries < ROAD_MAX_TRIES ? now + ROAD_RETRY_MS : Infinity
+      retryAt: wait === null ? Infinity : now + wait,
+      code: code
     });
-    if (tries < ROAD_MAX_TRIES) scheduleRoadWake(now + ROAD_RETRY_MS);
-    // A busy or broken router pauses every key, not just this one.
-    const code = err && typeof err.message === 'string' ? err.message : '';
-    if (code === 'http-429' || /^http-5\d\d$/.test(code)) {
+    if (wait !== null) scheduleRoadWake(now + wait);
+    // A busy router pauses every key, not just this one. A timeout counts:
+    // this router throttles by holding the connection, not by answering 429.
+    if (code === 'timeout' || code === 'http-429' || /^http-5\d\d$/.test(code)) {
       roadPauseUntil = now + roadBackoff;
+      roadPausedAt = now;
       roadBackoff = Math.min(roadBackoff * 2, ROAD_BACKOFF_MAX);
     }
   }
@@ -805,24 +917,27 @@ function restoreDraft() {
   // Drafts written before roads existed simply get the default.
   state.routeStyle = ROUTE_STYLES.indexOf(data.routeStyle) !== -1 ? data.routeStyle : 'roads';
 
-  const modeIds = MODE_META.map(function (m) { return m.id; });
+  // Mode ids go through normalizeMode, so a draft saved when the bicycle was
+  // still called 'bike' restores as a bicycle, not as nothing.
   const liveIds = new Set();
   for (let i = 0; i < stops.length; i++) liveIds.add(stops[i].id);
   if (Array.isArray(data.pairs)) {
     for (let i = 0; i < data.pairs.length; i++) {
       const pair = data.pairs[i];
       if (!Array.isArray(pair) || typeof pair[0] !== 'string') continue;
-      if (modeIds.indexOf(pair[1]) === -1) continue;
+      const mode = normalizeMode(pair[1]);
+      if (!mode) continue;
       // Pairs for stops that did not survive the restore are dead weight.
       const at = pair[0].indexOf('|');
       if (at < 0 || !liveIds.has(pair[0].slice(0, at)) || !liveIds.has(pair[0].slice(at + 1))) continue;
-      modeMemory.set(pair[0], pair[1]);
+      modeMemory.set(pair[0], mode);
     }
   }
   if (Array.isArray(data.modes) && data.modes.length === stops.length - 1) {
     for (let i = 0; i < data.modes.length; i++) {
-      if (modeIds.indexOf(data.modes[i]) === -1) continue;
-      modeMemory.set(stops[i].id + '|' + stops[i + 1].id, data.modes[i]);
+      const mode = normalizeMode(data.modes[i]);
+      if (!mode) continue;
+      modeMemory.set(stops[i].id + '|' + stops[i + 1].id, mode);
     }
   }
 
@@ -870,7 +985,7 @@ function startFresh() {
  * carry their own percent-encoding and must survive until the split is done.
  * @param {string} search location.search
  * @param {string} name parameter name
- * @returns {string} the raw value, empty when absent
+ * @returns {string|null} the raw value, null when the parameter is absent
  */
 function rawParam(search, name) {
   const parts = search.replace(/^\?/, '').split('&');
@@ -878,7 +993,7 @@ function rawParam(search, name) {
     const at = parts[i].indexOf('=');
     if (at > 0 && parts[i].slice(0, at) === name) return parts[i].slice(at + 1);
   }
-  return '';
+  return null;
 }
 
 /**
@@ -989,11 +1104,18 @@ function restorePrevious() {
   announce('Previous draft restored');
 }
 
-/** Drop the seed parameter so a refresh keeps the user's edits. */
+/**
+ * Drop the seed parameter so a refresh keeps the user's edits. Only that
+ * parameter: anything else on the address (a campaign tag, say) is not ours
+ * to take away.
+ */
 function stripSeedQuery() {
   if (!location.search) return;
+  const kept = location.search.replace(/^\?/, '').split('&').filter(function (part) {
+    return part && part.slice(0, 6) !== 'stops=';
+  });
   try {
-    history.replaceState(null, '', location.pathname + location.hash);
+    history.replaceState(null, '', location.pathname + (kept.length ? '?' + kept.join('&') : '') + location.hash);
   } catch (err) { /* nothing important rides on the address bar */ }
 }
 
@@ -1022,7 +1144,7 @@ function commit(opts) {
  */
 function addStop(partial) {
   if (state.stops.length >= MAX_STOPS) {
-    toast('Twelve stops is the max for one reel');
+    toast('Thirty stops is the max for one reel');
     return;
   }
   if (!partial || typeof partial.name !== 'string' || !validCoords(partial.lat, partial.lng)) {
@@ -1097,10 +1219,15 @@ function setMode(legIndex, mode) {
   const a = state.stops[legIndex];
   const b = state.stops[legIndex + 1];
   if (!a || !b) return;
+  // recomputeModes reads the leg in either direction, so the older choice
+  // for the reverse order has to go or it would win back after a reorder.
+  modeMemory.delete(b.id + '|' + a.id);
   modeMemory.set(a.id + '|' + b.id, mode);
   state.modes[legIndex] = mode;
-  // The list re-renders, so hand focus back to the button that was just used.
-  focusAfterRender = { index: legIndex, selector: '.mode-btn[data-mode="' + mode + '"]' };
+  // The list re-renders with the picker closed, so hand focus to the control
+  // that opened it, which now shows the new choice.
+  openLeg = -1;
+  focusAfterRender = { index: legIndex, selector: '.mode-trigger' };
   commit();
 }
 
@@ -1220,7 +1347,87 @@ function buildStopRow(stop, index) {
   return row;
 }
 
+/** Index of the leg whose mode picker is open, or -1 when none is. */
+let openLeg = -1;
+
 /**
+ * @param {string} mode a mode id
+ * @returns {Object} its MODE_META entry, the car's when the id is unknown
+ */
+function modeMeta(mode) {
+  const id = normalizeMode(mode) || 'car';
+  for (let i = 0; i < MODE_META.length; i++) {
+    if (MODE_META[i].id === id) return MODE_META[i];
+  }
+  return MODE_META[0];
+}
+
+/**
+ * Show or hide every leg's picker to match openLeg, without rebuilding.
+ */
+function syncPickers() {
+  const items = dom.stopList.children;
+  for (let i = 0; i < items.length; i++) {
+    const trigger = items[i].querySelector('.mode-trigger');
+    const picker = items[i].querySelector('.leg-picker');
+    if (!trigger || !picker) continue;
+    const open = i === openLeg;
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    picker.hidden = !open;
+  }
+}
+
+/**
+ * Open one leg's picker (closing any other) or close it when it is the one
+ * already open. Opening moves focus onto the current choice, so the keyboard
+ * lands inside the group it just revealed.
+ * @param {number} legIndex leg whose trigger was pressed
+ */
+function togglePicker(legIndex) {
+  if (openLeg === legIndex) {
+    closePicker(true);
+    return;
+  }
+  openLeg = legIndex;
+  syncPickers();
+  const item = dom.stopList.children[legIndex];
+  const current = item ? item.querySelector('.mode-btn[aria-pressed="true"]') : null;
+  if (current) current.focus();
+}
+
+/**
+ * @param {boolean} refocus hand focus back to the trigger that opened it
+ */
+function closePicker(refocus) {
+  if (openLeg < 0) return;
+  const was = openLeg;
+  openLeg = -1;
+  syncPickers();
+  if (!refocus) return;
+  const item = dom.stopList.children[was];
+  const trigger = item ? item.querySelector('.mode-trigger') : null;
+  if (trigger) trigger.focus();
+}
+
+/**
+ * A tap anywhere outside the open picker and its trigger closes it.
+ * @param {PointerEvent} ev pointerdown anywhere on the page
+ */
+function onPickerOutside(ev) {
+  if (openLeg < 0) return;
+  const item = dom.stopList.children[openLeg];
+  if (!item) { closePicker(false); return; }
+  const picker = item.querySelector('.leg-picker');
+  const trigger = item.querySelector('.mode-trigger');
+  const inside = (picker && picker.contains(ev.target)) || (trigger && trigger.contains(ev.target));
+  if (!inside) closePicker(false);
+}
+
+/**
+ * The leg connector: one trigger showing the current travel mode, the
+ * distance, the router's state for the leg, and a picker of every mode that
+ * unfolds under it on demand. Eight modes across thirty legs would be a wall
+ * of icons if they were all laid out at once.
  * @param {number} legIndex leg between stop legIndex and legIndex + 1
  * @returns {HTMLElement}
  */
@@ -1228,54 +1435,116 @@ function buildLegRow(legIndex) {
   const leg = make('div', 'leg');
   const a = state.stops[legIndex];
   const b = state.stops[legIndex + 1];
+  const current = modeMeta(state.modes[legIndex]);
+  const pickerId = 'legPicker' + legIndex;
 
-  const group = make('div', 'leg-modes');
-  group.setAttribute('role', 'group');
-  group.setAttribute('aria-label', 'Travel mode from ' + a.label + ' to ' + b.label);
+  const trigger = make('button', 'mode-trigger');
+  trigger.type = 'button';
+  trigger.setAttribute('aria-expanded', openLeg === legIndex ? 'true' : 'false');
+  trigger.setAttribute('aria-controls', pickerId);
+  trigger.title = 'Change travel mode';
+  trigger.appendChild(icon([current.d], { filled: true, cls: 'mode-ic' }));
+  trigger.appendChild(make('span', 'vh', 'Travel mode from ' + a.label + ' to ' + b.label + ': '));
+  trigger.appendChild(make('span', 'mode-name', current.label));
+  trigger.appendChild(icon(ICONS.down, { cls: 'ic mode-chev' }));
+  trigger.addEventListener('click', function () { togglePicker(legIndex); });
+  leg.appendChild(trigger);
 
+  leg.appendChild(make('span', 'leg-km'));
+
+  const picker = make('div', 'leg-picker');
+  picker.id = pickerId;
+  picker.setAttribute('role', 'group');
+  picker.setAttribute('aria-label', 'Travel mode from ' + a.label + ' to ' + b.label);
+  picker.hidden = openLeg !== legIndex;
   for (let i = 0; i < MODE_META.length; i++) {
     const meta = MODE_META[i];
     const btn = make('button', 'mode-btn');
     btn.type = 'button';
     btn.setAttribute('aria-label', meta.label);
-    btn.setAttribute('aria-pressed', state.modes[legIndex] === meta.id ? 'true' : 'false');
+    btn.title = meta.label;
+    btn.setAttribute('aria-pressed', current.id === meta.id ? 'true' : 'false');
     btn.dataset.mode = meta.id;
     btn.appendChild(icon([meta.d], { filled: true, cls: 'mode-ic' }));
     btn.addEventListener('click', function () { setMode(legIndex, meta.id); });
-    group.appendChild(btn);
+    picker.appendChild(btn);
   }
-  leg.appendChild(group);
-  leg.appendChild(make('span', 'leg-km'));
+  picker.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Escape') return;
+    ev.preventDefault();
+    closePicker(true);
+  });
+  leg.appendChild(picker);
+
   paintLeg(leg, legIndex);
   return leg;
 }
 
 /**
- * Put the distance, the in flight spinner and the fallback hint on one leg
- * connector. Kept separate from the row build so a road that lands mid edit
- * updates the number without rebuilding the list under the user.
+ * What to say on a leg that asked for a road and did not get one.
+ * @param {string} code a routes.js failure code
+ * @returns {string} a short line for the leg
+ */
+function roadNoteText(code) {
+  if (code === 'too-long') return 'Too far for a road route';
+  if (code === 'bad-route' || code === 'router-error') return 'No road route found';
+  return 'Road route unavailable';
+}
+
+/**
+ * Put the distance, the in flight spinner and the fallback note with its
+ * Retry control on one leg connector. Kept separate from the row build so a
+ * road that lands mid edit updates the number without rebuilding the list
+ * under the user.
  * @param {HTMLElement} leg the connector element
  * @param {number} legIndex leg between stop legIndex and legIndex + 1
  */
 function paintLeg(leg, legIndex) {
   const km = leg.querySelector('.leg-km');
   if (!km) return;
-  const status = roadStateForLeg(legIndex);
+  const road = roadStateForLeg(legIndex);
+  // Status pieces sit between the distance and the picker, which stays last
+  // so it unfolds under the whole row.
+  const picker = leg.querySelector('.leg-picker');
 
   km.textContent = fmtKm(legKmShown(legIndex));
-  if (status === 'failed') km.title = ROAD_FALLBACK_TITLE;
-  else km.removeAttribute('title');
 
   let spin = leg.querySelector('.leg-spin');
-  if (status === 'pending') {
+  if (road.status === 'pending') {
     if (!spin) {
       spin = make('span', 'leg-spin');
       spin.setAttribute('aria-hidden', 'true');
-      leg.appendChild(spin);
+      spin.title = 'Finding the road route';
+      leg.insertBefore(spin, picker);
     }
   } else if (spin && spin.parentNode) {
     spin.parentNode.removeChild(spin);
   }
+
+  const oldNote = leg.querySelector('.leg-note');
+  const oldRetry = leg.querySelector('.leg-retry');
+  const hadFocus = oldRetry && document.activeElement === oldRetry;
+  if (oldNote && oldNote.parentNode) oldNote.parentNode.removeChild(oldNote);
+  if (oldRetry && oldRetry.parentNode) oldRetry.parentNode.removeChild(oldRetry);
+  if (road.status !== 'failed') {
+    // The control the user just pressed has gone: keep focus on the row.
+    if (hadFocus) {
+      const trigger = leg.querySelector('.mode-trigger');
+      if (trigger) trigger.focus();
+    }
+    return;
+  }
+
+  leg.insertBefore(make('span', 'leg-note', roadNoteText(road.code)), picker);
+  // Over the cap is over the cap. Everything else may be the router's mood.
+  if (road.code === 'too-long') return;
+  const a = state.stops[legIndex];
+  const b = state.stops[legIndex + 1];
+  const retry = make('button', 'leg-retry', 'Retry');
+  retry.type = 'button';
+  retry.setAttribute('aria-label', 'Retry the road route from ' + a.label + ' to ' + b.label);
+  retry.addEventListener('click', function () { retryRoad(legIndex); });
+  leg.insertBefore(retry, picker);
 }
 
 /**
@@ -1322,7 +1591,7 @@ function applyFocusAfterRender(want) {
   dom.search.focus();
 }
 
-/** Rebuild the whole stop list. Cheap at 12 rows and keeps indexes honest. */
+/** Rebuild the whole stop list. Cheap at 30 rows and keeps indexes honest. */
 function renderStops() {
   dom.stopList.textContent = '';
   for (let i = 0; i < state.stops.length; i++) {
@@ -1438,9 +1707,12 @@ function startEdit(index) {
 
   /**
    * @param {boolean} save commit the typed value, or revert
-   * @param {boolean} fromKey Enter or Escape, so focus belongs back on the row
+   * @param {boolean} refocusRow a change rebuilds the list: put focus back on
+   *   this row afterwards rather than letting it fall to the body
+   * @param {boolean} refocusIfUnchanged Enter or Escape with nothing to
+   *   commit: focus belongs back on the row
    */
-  function finish(save, fromKey) {
+  function finish(save, refocusRow, refocusIfUnchanged) {
     if (done) return;
     done = true;
     const value = input.value;
@@ -1448,11 +1720,21 @@ function startEdit(index) {
     document.removeEventListener('pointerdown', onOutside, true);
     if (input.parentNode) input.parentNode.removeChild(input);
     btn.hidden = false;
-    const changed = save ? setLabel(index, value, fromKey) : false;
-    if (!changed && fromKey) btn.focus();
+    const changed = save ? setLabel(index, value, refocusRow) : false;
+    if (!changed && refocusIfUnchanged) btn.focus();
   }
 
-  function onBlur() { finish(true, false); }
+  /**
+   * Tab moves focus to the next control in the list and then blurs the
+   * input. A changed label rebuilds the list, which takes that control with
+   * it, so the row itself is the place to land. A pointer outside has its
+   * own handler below and never reaches here.
+   * @param {FocusEvent} ev blur
+   */
+  function onBlur(ev) {
+    const to = ev && ev.relatedTarget;
+    finish(true, !!(to && dom.stopList.contains(to)), false);
+  }
 
   /**
    * Commit on the way down, not on blur: the list is rebuilt before the click
@@ -1461,12 +1743,12 @@ function startEdit(index) {
    */
   function onOutside(ev) {
     if (ev.target === input || (input.contains && input.contains(ev.target))) return;
-    finish(true, false);
+    finish(true, false, false);
   }
 
   input.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Enter') { ev.preventDefault(); finish(true, true); }
-    else if (ev.key === 'Escape') { ev.preventDefault(); finish(false, true); }
+    if (ev.key === 'Enter') { ev.preventDefault(); finish(true, true, true); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); finish(false, true, true); }
   });
   input.addEventListener('blur', onBlur);
   document.addEventListener('pointerdown', onOutside, true);
@@ -1493,8 +1775,13 @@ function onDragStart(ev) {
   const handle = ev.currentTarget;
   const item = handle.closest('.stop-item');
   if (!item) return;
+  // An open rename commits on this same pointerdown, one listener earlier,
+  // and that rebuilds the list: this badge may already be off the page. A drag
+  // started on it would never see pointerup and would block every later drag.
+  if (!item.isConnected || !dom.stopList.contains(item)) return;
 
   const items = Array.from(dom.stopList.children);
+  if (items.indexOf(item) < 0) return;
   drag = {
     handle: handle,
     item: item,
@@ -1680,7 +1967,9 @@ function buildRouteShape() {
     if (value === state.routeStyle) return;
     state.routeStyle = value;
     // Stylized needs no network at all. Roads reuses the cache, so coming
-    // back is usually instant.
+    // back is usually instant, and choosing it again is a request to ask the
+    // router about every leg it turned down before.
+    if (value === 'roads') forgiveRoadFailures(true);
     commit();
   });
 }
@@ -2265,11 +2554,14 @@ async function startExport() {
 
   // Let roads still on the wire land first, so the video matches the preview
   // the user is about to get. Nearly always instant: the cache has them, and
-  // session failures are already marked so nothing can hang here.
+  // session failures are already marked so nothing can hang here. The hold is
+  // lifted for the wait, so a road landing during it applies at once.
+  applyLandedRoads();
+  if (roadJobs.size) dom.exStage.textContent = 'Waiting for road routes';
   await awaitPendingRoads();
   if (exportSession !== session) return;
   // Anything that just landed goes in before the timeline is handed over.
-  flushRoadRebuild();
+  applyLandedRoads();
   if (!timeline) {
     exporting = false;
     syncExportButtons();
@@ -2289,7 +2581,9 @@ async function startExport() {
     const result = await exportVideo({
       timeline: timeline,
       tiles: tilesFor(state.themeId),
-      onProgress: onExportProgress,
+      // Bound to this run: a run that failed still has tile windows settling,
+      // and their counts must not walk the bar of the retry that replaced it.
+      onProgress: function (p) { if (exportSession === session) onExportProgress(p); },
       signal: ac.signal
     });
     // Cancelled, closed, or superseded: drop the result, blob URL and all.
@@ -2307,6 +2601,9 @@ async function startExport() {
       closeDialog();
       return;
     }
+    // The encoder gave up, the lookahead prefetch did not. Stop it, so it
+    // neither competes with the retry nor keeps pins on the cache.
+    ac.abort();
     showError(err);
   }
 }
@@ -2416,6 +2713,16 @@ function wire() {
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) pause();
   });
+
+  document.addEventListener('pointerdown', onPickerOutside);
+
+  // A page that loaded in a tunnel marked its legs as misses. The network
+  // coming back is the moment to ask again, not three minutes later.
+  window.addEventListener('online', function () {
+    forgiveRoadFailures(false);
+    syncRoads();
+    refreshLegs();
+  });
 }
 
 /* ------------------------------------------------------------------ *
@@ -2472,14 +2779,20 @@ function init() {
       getRoads: function () {
         const pending = [];
         roadJobs.forEach(function (job, key) { pending.push(key); });
+        const failed = {};
+        roadFailed.forEach(function (miss, key) {
+          failed[key] = { code: miss.code, tries: miss.tries, retryIn: miss.retryAt - Date.now() };
+        });
         return {
           style: state.routeStyle,
           have: Object.keys(state.roads),
           pending: pending,
-          failed: Array.from(roadFailed.keys()),
+          failed: failed,
           pausedFor: Math.max(0, roadPauseUntil - Date.now())
         };
       },
+      retryRoad: retryRoad,
+      forgiveRoadFailures: forgiveRoadFailures,
       syncRoads: syncRoads,
       THEMES: THEMES,
       renderFrame: renderFrame,

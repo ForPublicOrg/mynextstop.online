@@ -526,13 +526,23 @@ export function buildRoadPath(a, b, road) {
 
   // Coarsest tier first, so the renderer can take the first tier whose error
   // budget fits the current scale and stop looking.
+  //
+  // A tier's cumulative lengths are the base path's at the points it kept,
+  // not the lengths of its own chords. The vehicle is placed by fraction of
+  // the base path, and the trail is stroked by fraction of whichever tier is
+  // drawn; measuring the tier's shorter chords would put the tip of the trail
+  // behind the vehicle by however much length the dropped bends held, and
+  // have it jump whenever the camera crossed a tier threshold.
   const levels = [];
   for (let i = 0; i < ROAD_LEVEL_ZOOMS.length; i++) {
     const maxErr = 0.75 / (256 * Math.pow(2, ROAD_LEVEL_ZOOMS[i]));
     const idx = douglasPeuckerIndices(pts, maxErr);
     const lpts = new Array(idx.length);
-    for (let k = 0; k < idx.length; k++) lpts[k] = pts[idx[k]];
-    const lcum = cumulative(lpts);
+    const lcum = new Float64Array(idx.length);
+    for (let k = 0; k < idx.length; k++) {
+      lpts[k] = pts[idx[k]];
+      lcum[k] = cum[idx[k]];
+    }
     levels.push({
       maxErr: maxErr,
       pts: lpts,

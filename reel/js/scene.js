@@ -39,7 +39,13 @@ export const FORMATS = {
 const SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", sans-serif';
 const SERIF = 'Georgia, "Times New Roman", serif';
 
-const ZOOM_MIN = 2.2;
+/**
+ * Camera floor. At 1.5 the whole world, all 360 degrees of it, fits inside
+ * the padded width of a 1080 px frame, so a round the world trip can still be
+ * framed whole at the outro. Tiles stop at zoom 2 and are drawn scaled down
+ * below it.
+ */
+const ZOOM_MIN = 1.5;
 const ZOOM_MAX = 11.5;
 const HOLD_ZOOM_CAP = 9.8;
 const HOLD_ZOOM_LIFT = 2;
@@ -47,7 +53,19 @@ const HOLD_ZOOM_FLOOR = 0.5;
 const TRAVEL_ZOOM_BREATH = 0.12;
 
 const SPEED_MULTIPLIER = { relaxed: 1.3, normal: 1, fast: 0.72 };
-const MAX_DURATION = 59;
+
+/**
+ * Longest reel, in seconds. Reels, TikTok and Shorts all take ninety seconds
+ * now, and only a trip with a great many stops gets anywhere near it.
+ */
+const MAX_DURATION = 90;
+
+/**
+ * The per leg choreography is never squeezed below this fraction of itself,
+ * whatever the cap says. Past this point a leg is a blink, and a reel a little
+ * over the cap beats one nobody can follow.
+ */
+const LEG_SQUEEZE_FLOOR = 0.25;
 
 /** Base durations in seconds, at normal speed. */
 const D_INTRO = 2;
@@ -131,6 +149,14 @@ const HEADING_WINDOW_PX = 60;
 /** Bounds of that window once expressed as a fraction of the leg. */
 const HEADING_W_MIN = 0.006;
 const HEADING_W_MAX = 0.035;
+
+/**
+ * The window for deciding which way a ground vehicle faces, as a multiple of
+ * the heading window. Facing is a binary, and a road running more or less
+ * straight north would flip it on every wobble across vertical if it read
+ * the same narrow window the heading does. A chord this long settles it.
+ */
+const FACING_WINDOW_MULT = 5;
 
 
 const MODE_IDS = new Set(MODE_META.map(function (m) { return m.id; }));
@@ -596,22 +622,30 @@ export function buildTimeline(project) {
       : clamp(1.4 + leg.km / 800, 1.8, 3.2);
     return raw * speed;
   });
+  let camOutDur = D_CAMOUT * speed;
+  let arriveDur = D_ARRIVE * speed;
   let holdDur = D_HOLD * speed;
   let outroHoldDur = D_OUTRO_HOLD * speed;
 
   const introDur = D_INTRO * speed;
-  const camOutDur = D_CAMOUT * speed;
-  const arriveDur = D_ARRIVE * speed;
   const outroMoveDur = D_OUTRO_MOVE * speed;
   const freezeDur = D_FREEZE * speed;
 
-  const fixed = introDur + outroMoveDur + freezeDur + legCount * (camOutDur + arriveDur);
-  let flex = holdDur * legCount + outroHoldDur;
+  // The opening and closing beats are fixed. Everything per leg, the pull
+  // out, the travel, the arrival and the hold, gives way together by one
+  // factor when the trip would run past the cap, so a thirty stop reel keeps
+  // the rhythm of a three stop one, only quicker. Squeezing only the travel
+  // and the hold, as this once did, left the pull out and arrival alone, and
+  // those two by themselves overran the cap past twenty legs.
+  const fixed = introDur + outroMoveDur + freezeDur;
+  let flex = outroHoldDur + legCount * (camOutDur + arriveDur + holdDur);
   for (let i = 0; i < travel.length; i++) flex += travel[i];
   if (fixed + flex > MAX_DURATION && flex > 0) {
-    const k = Math.max(0.12, (MAX_DURATION - fixed) / flex);
+    const k = Math.max(LEG_SQUEEZE_FLOOR, (MAX_DURATION - fixed) / flex);
     if (k < 1) {
       travel = travel.map(function (v) { return v * k; });
+      camOutDur *= k;
+      arriveDur *= k;
       holdDur *= k;
       outroHoldDur *= k;
     }
@@ -1430,6 +1464,30 @@ function headingAt(path, f, view, fallback) {
 }
 
 /**
+ * Which way a ground vehicle faces, from the chord across a wide window
+ * either side of it. Pure in `f`, like headingAt.
+ *
+ * @param {object} path A timeline leg path.
+ * @param {number} f Fraction along the leg.
+ * @param {{scale: number, ox: number, oy: number}} view Projection.
+ * @param {number} angle Heading to fall back on when the chord is degenerate.
+ * @returns {boolean} True when the vehicle faces left.
+ */
+function facingAt(path, f, view, angle) {
+  const lenPx = path.len * view.scale;
+  const raw = lenPx > 0 ? (FACING_WINDOW_MULT * HEADING_WINDOW_PX) / lenPx : 0.5;
+  const w = clamp(raw, 0.02, 0.5);
+  const back = pathPointAt(path, clamp01(f - w));
+  const fwd = pathPointAt(path, clamp01(f + w));
+  const dx = fwd.x - back.x;
+  if (dx !== 0) return dx < 0;
+  let a = angle;
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return Math.abs(a) > Math.PI / 2;
+}
+
+/**
  * Layer 7: the travelling vehicle and its ground shadow.
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
@@ -1468,7 +1526,16 @@ function drawVehicleLayer(ctx, tl, t, view) {
 
   ctx.save();
   ctx.globalAlpha = act.alpha;
-  drawVehicle(ctx, leg.mode, tl.theme, x, y, angle, u * (flying ? 1 + 0.4 * lift : 1));
+  drawVehicle(
+    ctx,
+    leg.mode,
+    tl.theme,
+    x,
+    y,
+    angle,
+    u * (flying ? 1 + 0.4 * lift : 1),
+    flying ? undefined : facingAt(leg.path, act.f, view, angle)
+  );
   ctx.restore();
 }
 
@@ -1494,29 +1561,41 @@ function collides(r, placed, gap) {
  * Paint one label chip with its tail.
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
- * @param {{left: number, top: number, w: number, h: number, below: boolean}} r Placement.
+ * @param {{left: number, top: number, w: number, h: number, side: string}} r
+ *   Placement. `side` is where the chip sits relative to its pin: 'above',
+ *   'below', 'right' or 'left'. The tail points back at the pin.
  * @param {number} px Pin x in drawing space, used to aim the tail.
+ * @param {number} py Pin y in drawing space, used to aim the tail.
  * @param {string} text Label text, already ellipsized.
  * @param {number} alpha Opacity.
  * @param {number} fs Font size in drawing space.
  * @returns {void}
  */
-function drawChip(ctx, tl, r, px, text, alpha, fs) {
+function drawChip(ctx, tl, r, px, py, text, alpha, fs) {
   const u = tl.u;
   const chip = tl.theme.chip;
   const tailW = 9 * u;
   const tailH = 12 * u;
   const tx = clamp(px, r.left + 20 * u, r.left + r.w - 20 * u);
+  const ty = clamp(py, r.top + 14 * u, r.top + r.h - 14 * u);
 
   ctx.save();
   ctx.globalAlpha = alpha;
 
   ctx.beginPath();
   roundRectPath(ctx, r.left, r.top, r.w, r.h, 16 * u);
-  if (r.below) {
+  if (r.side === 'below') {
     ctx.moveTo(tx - tailW, r.top);
     ctx.lineTo(tx + tailW, r.top);
     ctx.lineTo(tx, r.top - tailH);
+  } else if (r.side === 'right') {
+    ctx.moveTo(r.left, ty - tailW);
+    ctx.lineTo(r.left, ty + tailW);
+    ctx.lineTo(r.left - tailH, ty);
+  } else if (r.side === 'left') {
+    ctx.moveTo(r.left + r.w, ty - tailW);
+    ctx.lineTo(r.left + r.w, ty + tailW);
+    ctx.lineTo(r.left + r.w + tailH, ty);
   } else {
     ctx.moveTo(tx - tailW, r.top + r.h);
     ctx.lineTo(tx + tailW, r.top + r.h);
@@ -1539,6 +1618,14 @@ function drawChip(ctx, tl, r, px, text, alpha, fs) {
 
 /**
  * Layer 8: stop labels.
+ *
+ * Each chip tries four places in turn, above, below, right and left of its
+ * pin, and takes the first that is inside the frame, clear of the top strip
+ * the platform overlays cover, and clear of every chip already placed. A
+ * trip with thirty stops brings every label back at the outro, and with only
+ * above and below to choose from most of them used to lose out to a
+ * neighbour and vanish.
+ *
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
  * @param {number} t Seconds.
@@ -1555,7 +1642,15 @@ function drawChips(ctx, tl, t, view) {
   const pinR = 10 * u;
   const gap = 16 * u;
   const margin = 24 * u;
+  const topLimit = TOP_SAFE * u;
+  // The credits sit on the bottom edge; labels stay off them.
+  const bottomLimit = dims.h - 56 * u;
   const placed = [];
+
+  const inFrame = function (r) {
+    return r.left >= margin && r.left + r.w <= dims.w - margin &&
+      r.top >= topLimit && r.top + r.h <= bottomLimit;
+  };
 
   ctx.save();
   ctx.font = '600 ' + fs + 'px ' + (chip.serif ? SERIF : SANS);
@@ -1567,6 +1662,10 @@ function drawChips(ctx, tl, t, view) {
     const px = tl.world[s].x * view.scale + view.ox;
     const py = tl.world[s].y * view.scale + view.oy;
     if (!Number.isFinite(px) || !Number.isFinite(py)) continue;
+    // The horizontal clamp below keeps a chip on screen for a pin near the
+    // edge. A pin past the edge would get a chip hugging it with a tail aimed
+    // at nothing, so that case is culled on the pin before anything is sized.
+    if (px < -pinR || px > dims.w + pinR) continue;
 
     const stop = tl.stops[s];
     const text = ellipsize(stop.label || stop.name || '', CHIP_MAX_CHARS);
@@ -1574,29 +1673,29 @@ function drawChips(ctx, tl, t, view) {
 
     const w = ctx.measureText(text).width + padX * 2;
     const h = fs + padY * 2;
+    // Above and below slide along the pin so an edge pin still gets its
+    // label; right and left sit where they sit, and fall through if that is
+    // off the frame.
     const left = clamp(px - w / 2, margin, Math.max(margin, dims.w - margin - w));
-    const above = { left: left, top: py - pinR - gap - h, w: w, h: h, below: false };
-    const below = { left: left, top: py + pinR + gap, w: w, h: h, below: true };
+    const candidates = [
+      { left: left, top: py - pinR - gap - h, w: w, h: h, side: 'above' },
+      { left: left, top: py + pinR + gap, w: w, h: h, side: 'below' },
+      { left: px + pinR + gap, top: py - h / 2, w: w, h: h, side: 'right' },
+      { left: px - pinR - gap - w, top: py - h / 2, w: w, h: h, side: 'left' }
+    ];
 
-    // Above is only ever allowed clear of the platform overlay strip, and that
-    // holds for the de-collision fallback too: a colliding chip is skipped, it
-    // is never pushed up into the safe zone.
-    const aboveOk = above.top >= TOP_SAFE * u;
-    let rect = aboveOk ? above : below;
-    if (collides(rect, placed, 6 * u)) {
-      const alt = rect.below ? above : below;
-      if (!alt.below && !aboveOk) continue;
-      if (collides(alt, placed, 6 * u)) continue;
-      rect = alt;
+    let rect = null;
+    for (let c = 0; c < candidates.length; c++) {
+      const r = candidates[c];
+      if (!inFrame(r)) continue;
+      if (collides(r, placed, 6 * u)) continue;
+      rect = r;
+      break;
     }
-
-    // Cull on the chip itself, not on the pin: a clamped chip can sit fully on
-    // screen while its pin is far outside the frame.
-    if (rect.left + rect.w < -margin || rect.left > dims.w + margin ||
-      rect.top + rect.h < -margin || rect.top > dims.h + margin) continue;
+    if (!rect) continue;
 
     placed.push(rect);
-    drawChip(ctx, tl, rect, px, text, alpha, fs);
+    drawChip(ctx, tl, rect, px, py, text, alpha, fs);
   }
 
   ctx.restore();
@@ -1686,7 +1785,11 @@ function drawTitleCard(ctx, tl, alpha) {
   const cardW = Math.min(maxCardW, Math.min(innerMax, Math.max(widest, subW)) + padX * 2);
   const cardH = padY * 2 + lines.length * lineH + innerGap + subSize * 1.1;
   const left = dims.w / 2 - cardW / 2;
-  const top = dims.h * 0.38 - cardH / 2;
+  // The intro camera centres the first stop. A tall frame has room for the
+  // card well above it; a square or wide one does not, so the card rides
+  // higher there and the pin, its pulse and its chip stay in the clear.
+  const tall = dims.h >= dims.w * 1.3;
+  const top = dims.h * (tall ? 0.38 : 0.27) - cardH / 2;
 
   ctx.save();
   ctx.globalAlpha = alpha;

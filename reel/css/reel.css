@@ -325,9 +325,31 @@ a { color: var(--accent); }
   padding: 6px 0 6px 14px; margin-left: 25px;
   border-left: 2px dashed var(--line);
 }
-.leg-modes { display: flex; gap: 3px; }
+
+/* one control shows the leg's travel mode; the picker unfolds under it */
+.mode-trigger {
+  display: inline-flex; align-items: center; gap: 5px;
+  height: 36px; padding: 0 7px 0 8px; border-radius: 10px;
+  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--line);
+  font-size: 13px; font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 1px 2px rgba(16, 20, 24, .06);
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.mode-trigger:hover { background: var(--panel-2); }
+.mode-trigger[aria-expanded="true"] {
+  background: var(--accent-soft); color: var(--accent); border-color: var(--accent);
+}
+.mode-trigger .mode-ic { width: 20px; height: 20px; }
+.mode-chev { width: 14px; height: 14px; color: var(--muted); transition: transform .12s ease; }
+.mode-trigger[aria-expanded="true"] .mode-chev { color: var(--accent); transform: rotate(180deg); }
+
+.leg-picker {
+  flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 3px;
+  padding: 2px 0;
+}
 .mode-btn {
-  width: 40px; height: 44px; border-radius: 10px;
+  width: 36px; height: 40px; border-radius: 10px;
   display: grid; place-items: center; color: var(--muted);
   border: 1px solid transparent;
   transition: background .12s ease, color .12s ease, border-color .12s ease;
@@ -339,6 +361,15 @@ a { color: var(--accent); }
 }
 .leg-km { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
+/* the router had no road for this leg: say so, and offer another go */
+.leg-note { font-size: 12px; color: var(--muted); }
+.leg-retry {
+  font-size: 12px; font-weight: 650; color: var(--accent);
+  min-height: 28px; padding: 0 7px; border-radius: 8px;
+  transition: background .12s ease;
+}
+.leg-retry:hover { background: var(--accent-soft); }
+
 /* the road route for this leg is still on the wire */
 .leg-spin {
   width: 12px; height: 12px; border-radius: 99px; flex: 0 0 auto;
@@ -349,17 +380,22 @@ a { color: var(--accent); }
 
 /* Every small control keeps its tight visual size and wins a 44px pointer
    target through an invisible extension. Nothing moves, only hit testing
-   grows, so five mode buttons plus the distance still fit a 360px phone. */
-.stop-num, .stop-label-row, .row-btn, .mode-btn { position: relative; }
+   grows, so the mode picker's eight icons still fit a 360px phone. */
+.stop-num, .stop-label-row, .row-btn, .mode-btn, .mode-trigger, .leg-retry { position: relative; }
 .stop-num::after,
 .stop-label-row::after,
 .row-btn::after,
-.mode-btn::after {
+.mode-btn::after,
+.mode-trigger::after,
+.leg-retry::after {
   content: ""; position: absolute; left: 0; right: 0; top: 0; bottom: 0;
 }
 .stop-num::after { left: -7px; right: -7px; top: -7px; bottom: -7px; }
 .stop-label-row::after { top: -7px; bottom: -7px; }
-.row-btn::after, .mode-btn::after { left: -2px; right: -2px; }
+.row-btn::after { left: -2px; right: -2px; }
+.mode-btn::after { left: -2px; right: -2px; top: -2px; bottom: -2px; }
+.mode-trigger::after { top: -4px; bottom: -4px; }
+.leg-retry::after { top: -8px; bottom: -8px; }
 
 /* ----- style cards ----- */
 .style-row {
@@ -564,9 +600,11 @@ dialog[open] { display: block; }
 }
 
 /* Small phones: buy back the width the leg rail and the aspect glyphs take,
-   so five mode buttons plus the distance stay on one line. */
+   and lay the picker out as two even rows of four instead of a ragged wrap. */
 @media (max-width: 420px) {
   .leg { margin-left: 18px; padding-left: 11px; }
+  .leg-picker { display: grid; grid-template-columns: repeat(4, 40px); gap: 4px; }
+  .mode-btn { width: 40px; }
 }
 @media (max-width: 379px) {
   .seg-glyph { display: none; }

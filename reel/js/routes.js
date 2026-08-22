@@ -1,7 +1,8 @@
 /**
  * routes.js
- * Real road geometry for drive and ride legs, fetched from the FOSSGIS OSRM
- * routers (the same public service openstreetmap.org uses).
+ * Real road geometry for road legs (car, motorbike, bus, bicycle, on foot),
+ * fetched from the FOSSGIS OSRM routers (the same public service
+ * openstreetmap.org uses).
  *
  * Nothing here touches the DOM. localStorage is reached through a guarded
  * accessor, so the module still imports and runs in a plain node process.
@@ -14,20 +15,47 @@
 
 import { haversineKm, safeLatLng, douglasPeuckerIndices } from './geo.js';
 
-/** Router endpoints, one per supported profile. */
+/**
+ * Router endpoints, one per supported profile. The profile segment of the
+ * path is a placeholder osrm-routed ignores (each instance serves one profile),
+ * so every URL uses the same word openstreetmap.org itself sends.
+ */
 const ENDPOINTS = {
   car: 'https://routing.openstreetmap.de/routed-car/route/v1/driving/',
-  bike: 'https://routing.openstreetmap.de/routed-bike/route/v1/cycling/'
+  bike: 'https://routing.openstreetmap.de/routed-bike/route/v1/driving/',
+  foot: 'https://routing.openstreetmap.de/routed-foot/route/v1/driving/'
 };
 
-/** Query string shared by both profiles. */
+/** The leg modes each profile routes. Every other mode keeps its arc. */
+const PROFILE_OF_MODE = {
+  car: 'car',
+  moto: 'car',
+  bus: 'car',
+  cycle: 'bike',
+  // The old id for the bicycle, still in drafts saved before 'cycle' existed.
+  bike: 'bike',
+  walk: 'foot'
+};
+
+/** Query string shared by every profile. */
 const QUERY = '?overview=full&geometries=polyline6';
 
-/** Our own deadline, on top of whatever the caller's signal does. */
-const REQUEST_TIMEOUT_MS = 6000;
+/**
+ * Our own deadline, on top of whatever the caller's signal does.
+ *
+ * Generous on purpose. A long route with overview=full is a few hundred
+ * kilobytes on a slow mobile link, and when the router is busy it does not
+ * answer 429, it simply holds the connection. Six seconds turned both of
+ * those into "no road" for the rest of the session.
+ */
+const REQUEST_TIMEOUT_MS = 15000;
 
-/** Legs longer than this never reach the router at all. */
-const MAX_LEG_KM = 2000;
+/**
+ * Legs longer than this, as the crow flies, never reach the router at all: a
+ * Delhi to Lisbon "drive" is not a road trip, and nobody cycles or walks
+ * across a subcontinent in one leg.
+ */
+const MAX_LEG_KM = { car: 2000, bike: 1500, foot: 300 };
 
 /** Point budget for a stored route. */
 const MAX_POINTS = 600;
@@ -44,11 +72,23 @@ const KEY_DECIMALS = 4;
 /** Coordinate precision sent to the router. */
 const URL_DECIMALS = 6;
 
-/** A decoded end point may sit at most this far from its stop. */
-const ENDPOINT_MIN_KM = 2;
+/**
+ * How far a decoded end point may sit from its stop.
+ *
+ * The router snaps each stop to the nearest piece of its network, and a good
+ * share of the places people put in a reel are not on one: a lake, a pass, a
+ * trailhead village, a beach. The path pins its ends to the stops anyway, so a
+ * snap this far away renders as a short straight run off the road to the pin,
+ * which is exactly what the last stretch of such a trip is. The allowance
+ * grows with the leg, between these two bounds, so a pin in open desert or on
+ * an island that snaps to a road a hundred kilometres away still falls back to
+ * the arc instead of drawing a spike across the map.
+ */
+const ENDPOINT_MIN_KM = 10;
+const ENDPOINT_MAX_KM = 40;
 
-/** ... or this fraction of the straight line, whichever is larger. */
-const ENDPOINT_FRACTION = 0.1;
+/** Fraction of the straight line the allowance tracks between those bounds. */
+const ENDPOINT_FRACTION = 0.2;
 
 /** How far the traced polyline may drift from the router's own distance. */
 const LENGTH_FACTOR = 1.5;
@@ -60,13 +100,13 @@ const LENGTH_SLACK_KM = 1;
 
 /**
  * The router profile a leg mode maps to.
- * @param {string} mode A LegMode: 'plane', 'car', 'train', 'boat' or 'bike'.
- * @returns {string|null} 'car' for a drive, 'bike' for a ride, null otherwise.
+ * @param {string} mode A MODE_META id from vehicles.js.
+ * @returns {string|null} 'car', 'bike' or 'foot', or null for a mode that
+ *   keeps its stylized arc (plane, train, boat).
  */
 export function roadProfile(mode) {
-  if (mode === 'car') return 'car';
-  if (mode === 'bike') return 'bike';
-  return null;
+  if (typeof mode !== 'string') return null;
+  return Object.prototype.hasOwnProperty.call(PROFILE_OF_MODE, mode) ? PROFILE_OF_MODE[mode] : null;
 }
 
 /**
@@ -302,7 +342,7 @@ function roadFitsLeg(coords, km, a, b) {
   // not a drive worth animating.
   if (km > Math.max(4 * straight, straight + 80)) return false;
 
-  const near = Math.max(ENDPOINT_MIN_KM, ENDPOINT_FRACTION * straight);
+  const near = Math.min(ENDPOINT_MAX_KM, Math.max(ENDPOINT_MIN_KM, ENDPOINT_FRACTION * straight));
   const first = coords[0];
   const last = coords[coords.length - 1];
   if (haversineKm({ lat: first[1], lng: first[0] }, sa) > near) return false;
@@ -326,7 +366,7 @@ function roadFitsLeg(coords, km, a, b) {
  *
  * @param {{lat: number, lng: number}} a Start stop.
  * @param {{lat: number, lng: number}} b End stop.
- * @param {string} mode Leg mode, must be 'car' or 'bike'.
+ * @param {string} mode Leg mode, must map to a profile (see roadProfile).
  * @param {{signal?: AbortSignal}} [options] Caller's abort signal.
  * @returns {Promise<{coords: Array<number[]>, km: number}>} Road geometry as
  *   [lng, lat] pairs, and the router's driving distance in kilometres.
@@ -340,9 +380,9 @@ export async function fetchRoad(a, b, mode, options) {
   const sb = safeLatLng(b);
   const straight = haversineKm(sa, sb);
   if (!Number.isFinite(straight)) throw new Error('bad-route');
-  // The cap is checked before anything goes out on the wire: a Delhi to Lisbon
-  // "drive" is not a road trip, and the router should not be asked.
-  if (straight > MAX_LEG_KM) throw new Error('too-long');
+  // The cap is checked before anything goes out on the wire, so the router
+  // is never asked a question whose answer would be thrown away.
+  if (straight > MAX_LEG_KM[profile]) throw new Error('too-long');
 
   const url = ENDPOINTS[profile] +
     sa.lng.toFixed(URL_DECIMALS) + ',' + sa.lat.toFixed(URL_DECIMALS) + ';' +
@@ -486,7 +526,7 @@ function hydrate() {
 function keyStops(key) {
   const parts = String(key).split('|');
   if (parts.length !== 3) return null;
-  if (parts[0] !== 'car' && parts[0] !== 'bike') return null;
+  if (!Object.prototype.hasOwnProperty.call(ENDPOINTS, parts[0])) return null;
   const ends = [];
   for (let i = 1; i < 3; i++) {
     const nums = parts[i].split(',');
