@@ -75,7 +75,7 @@ function setTiles() {
   // the @2x endpoint the old provider had. Both layers share the tile pane;
   // add order keeps labels above the base, bringToBack keeps the base lowest.
   tiles = L.tileLayer(ESRI_TILE_URL.replace('{path}', style.base), {
-    attribution: 'Powered by Esri &mdash; &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+    attribution: 'Powered by Esri | &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
     maxZoom: 16, detectRetina: true,
   }).addTo(map);
   tileLabels = L.tileLayer(ESRI_TILE_URL.replace('{path}', style.labels), {
