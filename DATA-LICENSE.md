@@ -48,11 +48,12 @@ it lands in the right town. Credit for those coordinates belongs upstream:
 
 ## What the repository does not contain
 
-The base map is rendered at runtime from [CARTO](https://carto.com/) tiles
-built on [OpenStreetMap](https://www.openstreetmap.org/copyright) data. No map
-tiles or OSM-derived map geometry are distributed in this repository; tile usage
-is governed by CARTO's and OSM's own terms, and the app shows their attribution
-on the map.
+The base map is rendered at runtime from [Esri](https://www.esri.com/) ArcGIS
+Online tiles built on Esri, HERE, Garmin and
+[OpenStreetMap](https://www.openstreetmap.org/copyright) data. No map tiles or
+OSM-derived map geometry are distributed in this repository; tile usage is
+governed by Esri's and OSM's own terms, and the app shows their attribution on
+the map.
 
 ## A note on accuracy
 

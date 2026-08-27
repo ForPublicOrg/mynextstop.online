@@ -36,11 +36,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="manifest" href="/site.webmanifest" />
 
-  <!-- Map tiles are the heaviest thing this page pulls: warm the sockets early -->
-  <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin="anonymous" />
-  <link rel="preconnect" href="https://b.basemaps.cartocdn.com" crossorigin="anonymous" />
-  <link rel="preconnect" href="https://c.basemaps.cartocdn.com" crossorigin="anonymous" />
-  <link rel="preconnect" href="https://d.basemaps.cartocdn.com" crossorigin="anonymous" />
+  <!-- Map tiles are the heaviest thing this page pulls: warm the socket early -->
+  <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin="anonymous" />
 
   <link rel="stylesheet" href="/reel/css/reel.css" />
 
@@ -193,7 +190,7 @@
     </main>
 
     <footer class="reel-foot">
-      <p>Map data &#169; OpenStreetMap contributors, style &#169; CARTO, imagery &#169; Esri.</p>
+      <p>Map data &#169; Esri, HERE, Garmin, &#169; OpenStreetMap contributors, imagery &#169; Esri.</p>
       <p>Videos you export are yours to post.</p>
       <p class="foot-links"><a href="/">map</a><a href="/places">places</a></p>
     </footer>
@@ -222,10 +219,11 @@
         <video id="exVideo" class="ex-video" controls loop muted playsinline></video>
         <p class="ex-meta" id="exMeta"></p>
         <p class="ex-note">No audio track: add trending audio in Instagram or TikTok when you post.</p>
-        <p class="ex-note" id="exFallbackNote" hidden>Exported as WebM because this browser cannot write MP4. Chrome, Edge or Safari 16.4+ can.</p>
+        <p class="ex-note" id="exFallbackNote" hidden>Exported as WebM because this browser cannot write MP4. Chrome, Edge or Safari can.</p>
         <p class="ex-note" id="exTileNote" hidden></p>
         <div class="ex-acts">
           <a id="exDownload" class="btn btn-primary btn-wide" download="mynextstop-reel.mp4" href="#">Download video</a>
+          <button id="exShare" class="btn btn-ghost btn-wide" type="button" hidden>Share / save to Photos</button>
           <button id="exClose" class="btn btn-ghost btn-wide" type="button">Close</button>
         </div>
       </div>

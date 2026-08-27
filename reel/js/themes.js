@@ -9,24 +9,34 @@
  * No DOM access beyond the canvas context handed to paintSwatch.
  */
 
-const CARTO_SUBDOMAINS = ['a', 'b', 'c', 'd'];
-const CARTO_ATTRIBUTION = '© OpenStreetMap contributors © CARTO';
+const ESRI_CANVAS_ATTRIBUTION = '© Esri, HERE, Garmin © OpenStreetMap contributors';
 const ESRI_ATTRIBUTION = '© Esri, Maxar, Earthstar Geographics';
 
 /**
- * Build a Carto raster tile template.
- * @param {string} path Style path, for example 'rastertiles/voyager_nolabels'.
+ * Build an Esri raster tile template.
+ *
+ * All four map themes ride the keyless ArcGIS Online canvas layers: CARTO's
+ * free rasters started watermarking every zoom with "API KEY REQUIRED" in
+ * Aug 2026, so they are gone from this project. The canvas bases carry no
+ * street labels, which is what a stylised reel wants, and the server answers
+ * with open CORS so the export canvas stays untainted.
+ *
+ * Esri tile addresses run {z}/{y}/{x}, row before column. The tiles are
+ * 256 px, so zoomBias 1 fetches one level deeper for the same on-screen
+ * density the old 512 px @2x tiles had.
+ *
+ * @param {string} path Service path, for example 'Canvas/World_Light_Gray_Base'.
  * @returns {{template: string, subdomains: string[], size: number, zoomBias: number, minZoom: number, maxZoom: number}}
  *   A tiles spec.
  */
-function cartoTiles(path) {
+function esriTiles(path) {
   return {
-    template: 'https://{s}.basemaps.cartocdn.com/' + path + '/{z}/{x}/{y}@2x.png',
-    subdomains: CARTO_SUBDOMAINS.slice(),
-    size: 512,
-    zoomBias: 0,
+    template: 'https://server.arcgisonline.com/ArcGIS/rest/services/' + path + '/MapServer/tile/{z}/{y}/{x}',
+    subdomains: [],
+    size: 256,
+    zoomBias: 1,
     minZoom: 2,
-    maxZoom: 19
+    maxZoom: 16
   };
 }
 
@@ -52,9 +62,11 @@ export const THEMES = {
   voyage: {
     id: 'voyage',
     name: 'Voyage',
-    tiles: cartoTiles('rastertiles/voyager_nolabels'),
-    bg: '#e8ecec',
-    overlay: null,
+    tiles: esriTiles('Canvas/World_Light_Gray_Base'),
+    bg: '#e9e8e5',
+    // A whisper of the brand teal over the neutral gray base, so voyage keeps
+    // its own cast now that vintage shares the same tiles.
+    overlay: { color: 'rgba(223,232,229,.4)', blend: 'multiply' },
     vignette: 0,
     route: {
       color: '#0e7a6c',
@@ -70,16 +82,19 @@ export const THEMES = {
     pin: { fill: '#0e7a6c', ring: '#ffffff' },
     chip: { bg: '#ffffff', ink: '#1b1e22', serif: false },
     card: { bg: 'rgba(255,255,255,.94)', ink: '#12161a', sub: '#5b6470', glow: null },
-    attribution: CARTO_ATTRIBUTION,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
     swatch: { top: '#eef2f1', bottom: '#dbe4e2' }
   },
 
   noir: {
     id: 'noir',
     name: 'Noir',
-    tiles: cartoTiles('dark_nolabels'),
-    bg: '#14171a',
-    overlay: null,
+    tiles: esriTiles('Canvas/World_Dark_Gray_Base'),
+    bg: '#3f4144',
+    // The Esri dark canvas is a mid gray. Multiplying it down keeps noir the
+    // near-black look it had on the old tiles; routes and chips draw later,
+    // so only the map itself is crushed.
+    overlay: { color: 'rgba(8,11,14,.52)', blend: 'multiply' },
     vignette: 0.35,
     route: {
       color: '#f5b42a',
@@ -95,15 +110,15 @@ export const THEMES = {
     pin: { fill: '#f5b42a', ring: '#f8fafc' },
     chip: { bg: '#1e2126', ink: '#f3f4f6', serif: false },
     card: { bg: 'rgba(20,23,26,.94)', ink: '#f8fafc', sub: '#a3aab4', glow: null },
-    attribution: CARTO_ATTRIBUTION,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
     swatch: { top: '#23272c', bottom: '#101315' }
   },
 
   vintage: {
     id: 'vintage',
     name: 'Vintage',
-    tiles: cartoTiles('light_nolabels'),
-    bg: '#efe7d6',
+    tiles: esriTiles('Canvas/World_Light_Gray_Base'),
+    bg: '#eae7e2',
     overlay: { color: 'rgba(226,200,152,.35)', blend: 'multiply' },
     vignette: 0.28,
     route: {
@@ -120,7 +135,7 @@ export const THEMES = {
     pin: { fill: '#b3382c', ring: '#fffaee' },
     chip: { bg: '#f7efdd', ink: '#41321f', serif: true },
     card: { bg: 'rgba(247,239,221,.94)', ink: '#3a2c1a', sub: '#7a6647', glow: null },
-    attribution: CARTO_ATTRIBUTION,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
     swatch: { top: '#f4ecdb', bottom: '#e2d3b4' }
   },
 
@@ -160,9 +175,11 @@ export const THEMES = {
   neon: {
     id: 'neon',
     name: 'Neon',
-    tiles: cartoTiles('dark_nolabels'),
-    bg: '#0b1020',
-    overlay: { color: 'rgba(20,16,64,.35)', blend: 'overlay' },
+    tiles: esriTiles('Canvas/World_Dark_Gray_Base'),
+    bg: '#3e4048',
+    // Multiply, not 'overlay': the mid-gray Esri canvas needs to be pulled
+    // down into the dark indigo that the neon glow reads against.
+    overlay: { color: 'rgba(30,26,84,.5)', blend: 'multiply' },
     vignette: 0.4,
     route: {
       color: null,
@@ -179,7 +196,7 @@ export const THEMES = {
     pin: { fill: '#22d3ee', ring: '#f0f9ff' },
     chip: { bg: 'rgba(11,16,32,.88)', ink: '#e0f2fe', serif: false },
     card: { bg: 'rgba(11,16,32,.94)', ink: '#e0f2fe', sub: '#7dd3fc', glow: 'rgba(103,232,249,.9)' },
-    attribution: CARTO_ATTRIBUTION,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
     swatch: { top: '#1a1e46', bottom: '#0b1020' }
   }
 };

@@ -18,14 +18,22 @@ const SRI_JS = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
 const SRI_CSS = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
 
 const STATUS_COLOR = { peak: '#0f9d6e', shoulder: '#e8890c', off: '#98928a', avoid: '#d4482c' };
-// labeled tiles: place names on the basemap do real wayfinding work
-const TILE_STYLES = { light: 'rastertiles/voyager', dark: 'dark_all' };
-// matches CARTO's own admin-boundary line color in each style
-const BORDER_COLOR = { light: '#b3a59a', dark: '#5b5f66' };
+// Keyless Esri (ArcGIS Online) canvas basemaps: CARTO's free rasters started
+// baking an "API KEY REQUIRED" watermark into every tile in Aug 2026. The
+// canvas style splits base and place names into two stacked raster layers, so
+// the map keeps labeled wayfinding without any key. Native tiles stop at z16,
+// far beyond this map's z13 ceiling.
+const ESRI_TILE_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/{path}/MapServer/tile/{z}/{y}/{x}';
+const TILE_STYLES = {
+  light: { base: 'Canvas/World_Light_Gray_Base', labels: 'Canvas/World_Light_Gray_Reference' },
+  dark: { base: 'Canvas/World_Dark_Gray_Base', labels: 'Canvas/World_Dark_Gray_Reference' },
+};
+// matches the Esri canvas admin-boundary line color in each style
+const BORDER_COLOR = { light: '#b5b3af', dark: '#6b6f74' };
 const ROUTE_COLOR = { light: '#0e7a6c', dark: '#2fae9c' };
 const CASING_OPACITY = { light: 0.85, dark: 0.4 };
 
-let map = null, dotsLayer = null, routeLayer = null, tiles = null, borderLayer = null;
+let map = null, dotsLayer = null, routeLayer = null, tiles = null, tileLabels = null, borderLayer = null;
 let loading = null, onSelect = null;
 let theme = 'light';
 // season dots are cached and patched in place: rebuilding every marker on
@@ -61,8 +69,17 @@ function loadLeaflet() {
 function setTiles() {
   const L = window.L;
   if (tiles) map.removeLayer(tiles);
-  tiles = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${TILE_STYLES[theme]}/{z}/{x}/{y}{r}.png`, {
-    attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19,
+  if (tileLabels) map.removeLayer(tileLabels);
+  const style = TILE_STYLES[theme];
+  // detectRetina fetches one zoom deeper on high-dpi screens, standing in for
+  // the @2x endpoint the old provider had. Both layers share the tile pane;
+  // add order keeps labels above the base, bringToBack keeps the base lowest.
+  tiles = L.tileLayer(ESRI_TILE_URL.replace('{path}', style.base), {
+    attribution: 'Powered by Esri &mdash; &copy; Esri, HERE, Garmin, &copy; OpenStreetMap contributors',
+    maxZoom: 16, detectRetina: true,
+  }).addTo(map);
+  tileLabels = L.tileLayer(ESRI_TILE_URL.replace('{path}', style.labels), {
+    maxZoom: 16, detectRetina: true,
   }).addTo(map);
   tiles.bringToBack();
 }

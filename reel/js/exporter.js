@@ -8,8 +8,14 @@
  *     machine allows, produces an H.264 MP4 that Instagram, TikTok and Shorts accept.
  *     Tiles are loaded a window ahead of the encoder for speed, with a per frame
  *     residency gate under that for correctness.
- *  2. `MediaRecorder` over `canvas.captureStream()`. Real time replay, produces WebM.
- *     Used only when WebCodecs H.264 is unavailable (Firefox today, older Safari).
+ *  2. `MediaRecorder` over `canvas.captureStream()`. Real time replay. Writes MP4
+ *     where the recorder can (Safari, newer Chrome), WebM elsewhere (Firefox).
+ *
+ * The WebCodecs path is only trusted after a real two-frame probe encode:
+ * `isConfigSupported` answers yes on Safari builds and broken hardware encoders
+ * that then fail on the first real frame. And when the full encode fails partway
+ * anyway, the export starts over on the recorder path instead of surfacing an
+ * error. Between the two, every current browser gets a file.
  *
  * Canvas 2D only, no OffscreenCanvas, no WebGL, no build step.
  */
@@ -22,8 +28,15 @@ import { renderFrame, planTiles, FPS } from './scene.js';
 // gate turns itself off.
 import * as scene from './scene.js';
 
-/** Codec strings tried in order: High, Main, Baseline, all at level 4.0. */
-const MP4_CODECS = ['avc1.640028', 'avc1.4d0028', 'avc1.42e028'];
+/**
+ * Codec strings tried in order: High, Main, Baseline at level 4.0, then the
+ * same profiles at level 4.2 for encoders that refuse 4.0 near its ceiling
+ * (1080x1920 at 30 fps sits within a hair of the level 4.0 limit).
+ */
+const MP4_CODECS = [
+  'avc1.640028', 'avc1.4d0028', 'avc1.42e028',
+  'avc1.64002a', 'avc1.4d002a', 'avc1.42e02a',
+];
 
 /** Target bitrate for 9:16 and 16:9 exports, in bits per second. */
 const BITRATE_WIDE = 12000000;
@@ -32,7 +45,13 @@ const BITRATE_WIDE = 12000000;
 const BITRATE_SQUARE = 10000000;
 
 /** Target bitrate for the MediaRecorder fallback, in bits per second. */
-const BITRATE_WEBM = 8000000;
+const BITRATE_RECORDER = 8000000;
+
+/** Ceiling on one WebCodecs probe encode, in milliseconds. */
+const PROBE_TIMEOUT_MS = 5000;
+
+/** Probe encodes allowed per output size before the WebCodecs path is written off. */
+const PROBE_ATTEMPTS = 2;
 
 /**
  * Ceiling on the encoded file. The muxer assembles the MP4 in memory, and
@@ -359,41 +378,172 @@ function buildEncoderConfigs(width, height, duration) {
   }));
 }
 
+/** Probe outcomes by 'WxH': a proven config skeleton, or null for a failed size. */
+const probeResults = new Map();
+
 /**
- * Ask the browser which of our H.264 configs it can actually encode.
+ * Prove a config by actually encoding with it.
+ *
+ * `isConfigSupported` is a promise, not a warranty: Safari answers yes and then
+ * errors on configure or the first frame, and Chrome on a machine with a broken
+ * hardware encoder does the same. Two frames encoded end to end, at the exact
+ * output size, is the only signal that holds. The probe also requires the
+ * decoder description mp4-muxer needs to write the avcC box: chunks without one
+ * would take the real export down at the first addVideoChunk.
+ *
+ * @param {Object} config a VideoEncoderConfig that passed isConfigSupported
  * @param {number} width
  * @param {number} height
- * @param {number} [duration] seconds
- * @returns {Promise<Object|null>} the first supported config, or null
+ * @returns {Promise<boolean>} true when the config produced usable chunks
  */
-async function pickEncoderConfig(width, height, duration) {
+function verifyEncoderConfig(config, width, height) {
+  return new Promise((resolve) => {
+    let settled = false;
+    let timer = 0;
+    /** @type {VideoEncoder|null} */
+    let encoder = null;
+    let chunks = 0;
+    let described = false;
+
+    const finish = (ok) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      timer = 0;
+      if (encoder && encoder.state !== 'closed') {
+        try {
+          encoder.close();
+        } catch (err) {
+          // Closing an encoder that already errored can throw. Nothing to do.
+        }
+      }
+      resolve(ok);
+    };
+
+    try {
+      if (typeof document === 'undefined') {
+        finish(false);
+        return;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d', { alpha: false });
+      if (!ctx) {
+        finish(false);
+        return;
+      }
+
+      encoder = new VideoEncoder({
+        output: (chunk, meta) => {
+          chunks += 1;
+          if (meta && meta.decoderConfig && meta.decoderConfig.description) described = true;
+        },
+        error: () => finish(false),
+      });
+      encoder.configure(config);
+
+      for (let i = 0; i < 2; i += 1) {
+        ctx.fillStyle = i === 0 ? '#20313f' : '#22333d';
+        ctx.fillRect(0, 0, width, height);
+        const frame = new VideoFrame(canvas, {
+          timestamp: Math.round((i * 1000000) / FPS),
+          duration: Math.round(1000000 / FPS),
+        });
+        try {
+          encoder.encode(frame, { keyFrame: i === 0 });
+        } finally {
+          frame.close();
+        }
+      }
+
+      encoder.flush().then(
+        () => finish(chunks > 0 && described),
+        () => finish(false)
+      );
+      timer = setTimeout(() => finish(false), PROBE_TIMEOUT_MS);
+    } catch (err) {
+      finish(false);
+    }
+  });
+}
+
+/**
+ * The first H.264 config that both claims support and survives a probe encode.
+ *
+ * Outcomes are cached by output size, so a size probes once per page: the
+ * support check at load pays it for 9:16, and an export of a fresh size pays a
+ * fraction of a second before its first frame. The candidates share one
+ * platform encoder, so when the best profile fails its probe the rest almost
+ * always fail identically: PROBE_ATTEMPTS bounds the worst case rather than
+ * probing every profile in the list.
+ *
+ * @param {number} width
+ * @param {number} height
+ * @param {number} [duration] seconds, sets the bitrate of the returned config
+ * @returns {Promise<Object|null>} a proven config, or null
+ */
+async function pickVerifiedConfig(width, height, duration) {
+  const key = width + 'x' + height;
+  const cached = probeResults.get(key);
+  if (cached !== undefined) {
+    return cached ? { ...cached, bitrate: bitrateFor(width, height, duration) } : null;
+  }
   if (typeof VideoEncoder === 'undefined' || typeof VideoFrame === 'undefined') return null;
   if (typeof VideoEncoder.isConfigSupported !== 'function') return null;
+
   const candidates = buildEncoderConfigs(width, height, duration);
-  for (let i = 0; i < candidates.length; i += 1) {
+  let probes = 0;
+  for (let i = 0; i < candidates.length && probes < PROBE_ATTEMPTS; i += 1) {
+    let supported = null;
     try {
       const result = await VideoEncoder.isConfigSupported(candidates[i]);
+      // Prefer the config the browser normalised for us when it hands one
+      // back, but pin the avc output format: a normaliser that drops it would
+      // flip the encoder to Annex B and fail the mux for no real reason.
       if (result && result.supported) {
-        // Prefer the config the browser normalised for us when it hands one back.
-        return result.config || candidates[i];
+        supported = { ...(result.config || candidates[i]), avc: { format: 'avc' } };
       }
     } catch (err) {
       // Unsupported codec strings can reject outright. Try the next one.
+      continue;
+    }
+    if (!supported) continue;
+    probes += 1;
+    if (await verifyEncoderConfig(supported, width, height)) {
+      probeResults.set(key, supported);
+      return supported;
     }
   }
+  probeResults.set(key, null);
   return null;
 }
 
 /**
- * Pick a WebM mime type MediaRecorder will accept.
- * @returns {string|null}
+ * Recorder containers tried in order: MP4 first, because the reel is bound for
+ * Instagram and TikTok and Safari can only write MP4, then WebM for engines
+ * that cannot write MP4 (Firefox).
  */
-function pickWebmMime() {
+const RECORDER_FORMATS = [
+  { mimeType: 'video/mp4;codecs=avc1.4d0028', ext: 'mp4' },
+  { mimeType: 'video/mp4;codecs=avc1', ext: 'mp4' },
+  { mimeType: 'video/mp4', ext: 'mp4' },
+  { mimeType: 'video/webm;codecs=vp9', ext: 'webm' },
+  { mimeType: 'video/webm;codecs=vp8', ext: 'webm' },
+  { mimeType: 'video/webm', ext: 'webm' },
+];
+
+/**
+ * Pick the container MediaRecorder will accept.
+ * @returns {{ mimeType: string, ext: 'mp4'|'webm' }|null}
+ */
+function pickRecorderFormat() {
   if (typeof MediaRecorder === 'undefined') return null;
-  const options = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
-  if (typeof MediaRecorder.isTypeSupported !== 'function') return 'video/webm';
-  for (let i = 0; i < options.length; i += 1) {
-    if (MediaRecorder.isTypeSupported(options[i])) return options[i];
+  if (typeof MediaRecorder.isTypeSupported !== 'function') {
+    return { mimeType: 'video/webm', ext: 'webm' };
+  }
+  for (let i = 0; i < RECORDER_FORMATS.length; i += 1) {
+    if (MediaRecorder.isTypeSupported(RECORDER_FORMATS[i].mimeType)) return RECORDER_FORMATS[i];
   }
   return null;
 }
@@ -402,33 +552,38 @@ function pickWebmMime() {
  * True when a canvas can be turned into a MediaStream and recorded.
  * @returns {boolean}
  */
-function canRecordWebm() {
+function canRecordFallback() {
   if (typeof document === 'undefined') return false;
   if (typeof HTMLCanvasElement === 'undefined') return false;
   if (typeof HTMLCanvasElement.prototype.captureStream !== 'function') return false;
-  return pickWebmMime() !== null;
+  return pickRecorderFormat() !== null;
 }
 
 /**
- * Report which export formats this browser can produce.
- * Safe to call at any time, does not allocate an encoder.
+ * Report which export containers this browser can produce, by either path.
+ * The first call for a size may run a sub-second probe encode; the outcome is
+ * cached, so calling again is free.
  *
  * @returns {Promise<{ mp4: boolean, webm: boolean }>}
  */
 export async function detectExportSupport() {
   let mp4 = false;
   try {
-    mp4 = (await pickEncoderConfig(PROBE_WIDTH, PROBE_HEIGHT)) !== null;
+    mp4 = (await pickVerifiedConfig(PROBE_WIDTH, PROBE_HEIGHT)) !== null;
   } catch (err) {
     mp4 = false;
   }
-  let webm = false;
+  /** @type {{ mimeType: string, ext: string }|null} */
+  let recorder = null;
   try {
-    webm = canRecordWebm();
+    recorder = canRecordFallback() ? pickRecorderFormat() : null;
   } catch (err) {
-    webm = false;
+    recorder = null;
   }
-  return { mp4, webm };
+  return {
+    mp4: mp4 || Boolean(recorder && recorder.ext === 'mp4'),
+    webm: Boolean(recorder && recorder.ext === 'webm'),
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -916,11 +1071,42 @@ async function encodeMp4({
 }
 
 /* ------------------------------------------------------------------ */
-/* WebM fallback, MediaRecorder over captureStream                     */
+/* realtime fallback, MediaRecorder over captureStream                 */
 /* ------------------------------------------------------------------ */
 
 /**
- * Record the timeline in real time into a WebM blob.
+ * Keep the canvas in the live DOM while the recorder runs.
+ *
+ * WebKit only delivers captureStream frames for a canvas its compositor
+ * actually paints: recording a detached canvas on Safari produces an empty or
+ * frozen file. A two pixel, effectively invisible presence in the corner is
+ * enough, and harmless on the engines that do not need it.
+ *
+ * @param {HTMLCanvasElement} canvas
+ * @returns {() => void} undo, safe to call more than once
+ */
+function attachForCapture(canvas) {
+  if (typeof document === 'undefined' || !document.body || canvas.isConnected) {
+    return () => {};
+  }
+  const style = canvas.style;
+  style.position = 'fixed';
+  style.left = '0';
+  style.bottom = '0';
+  style.width = '2px';
+  style.height = '2px';
+  style.opacity = '0.01';
+  style.pointerEvents = 'none';
+  canvas.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(canvas);
+  return () => {
+    if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+  };
+}
+
+/**
+ * Record the timeline in real time into a video blob, MP4 or WebM depending
+ * on what this browser's MediaRecorder can write.
  * This is playback rather than frame stepping, so time comes from the clock.
  *
  * Two things keep a background tab honest. The recording clock stops while the
@@ -944,17 +1130,18 @@ async function encodeMp4({
  * @param {any} args.tileWindows windowed tile loader from createTileWindows
  * @param {(info: {stage: 'tiles'|'encode'|'finish', done?: number, total?: number}) => void} [args.onProgress]
  * @param {AbortSignal} [args.signal]
- * @returns {Promise<{ blob: Blob, mimeType: string, ext: 'webm', seconds: number }>}
+ * @returns {Promise<{ blob: Blob, mimeType: string, ext: 'mp4'|'webm', seconds: number }>}
  */
-function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onProgress, signal }) {
-  const mimeType = pickWebmMime();
-  if (!mimeType || typeof canvas.captureStream !== 'function') {
+function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, onProgress, signal }) {
+  const format = pickRecorderFormat();
+  if (!format || typeof canvas.captureStream !== 'function') {
     return Promise.reject(new Error('export-unsupported'));
   }
 
   const total = frameCount(duration);
-  const containerType = mimeType.split(';')[0];
+  const containerType = format.mimeType.split(';')[0];
   const doc = typeof document !== 'undefined' ? document : null;
+  const detach = attachForCapture(canvas);
 
   return new Promise((resolve, reject) => {
     /** @type {Blob[]} */
@@ -1007,6 +1194,7 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onPro
         doc.removeEventListener('visibilitychange', onVisibility);
       }
       stopTracks();
+      detach();
     };
 
     const releaseRecorder = () => {
@@ -1043,8 +1231,8 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onPro
 
       stream = canvas.captureStream(FPS);
       recorder = new MediaRecorder(stream, {
-        mimeType,
-        videoBitsPerSecond: Math.min(BITRATE_WEBM, bitrateFor(canvas.width, canvas.height, duration)),
+        mimeType: format.mimeType,
+        videoBitsPerSecond: Math.min(BITRATE_RECORDER, bitrateFor(canvas.width, canvas.height, duration)),
       });
 
       recorder.ondataavailable = (event) => {
@@ -1068,7 +1256,7 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onPro
         resolve({
           blob: new Blob(chunks, { type: containerType }),
           mimeType: containerType,
-          ext: 'webm',
+          ext: format.ext,
           seconds: Math.max(1 / FPS, recorded),
         });
       };
@@ -1215,8 +1403,10 @@ function recordWebm({ timeline, tiles, canvas, ctx, duration, tileWindows, onPro
  *  - `encode`: rendering and encoding frames.
  *  - `finish`: the last frame is in, the file is being written. No counts.
  *
- * Prefers H.264 MP4 via WebCodecs. Falls back to a real time WebM recording when
- * the browser cannot encode H.264, in which case the result has `ext: 'webm'`.
+ * Prefers H.264 MP4 via WebCodecs, and only after the config survives a probe
+ * encode. Falls back to a real time MediaRecorder capture when WebCodecs is
+ * unavailable, fails its probe, or dies partway through the real encode: MP4
+ * where the recorder can write it (Safari), WebM elsewhere (`ext` says which).
  *
  * Tile failures are non fatal and surface as `failedTiles`.
  *
@@ -1234,23 +1424,19 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
   throwIfAborted(signal);
 
   const plan = planFor(timeline);
-  const config = await pickEncoderConfig(width, height, duration);
+  const config = await pickVerifiedConfig(width, height, duration);
   throwIfAborted(signal);
 
   const { canvas, ctx } = createRenderTarget(width, height);
+  const windows = windowPlan(plan);
+  const makeTileWindows = () =>
+    createTileWindows({ tiles, windows, total: plan.length, onProgress, signal });
 
-  let result;
+  let result = null;
   let failedTiles = 0;
 
-  const tileWindows = createTileWindows({
-    tiles,
-    windows: windowPlan(plan),
-    total: plan.length,
-    onProgress,
-    signal,
-  });
-
   if (config) {
+    const tileWindows = makeTileWindows();
     report(onProgress, 'tiles', 0, plan.length);
     try {
       result = await encodeMp4({
@@ -1266,12 +1452,22 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
         onProgress,
         signal,
       });
+      failedTiles = tileWindows.failed();
+    } catch (err) {
+      // A cancel stays a cancel. Anything else means the encoder or the muxer
+      // gave out after passing its probe, which some hardware encoders do deep
+      // into a long run. The realtime recorder is slower but far harder to
+      // kill, so start over on it rather than surface an error.
+      if (isAbortError(err) || !canRecordFallback()) throw err;
+      result = null;
     } finally {
       tileWindows.releaseAll();
     }
-    failedTiles = tileWindows.failed();
-  } else {
-    if (!canRecordWebm()) throw new Error('export-unsupported');
+  }
+
+  if (!result) {
+    if (!canRecordFallback()) throw new Error('export-unsupported');
+    const tileWindows = makeTileWindows();
     report(onProgress, 'tiles', 0, plan.length);
     try {
       // Real time playback cannot stop to load, so the opening is made ready
@@ -1279,7 +1475,7 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
       await tileWindows.ensure(0);
       throwIfAborted(signal);
       tileWindows.warm(1);
-      result = await recordWebm({
+      result = await recordRealtime({
         timeline,
         tiles,
         canvas,
@@ -1289,10 +1485,10 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
         onProgress,
         signal,
       });
+      failedTiles = tileWindows.failed();
     } finally {
       tileWindows.releaseAll();
     }
-    failedTiles = tileWindows.failed();
   }
 
   return {

@@ -235,6 +235,7 @@ const dom = {
   exFallbackNote: byId('exFallbackNote'),
   exTileNote: byId('exTileNote'),
   exDownload: /** @type {HTMLAnchorElement} */ (byId('exDownload')),
+  exShare: /** @type {HTMLButtonElement} */ (byId('exShare')),
   exClose: byId('exClose'),
   exError: byId('exError'),
   exErrorMsg: byId('exErrorMsg'),
@@ -2187,6 +2188,8 @@ function warmTiles() {
 
 let exportAbort = null;
 let exportUrl = '';
+/** The finished reel as a File, kept only while the done pane is up, for the share sheet. */
+let exportFile = null;
 let lastFocus = null;
 let manualDialog = false;
 let cleanupDone = true;
@@ -2208,12 +2211,14 @@ function syncExportButtons() {
     btn.disabled = !ready;
   }
   if (state.stops.length < 2) dom.exportHint.textContent = 'Add at least 2 stops';
-  else if (!canRecord) dom.exportHint.textContent = 'This browser cannot record video. Try Chrome, Edge or Safari 16.4+.';
+  else if (!canRecord) dom.exportHint.textContent = 'This browser cannot record video. Try a recent Chrome, Edge, Safari or Firefox.';
   else dom.exportHint.textContent = 'No sign-up, the file never leaves your device.';
 }
 
 /** Drop the previous object URL so blobs do not pile up. */
 function revokeExportUrl() {
+  exportFile = null;
+  dom.exShare.hidden = true;
   if (!exportUrl) return;
   dom.exVideo.removeAttribute('src');
   dom.exVideo.load();
@@ -2451,6 +2456,21 @@ function showResult(result) {
   dom.exDownload.download = 'mynextstop-reel.' + result.ext;
   dom.exFallbackNote.hidden = result.ext !== 'webm';
 
+  // The system share sheet is how a phone gets the file into Photos and then
+  // Instagram; plain downloads land in the file manager where nobody looks.
+  // Progressive: the button only appears where files can actually be shared.
+  if (typeof File === 'function' && navigator.share && typeof navigator.canShare === 'function') {
+    try {
+      const file = new File([result.blob], 'mynextstop-reel.' + result.ext, { type: result.mimeType });
+      if (navigator.canShare({ files: [file] })) {
+        exportFile = file;
+        dom.exShare.hidden = false;
+      }
+    } catch (err) {
+      // Sharing is a bonus. The download link above always works.
+    }
+  }
+
   const failed = Number(result.failedTiles) || 0;
   if (failed > 0) {
     dom.exTileNote.textContent = 'Some map tiles did not load (' + failed + '). The video may have blank patches.';
@@ -2466,7 +2486,7 @@ function showResult(result) {
 
 /** Internal exporter codes, said the way a person would say them. */
 const EXPORT_ERROR_COPY = {
-  'export-unsupported': 'This browser cannot record video. Try Chrome, Edge or Safari 16.4+.',
+  'export-unsupported': 'This browser cannot record video. Try a recent Chrome, Edge, Safari or Firefox.',
   'bad-timeline': 'This route could not be turned into a video. Try removing a stop, then export again.',
   'canvas-unavailable': 'The video canvas could not start. Reload the page, then try again.',
   'muxer-empty': 'The video came out empty. Try again, or try a shorter route.',
@@ -2687,6 +2707,12 @@ function wire() {
     closeDialog();
   });
   dom.exClose.addEventListener('click', closeDialog);
+  dom.exShare.addEventListener('click', function () {
+    if (!exportFile || !navigator.share) return;
+    navigator.share({ files: [exportFile], title: 'My trip reel' }).catch(function () {
+      // A dismissed share sheet rejects. Nothing to clean up.
+    });
+  });
   dom.exErrClose.addEventListener('click', closeDialog);
   dom.exRetry.addEventListener('click', startExport);
 

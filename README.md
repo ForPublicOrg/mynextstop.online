@@ -61,8 +61,8 @@ Zero-framework static frontend: the same pattern as
 - `data/holidays.json`: verified Indian holidays through 2027 for the long-weekend radar.
 - `js/icons.js`: the mynextstop icon set: one hand-kept line-icon system (UI glyphs +
   16 category glyphs + transport modes), all `currentColor` SVG. No emoji, no icon fonts.
-- Leaflet + CARTO basemap tiles (theme-aware light/dark), with India's official boundary
-  drawn as a corrective overlay (see DATA-LICENSE.md).
+- Leaflet + Esri canvas basemap tiles (theme-aware light/dark, no API key), with India's
+  official boundary drawn as a corrective overlay (see DATA-LICENSE.md).
 - `tools/build-seo.mjs`: generates the readable half of the site, 657 static pages
   (589 destination guides, 36 state guides, 12 month guides, 16 theme guides, four
   browse indexes) plus the sitemaps, straight out of `data/destinations.json`. Output
@@ -161,5 +161,5 @@ you can hack on it.
 - **Code** (HTML/CSS/JS): [MIT](LICENSE) © 2026 Vikas
 - **Destination & holiday data** (`data/`): [CC BY 4.0](DATA-LICENSE.md), 
   use it anywhere, credit mynextstop.online
-- Base map tiles at runtime: © [CARTO](https://carto.com/) ·
+- Base map tiles at runtime: © [Esri](https://www.esri.com/), HERE, Garmin ·
   © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors

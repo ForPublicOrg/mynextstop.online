@@ -34,7 +34,7 @@ const MAX_LOADED = 700;
  * still loading the later ones, and every opening frame would come out blank.
  * The ceiling keeps a pathological plan from pinning the whole world.
  */
-// Satellite 256 px tiles decode to roughly 0.26 MB each, so 3200 pinned bounds decoded-tile memory near 850 MB worst case, and far less for carto where plans are small.
+// The 256 px tiles decode to roughly 0.26 MB each, so 3200 pinned bounds decoded-tile memory near 850 MB worst case.
 const MAX_PINNED = 3200;
 
 /** Ceiling on prefetch concurrency, to stay polite to the tile hosts. */
