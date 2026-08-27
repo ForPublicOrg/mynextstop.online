@@ -20,13 +20,13 @@
  * Canvas 2D only, no OffscreenCanvas, no WebGL, no build step.
  */
 
-import { Muxer, ArrayBufferTarget } from './vendor/mp4-muxer.min.mjs';
-import { renderFrame, planTiles, FPS } from './scene.js';
+import { Muxer, ArrayBufferTarget } from './vendor/mp4-muxer.min.mjs?v=e1';
+import { renderFrame, planTiles, FPS } from './scene.js?v=e1';
 // Namespace import on purpose: the per-frame tile query is optional, and a named
 // import of an export the scene does not have would fail the whole module at
 // link time. Read through the namespace it is simply undefined, and the frame
 // gate turns itself off.
-import * as scene from './scene.js';
+import * as scene from './scene.js?v=e1';
 
 /**
  * Codec strings tried in order: High, Main, Baseline at level 4.0, then the
@@ -92,6 +92,16 @@ const RECORDER_TIMESLICE_MS = 500;
  * is throttled or suspended, in milliseconds.
  */
 const RECORDER_WATCHDOG_MS = 250;
+
+/**
+ * Ceiling on one starvation pause in the realtime recorder, in milliseconds.
+ *
+ * When the clock reaches a window whose tiles are not in yet, the recording
+ * freezes rather than write frames on a bare background. The ceiling keeps one
+ * unreachable tile host from holding the recording open forever: when it runs
+ * out, the frame draws with whatever arrived, same as the MP4 path's gate.
+ */
+const STARVE_WAIT_MS = 25000;
 
 /**
  * Frames covered by one tile prefetch window.
@@ -636,25 +646,57 @@ function windowPlan(list) {
  * the same thing it always did even though loading now interleaves with
  * encoding.
  *
+ * A window that has already settled is not simply done for good: on a plan
+ * bigger than the pin ceiling the LRU can take a loaded tile back before its
+ * frames encode. `ensure` therefore revalidates a settled window's residency
+ * and quietly runs again for whatever is gone, and `ready` answers the
+ * realtime recorder's question, "can this window be painted right now".
+ *
  * @param {Object} args
  * @param {any} args.tiles TileCache instance, may be null
  * @param {Array<Array<any>>} args.windows
  * @param {number} args.total plan length
+ * @param {{accepted: boolean}} [args.gaps] set once the user chose to export
+ *   with gaps: tiles that used up every attempt stop counting as missing, so
+ *   neither the revalidation nor the recorder waits on hopeless loads
  * @param {(info: {stage: 'tiles'|'encode'|'finish', done?: number, total?: number}) => void} [args.onProgress]
  * @param {AbortSignal} [args.signal]
  * @returns {{ ensure: (k: number) => Promise<void>, warm: (k: number) => void,
- *   release: (k: number) => void, releaseAll: () => void, failed: () => number }}
+ *   release: (k: number) => void, releaseAll: () => void,
+ *   ready: (k: number) => boolean, failed: () => number }}
  */
-function createTileWindows({ tiles, windows, total, onProgress, signal }) {
+function createTileWindows({ tiles, windows, total, gaps, onProgress, signal }) {
   const usable = Boolean(tiles) && typeof tiles.prefetch === 'function';
   const canRelease = usable && typeof tiles.releasePins === 'function';
+  const canQuery = usable && typeof tiles.missing === 'function';
+  const query = (list) => missingBeyondGaps(tiles, list, gaps);
   /** @type {Map<number, Promise<void>>} */
   const runs = new Map();
+  /** @type {Set<number>} windows whose latest run has settled */
+  const settledRuns = new Set();
   /** @type {Map<number, number>} */
   const settled = new Map();
-  /** @type {Set<number>} */
-  const held = new Set();
-  let failedTiles = 0;
+  /** @type {Map<number, number>} pinned prefetch passes per window, for release */
+  const pinDepth = new Map();
+  /**
+   * Tiles seen missing at the moment their window's load settled, by key.
+   * A Set, not a tally: a window can run more than once, and the same dead
+   * tile must not count once per run. Measured at settle time, while the
+   * window's pins still hold, so tiles the LRU lets go after their frames
+   * were drawn are never mistaken for failures.
+   * @type {Set<string>}
+   */
+  const failedKeys = new Set();
+
+  const noteFailures = (list) => {
+    if (!canQuery) return;
+    try {
+      const absent = tiles.missing(list);
+      for (let i = 0; i < absent.length; i += 1) failedKeys.add(tileKey(absent[i]));
+    } catch (err) {
+      // Counting only; never worth failing a run over.
+    }
+  };
 
   const publish = () => {
     let done = 0;
@@ -667,16 +709,30 @@ function createTileWindows({ tiles, windows, total, onProgress, signal }) {
   const start = (k) => {
     if (k < 0 || k >= windows.length) return Promise.resolve();
     const running = runs.get(k);
-    if (running) return running;
+    if (running && !settledRuns.has(k)) return running;
 
     const list = windows[k];
     if (!usable || !list || !list.length) {
       const empty = Promise.resolve();
       runs.set(k, empty);
+      settledRuns.add(k);
       return empty;
     }
 
-    held.add(k);
+    if (running) {
+      // Settled once already: only run again for tiles the LRU took back.
+      if (!canQuery) return running;
+      let absent;
+      try {
+        absent = query(list);
+      } catch (err) {
+        return running;
+      }
+      if (!absent || !absent.length) return running;
+    }
+
+    settledRuns.delete(k);
+    pinDepth.set(k, (pinDepth.get(k) || 0) + 1);
     const run = tiles
       .prefetch(list, {
         concurrency: 10,
@@ -688,16 +744,18 @@ function createTileWindows({ tiles, windows, total, onProgress, signal }) {
         },
       })
       .then(
-        (result) => {
+        () => {
+          settledRuns.add(k);
           settled.set(k, list.length);
-          if (result && Number.isFinite(result.failed)) failedTiles += Math.max(0, result.failed);
+          noteFailures(list);
           publish();
         },
-        (err) => {
+        () => {
           // Aborts surface through the signal check the caller runs next, and a
           // window that could not load at all is just missing tiles.
+          settledRuns.add(k);
           settled.set(k, list.length);
-          if (!isAbortError(err)) failedTiles += list.length;
+          noteFailures(list);
           publish();
         }
       );
@@ -705,37 +763,107 @@ function createTileWindows({ tiles, windows, total, onProgress, signal }) {
     return run;
   };
 
-  return {
-    ensure: (k) => start(k),
-    warm: (k) => {
-      start(k);
-    },
-    release: (k) => {
-      if (!canRelease || !held.has(k)) return;
-      held.delete(k);
+  const releaseWindow = (k) => {
+    const depth = pinDepth.get(k) || 0;
+    if (!canRelease || depth <= 0) {
+      pinDepth.delete(k);
+      return;
+    }
+    pinDepth.delete(k);
+    // Every prefetch pass pinned the window once, so undo them all.
+    for (let i = 0; i < depth; i += 1) {
       try {
         tiles.releasePins(windows[k]);
       } catch (err) {
         // Releasing a pin can never be worth failing an export over.
       }
-    },
-    releaseAll: () => {
-      if (!canRelease) {
-        held.clear();
-        return;
-      }
-      const keys = Array.from(held);
-      held.clear();
-      for (let i = 0; i < keys.length; i += 1) {
-        try {
-          tiles.releasePins(windows[keys[i]]);
-        } catch (err) {
-          // Same as above.
-        }
-      }
-    },
-    failed: () => failedTiles,
+    }
   };
+
+  return {
+    ensure: (k) => start(k),
+    warm: (k) => {
+      start(k);
+    },
+    release: releaseWindow,
+    releaseAll: () => {
+      const keys = Array.from(pinDepth.keys());
+      for (let i = 0; i < keys.length; i += 1) {
+        releaseWindow(keys[i]);
+      }
+    },
+    ready: (k) => {
+      if (!usable || k < 0 || k >= windows.length) return true;
+      const list = windows[k];
+      if (!list || !list.length) return true;
+      if (!settledRuns.has(k)) return false;
+      if (!canQuery) return true;
+      try {
+        return query(list).length === 0;
+      } catch (err) {
+        return true;
+      }
+    },
+    failed: () => failedKeys.size,
+  };
+}
+
+/**
+ * Wrapped cache key for a tile, matching what TileCache.missing hands back.
+ * @param {{z: number, x: number, y: number}} t a tile from missing()
+ * @returns {string}
+ */
+function tileKey(t) {
+  return t.z + '/' + t.x + '/' + t.y;
+}
+
+/**
+ * Tiles of the plan that are not resident right now, by ground truth rather
+ * than by load bookkeeping. Plan entries are unique, so this never lists a
+ * tile twice.
+ *
+ * @param {any} tiles TileCache instance, may be null
+ * @param {Array<Array<any>>} windows the windowed plan
+ * @returns {Array<{z: number, x: number, y: number}>} the tiles a frame could still find missing
+ */
+function collectMissingTiles(tiles, windows) {
+  if (!tiles || typeof tiles.missing !== 'function') return [];
+  const out = [];
+  for (let k = 0; k < windows.length; k += 1) {
+    const list = windows[k];
+    if (!list || !list.length) continue;
+    try {
+      const absent = tiles.missing(list);
+      for (let i = 0; i < absent.length; i += 1) out.push(absent[i]);
+    } catch (err) {
+      return [];
+    }
+  }
+  return out;
+}
+
+/**
+ * The missing tiles of a list that were not already accepted as gaps.
+ *
+ * Once the user has said "export anyway", the tiles they saw missing in the
+ * prompt must never again read as work: the renderer's own cache misses keep
+ * resurrecting dead tiles into fresh doomed load attempts, and anything that
+ * treats those as loads-in-progress stalls on every one of them, frame after
+ * frame. Filtering by the accepted set keeps the gate and the recorder's
+ * readiness check watching for real trouble, evicted good tiles, only.
+ *
+ * @param {any} tiles TileCache instance
+ * @param {Array<any>} list tiles to check
+ * @param {{accepted: boolean, hopeless: Set<string>|null}} [gaps]
+ * @returns {Array<{z: number, x: number, y: number}>}
+ */
+function missingBeyondGaps(tiles, list, gaps) {
+  const accepted = Boolean(gaps && gaps.accepted);
+  let absent = tiles.missing(list, { ignoreFailed: accepted });
+  if (accepted && gaps.hopeless && absent.length) {
+    absent = absent.filter((t) => !gaps.hopeless.has(tileKey(t)));
+  }
+  return absent;
 }
 
 /**
@@ -795,10 +923,12 @@ function withDeadline(work, ms) {
  * @param {Object} args
  * @param {any} args.timeline
  * @param {any} args.tiles TileCache instance, may be null
+ * @param {{accepted: boolean}} [args.gaps] set once the user chose to export
+ *   with gaps: hopeless tiles stop tripping the gate on every frame
  * @param {AbortSignal} [args.signal]
  * @returns {{ ensure: (frame: number) => Promise<void>|null, releaseAll: () => void }}
  */
-function createFrameGate({ timeline, tiles, signal }) {
+function createFrameGate({ timeline, tiles, gaps, signal }) {
   const query = typeof scene.tilesForFrame === 'function' ? scene.tilesForFrame : null;
   const usable =
     Boolean(query) &&
@@ -838,7 +968,7 @@ function createFrameGate({ timeline, tiles, signal }) {
 
       let absent;
       try {
-        absent = tiles.missing(list);
+        absent = missingBeyondGaps(tiles, list, gaps);
       } catch (err) {
         return null;
       }
@@ -946,6 +1076,7 @@ async function encodeMp4({
   height,
   duration,
   tileWindows,
+  gaps,
   onProgress,
   signal,
 }) {
@@ -963,7 +1094,7 @@ async function encodeMp4({
   /** @type {VideoEncoder|null} */
   let encoder = null;
 
-  const frameGate = createFrameGate({ timeline, tiles, signal });
+  const frameGate = createFrameGate({ timeline, tiles, gaps, signal });
 
   const recordFailure = (err) => {
     if (failure) return;
@@ -1109,17 +1240,20 @@ function attachForCapture(canvas) {
  * on what this browser's MediaRecorder can write.
  * This is playback rather than frame stepping, so time comes from the clock.
  *
- * Two things keep a background tab honest. The recording clock stops while the
- * page is hidden, and the recorder pauses with it, so the file can never fill
- * up with a frozen frame or run longer than the timeline. And a coarse interval
- * runs alongside requestAnimationFrame, so a throttled or suspended frame
- * callback cannot starve the render or leave the promise hanging forever.
+ * The recording freezes, recorder and clock together, whenever the page is
+ * hidden or the clock has outrun the tiles. One mechanism serves both: the
+ * two conditions are tracked separately and the freeze holds while either
+ * stands, so overlapping spans are never double counted against the clock.
+ * The file can therefore never fill up with a frozen frame, run longer than
+ * the timeline, or write a stretch of bare background where the map should
+ * be. A coarse interval runs alongside requestAnimationFrame, so a throttled
+ * or suspended frame callback cannot starve the render or leave the promise
+ * hanging forever.
  *
  * Tiles are loaded a window ahead of the clock, the same windows the MP4 path
  * uses, so a long trip is never asked to pin its whole plan at once: past the
  * pin ceiling the cache would quietly let the later tiles go before the first
- * frame was even drawn. Real time cannot stop to wait, so a window that is
- * late simply draws from parent tiles, which is what it always did.
+ * frame was even drawn.
  *
  * @param {Object} args
  * @param {any} args.timeline
@@ -1154,7 +1288,9 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
     let startedAt = 0;
     let stoppedAt = 0;
     let pausedFor = 0;
-    let hiddenAt = 0;
+    let frozenAt = 0;
+    let hiddenNow = false;
+    let starvedNow = false;
     let lastPaintAt = 0;
     let windowIndex = 0;
 
@@ -1283,12 +1419,77 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
         }, RECORDER_TAIL_MS);
       };
 
+      const restartRaf = () => {
+        stopRaf();
+        if (settled || stopping || frozenAt) return;
+        rafId = requestAnimationFrame(tick);
+      };
+
+      /**
+       * Hold or release the recording as the freeze conditions change.
+       * The freeze stands while the page is hidden or the clock has outrun
+       * the tiles; recorder and clock always move together.
+       * @param {number} now performance.now style timestamp
+       */
+      const updateFrozen = (now) => {
+        if (settled || stopping) return;
+        const shouldFreeze = hiddenNow || starvedNow;
+        if (shouldFreeze && !frozenAt) {
+          frozenAt = now;
+          stopRaf();
+          if (recorder.state === 'recording' && typeof recorder.pause === 'function') {
+            try {
+              recorder.pause();
+            } catch (err) {
+              // A recorder that will not pause still has the clock held for it.
+            }
+          }
+          return;
+        }
+        if (!shouldFreeze && frozenAt) {
+          pausedFor += now - frozenAt;
+          frozenAt = 0;
+          if (recorder.state === 'paused' && typeof recorder.resume === 'function') {
+            try {
+              recorder.resume();
+            } catch (err) {
+              // Same as above.
+            }
+          }
+          lastPaintAt = now;
+          restartRaf();
+        }
+      };
+
+      /**
+       * The clock reached a window whose tiles are not in. Freeze until they
+       * are, or until the starvation ceiling says to move on regardless.
+       * @param {number} k window index
+       * @param {number} now performance.now style timestamp
+       */
+      const starve = (k, now) => {
+        if (settled || stopping || starvedNow) return;
+        starvedNow = true;
+        updateFrozen(now);
+        withDeadline(tileWindows.ensure(k), STARVE_WAIT_MS).then(
+          () => {
+            if (settled || stopping || !starvedNow) return;
+            starvedNow = false;
+            updateFrozen(performance.now());
+          },
+          (err) => {
+            // Only an abort comes through withDeadline as a rejection.
+            fail(isAbortError(err) ? err : createAbortError());
+          }
+        );
+      };
+
       /**
        * Paint the frame the clock is currently on and stop when time is up.
        * @param {number} now performance.now style timestamp
        */
       const step = (now) => {
-        if (settled || stopping) return;
+        if (settled || stopping || frozenAt) return;
         const elapsed = Math.max(0, now - startedAt - pausedFor) / 1000;
         const t = Math.min(elapsed, duration);
         // Keep one window of tiles loading ahead of the clock and let go of
@@ -1299,6 +1500,10 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
           tileWindows.warm(atWindow);
           tileWindows.warm(atWindow + 1);
           tileWindows.release(atWindow - 2);
+          if (typeof tileWindows.ready === 'function' && !tileWindows.ready(atWindow)) {
+            starve(atWindow, now);
+            return;
+          }
         }
         try {
           paint(ctx, timeline, t, tiles);
@@ -1314,47 +1519,16 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
 
       const tick = (now) => {
         rafId = 0;
-        if (settled || stopping || isHidden()) return;
+        if (settled || stopping || frozenAt) return;
         step(now);
-        if (settled || stopping || rafId) return;
-        rafId = requestAnimationFrame(tick);
-      };
-
-      const restartRaf = () => {
-        stopRaf();
-        if (settled || stopping) return;
+        if (settled || stopping || frozenAt || rafId) return;
         rafId = requestAnimationFrame(tick);
       };
 
       onVisibility = () => {
-        if (settled) return;
-        if (isHidden()) {
-          // Freeze both the recording and the clock, so the two stay in step.
-          if (stopping || hiddenAt) return;
-          hiddenAt = performance.now();
-          stopRaf();
-          if (recorder.state === 'recording' && typeof recorder.pause === 'function') {
-            try {
-              recorder.pause();
-            } catch (err) {
-              // A recorder that will not pause still has the clock held for it.
-            }
-          }
-          return;
-        }
-        if (!hiddenAt) return;
-        const now = performance.now();
-        pausedFor += now - hiddenAt;
-        hiddenAt = 0;
-        if (recorder.state === 'paused' && typeof recorder.resume === 'function') {
-          try {
-            recorder.resume();
-          } catch (err) {
-            // Same as above.
-          }
-        }
-        lastPaintAt = now;
-        restartRaf();
+        if (settled || stopping) return;
+        hiddenNow = isHidden();
+        updateFrozen(performance.now());
       };
 
       if (doc && typeof doc.addEventListener === 'function') {
@@ -1373,14 +1547,15 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
       // The watchdog is the floor under a throttled or suspended frame callback:
       // it advances the render itself and can end the recording on its own.
       watchdog = setInterval(() => {
-        if (settled || stopping || isHidden()) return;
+        if (settled || stopping || frozenAt) return;
         const now = performance.now();
         if (now - lastPaintAt < RECORDER_WATCHDOG_MS) return;
         step(now);
-        if (!settled && !stopping) restartRaf();
+        if (!settled && !stopping && !frozenAt) restartRaf();
       }, RECORDER_WATCHDOG_MS);
 
-      if (isHidden()) onVisibility();
+      hiddenNow = isHidden();
+      if (hiddenNow) updateFrozen(performance.now());
       rafId = requestAnimationFrame(tick);
     } catch (err) {
       fail(err instanceof Error || isAbortError(err) ? err : new Error('export-unsupported'));
@@ -1396,12 +1571,20 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
  * Render a timeline to a video file.
  *
  * Stages, reported through `onProgress`:
- *  - `tiles`: warming the map tile cache so frames do not render half empty. On
- *    the MP4 path this loads a window of the plan at a time, so it interleaves
- *    with `encode` rather than finishing first. `done` and `total` still count
- *    the whole plan.
- *  - `encode`: rendering and encoding frames.
+ *  - `tiles`: loading every tile the route touches, before any frame is drawn.
+ *    `done` and `total` count the whole plan.
+ *  - `encode`: rendering and encoding frames. Late window reloads can report
+ *    `tiles` again during this stage when the cache had to let tiles go.
  *  - `finish`: the last frame is in, the file is being written. No counts.
+ *
+ * For plans the tile cache can hold pinned at once, the whole plan is made
+ * resident before encoding starts, and when tiles are still missing after
+ * that (dead network, a struggling tile host) the export does not quietly
+ * continue: `confirmTiles` is asked, and the answer decides whether to load
+ * again, export with gaps, or cancel. Plans past the pin ceiling keep the
+ * windowed flow, where the per-frame gate and the recorder's starvation
+ * pause hold each stretch of the video for its own tiles instead. Without a
+ * `confirmTiles` callback the export proceeds with gaps, as it always did.
  *
  * Prefers H.264 MP4 via WebCodecs, and only after the config survives a probe
  * encode. Falls back to a real time MediaRecorder capture when WebCodecs is
@@ -1414,12 +1597,14 @@ function recordRealtime({ timeline, tiles, canvas, ctx, duration, tileWindows, o
  * @param {any} args.timeline built by `buildTimeline` in scene.js
  * @param {any} args.tiles a TileCache for the timeline theme
  * @param {(info: {stage: 'tiles'|'encode'|'finish', done?: number, total?: number}) => void} [args.onProgress]
+ * @param {(missing: number) => Promise<'retry'|'continue'|'cancel'>|'retry'|'continue'|'cancel'} [args.confirmTiles]
+ *   asked when tiles are still missing after the pre-encode load
  * @param {AbortSignal} [args.signal] cancels at any point
  * @returns {Promise<{ blob: Blob, mimeType: string, ext: 'mp4'|'webm', width: number,
  *   height: number, seconds: number, failedTiles: number }>}
  * @throws {DOMException} named 'AbortError' when cancelled
  */
-export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) {
+export async function exportVideo({ timeline, tiles, onProgress, confirmTiles, signal } = {}) {
   const { width, height, duration } = readTimeline(timeline);
   throwIfAborted(signal);
 
@@ -1429,49 +1614,104 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
 
   const { canvas, ctx } = createRenderTarget(width, height);
   const windows = windowPlan(plan);
+  // Filled in once the user chooses to export with gaps: from then on the
+  // tiles they accepted as missing stop counting as missing anywhere, so the
+  // encode runs at full speed instead of chasing hopeless loads every frame.
+  const gaps = { accepted: false, hopeless: null };
   const makeTileWindows = () =>
-    createTileWindows({ tiles, windows, total: plan.length, onProgress, signal });
+    createTileWindows({ tiles, windows, total: plan.length, gaps, onProgress, signal });
 
-  let result = null;
-  let failedTiles = 0;
+  // The whole-route guarantee is only honest for a plan the cache can hold
+  // pinned all at once. Past the pin ceiling the LRU would evict the preload's
+  // own early tiles, "everything resident" could never come true, and a
+  // retry would loop forever. Bigger plans keep the windowed flow, where the
+  // per-frame gate and the recorder's starvation pause do the same job a
+  // window at a time.
+  const capacity =
+    tiles && typeof tiles.pinCapacity === 'function' ? Number(tiles.pinCapacity()) : 0;
+  const fullPreload = plan.length > 0 && plan.length <= capacity;
 
-  if (config) {
-    const tileWindows = makeTileWindows();
+  let tileWindows = makeTileWindows();
+  try {
     report(onProgress, 'tiles', 0, plan.length);
-    try {
-      result = await encodeMp4({
-        timeline,
-        tiles,
-        canvas,
-        ctx,
-        config,
-        width,
-        height,
-        duration,
-        tileWindows,
-        onProgress,
-        signal,
-      });
-      failedTiles = tileWindows.failed();
-    } catch (err) {
-      // A cancel stays a cancel. Anything else means the encoder or the muxer
-      // gave out after passing its probe, which some hardware encoders do deep
-      // into a long run. The realtime recorder is slower but far harder to
-      // kill, so start over on it rather than surface an error.
-      if (isAbortError(err) || !canRecordFallback()) throw err;
-      result = null;
-    } finally {
+
+    // Make the whole route resident before a single frame is drawn. When
+    // tiles are missing at the end of a pass, the caller's prompt decides:
+    // another pass with the backoff clocks forgiven, export with gaps, or
+    // cancel.
+    while (fullPreload) {
+      for (let k = 0; k < windows.length; k += 1) {
+        await tileWindows.ensure(k);
+        throwIfAborted(signal);
+      }
+      const absentTiles = collectMissingTiles(tiles, windows);
+      if (!absentTiles.length || typeof confirmTiles !== 'function') break;
+      let choice;
+      try {
+        choice = await confirmTiles(absentTiles.length);
+      } catch (err) {
+        // A broken prompt must not take the export with it.
+        choice = 'continue';
+      }
+      throwIfAborted(signal);
+      if (choice === 'continue') {
+        gaps.accepted = true;
+        gaps.hopeless = new Set(absentTiles.map(tileKey));
+        break;
+      }
+      if (choice !== 'retry') throw createAbortError();
+      if (typeof tiles.forgive === 'function') {
+        try {
+          tiles.forgive();
+        } catch (err) {
+          // The retry pass still runs, it just respects the cooldowns.
+        }
+      }
       tileWindows.releaseAll();
+      tileWindows = makeTileWindows();
+      report(onProgress, 'tiles', 0, plan.length);
     }
-  }
 
-  if (!result) {
-    if (!canRecordFallback()) throw new Error('export-unsupported');
-    const tileWindows = makeTileWindows();
-    report(onProgress, 'tiles', 0, plan.length);
-    try {
-      // Real time playback cannot stop to load, so the opening is made ready
-      // before the clock starts and the rest follows it a window ahead.
+    let result = null;
+
+    if (config) {
+      try {
+        result = await encodeMp4({
+          timeline,
+          tiles,
+          canvas,
+          ctx,
+          config,
+          width,
+          height,
+          duration,
+          tileWindows,
+          gaps,
+          onProgress,
+          signal,
+        });
+      } catch (err) {
+        // A cancel stays a cancel. Anything else means the encoder or the
+        // muxer gave out after passing its probe, which some hardware encoders
+        // do deep into a long run. The realtime recorder is slower but far
+        // harder to kill, so start over on it rather than surface an error.
+        if (isAbortError(err) || !canRecordFallback()) throw err;
+        result = null;
+      } finally {
+        tileWindows.releaseAll();
+      }
+      if (!result) {
+        // Fresh window state for the rescue run; the tiles themselves are
+        // still hot in the cache, so this costs nothing.
+        tileWindows = makeTileWindows();
+        report(onProgress, 'tiles', 0, plan.length);
+      }
+    }
+
+    if (!result) {
+      if (!canRecordFallback()) throw new Error('export-unsupported');
+      // Real time cannot stop at the start, so the opening window is made
+      // ready before the clock runs and the rest follows a window ahead.
       await tileWindows.ensure(0);
       throwIfAborted(signal);
       tileWindows.warm(1);
@@ -1485,19 +1725,20 @@ export async function exportVideo({ timeline, tiles, onProgress, signal } = {}) 
         onProgress,
         signal,
       });
-      failedTiles = tileWindows.failed();
-    } finally {
-      tileWindows.releaseAll();
     }
-  }
 
-  return {
-    blob: result.blob,
-    mimeType: result.mimeType,
-    ext: result.ext,
-    width,
-    height,
-    seconds: result.seconds,
-    failedTiles,
-  };
+    return {
+      blob: result.blob,
+      mimeType: result.mimeType,
+      ext: result.ext,
+      width,
+      height,
+      seconds: result.seconds,
+      failedTiles: tileWindows.failed(),
+    };
+  } finally {
+    // Whatever way this export ends, cancelled at the tiles prompt included,
+    // the page-lifetime cache gets its pins back.
+    tileWindows.releaseAll();
+  }
 }

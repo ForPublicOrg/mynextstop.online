@@ -21,10 +21,10 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js';
-import { roadKey } from './routes.js';
-import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js';
-import { MODE_META, drawVehicle } from './vehicles.js';
+} from './geo.js?v=e1';
+import { roadKey } from './routes.js?v=e1';
+import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e1';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e1';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;

@@ -10,7 +10,7 @@
 // repaint tile pixels, so India's official national boundary
 // (data/india-border.geojson) is drawn as a thin line on top, colored to
 // match the basemap's own admin lines.
-import { seasonStatus, travelText } from './engine.js';
+import { seasonStatus, travelText } from './engine.js?v=e1';
 
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';

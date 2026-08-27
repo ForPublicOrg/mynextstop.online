@@ -1,10 +1,10 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground } from './themes.js';
-import { icon } from './icons.js';
-import { CITIES, nearestCity } from './cities.js';
-import { locate, inIndia } from './geo.js';
-import { store } from './store.js';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e1';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground } from './themes.js?v=e1';
+import { icon } from './icons.js?v=e1';
+import { CITIES, nearestCity } from './cities.js?v=e1';
+import { locate, inIndia } from './geo.js?v=e1';
+import { store } from './store.js?v=e1';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e1';
 
 // ----- state -----
 let DESTS = [];

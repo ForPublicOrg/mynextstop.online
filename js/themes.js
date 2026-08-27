@@ -1,7 +1,7 @@
 // Visual identity per category: a gradient pair for the big cards, one hue
 // for small tinted chips, and a glyph from the icon set (icon name ===
 // category key). The first category decides a destination's look.
-import { icon } from './icons.js';
+import { icon } from './icons.js?v=e1';
 
 // Gradient stops are kept dark enough that solid white text passes WCAG AA
 // (~4.5:1) on the lighter stop; don't brighten these without re-checking.

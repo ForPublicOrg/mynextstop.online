@@ -8,16 +8,16 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js';
-import { MODE_META, normalizeMode } from './vehicles.js';
-import { TileCache } from './tiles.js';
-import { haversineKm } from './geo.js';
+import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e1';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e1';
+import { TileCache } from './tiles.js?v=e1';
+import { haversineKm } from './geo.js?v=e1';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js';
-import { exportVideo, detectExportSupport } from './exporter.js';
-import { createSearch } from './search.js';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js';
+} from './scene.js?v=e1';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e1';
+import { createSearch } from './search.js?v=e1';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e1';
 
 /* ------------------------------------------------------------------ *
  * constants
@@ -237,6 +237,11 @@ const dom = {
   exDownload: /** @type {HTMLAnchorElement} */ (byId('exDownload')),
   exShare: /** @type {HTMLButtonElement} */ (byId('exShare')),
   exClose: byId('exClose'),
+  exTiles: byId('exTiles'),
+  exTilesMsg: byId('exTilesMsg'),
+  exTilesRetry: byId('exTilesRetry'),
+  exTilesGo: byId('exTilesGo'),
+  exTilesCancel: byId('exTilesCancel'),
   exError: byId('exError'),
   exErrorMsg: byId('exErrorMsg'),
   exRetry: byId('exRetry'),
@@ -2227,15 +2232,52 @@ function revokeExportUrl() {
 }
 
 /**
- * @param {'progress'|'done'|'error'} pane which pane to show
+ * @param {'progress'|'done'|'tiles'|'error'} pane which pane to show
  */
 function showPane(pane) {
   dom.exProgress.hidden = pane !== 'progress';
   dom.exDone.hidden = pane !== 'done';
+  dom.exTiles.hidden = pane !== 'tiles';
   dom.exError.hidden = pane !== 'error';
   if (pane === 'progress') dom.exTitle.textContent = 'Exporting your reel';
   else if (pane === 'done') dom.exTitle.textContent = 'Your reel is ready';
+  else if (pane === 'tiles') dom.exTitle.textContent = 'Waiting for map tiles';
   else dom.exTitle.textContent = 'Export did not finish';
+}
+
+/** Resolver for the missing-tiles question the exporter is waiting on. */
+let tileChoiceResolve = null;
+
+/**
+ * Hand the exporter's missing-tiles question to the user.
+ *
+ * The export sits paused inside exportVideo until one of the pane's buttons
+ * answers. Closing the dialog answers 'cancel' through settleTileChoice, so
+ * the exporter can never be left waiting on a pane nobody can see.
+ *
+ * @param {number} missing tiles still absent after a full load pass
+ * @returns {Promise<'retry'|'continue'|'cancel'>}
+ */
+function askTileChoice(missing) {
+  return new Promise(function (resolve) {
+    settleTileChoice('cancel');
+    tileChoiceResolve = resolve;
+    dom.exTilesMsg.textContent = missing === 1
+      ? '1 map tile on your route has not loaded.'
+      : missing + ' map tiles on your route have not loaded.';
+    showPane('tiles');
+    dom.exTilesRetry.focus();
+  });
+}
+
+/**
+ * Answer the pending missing-tiles question, if one is open.
+ * @param {'retry'|'continue'|'cancel'} choice the user's answer
+ */
+function settleTileChoice(choice) {
+  const resolve = tileChoiceResolve;
+  tileChoiceResolve = null;
+  if (resolve) resolve(choice);
 }
 
 /** Body sections that must go quiet while the manual dialog is up. */
@@ -2366,6 +2408,7 @@ function onDialogClosed() {
   cleanupDone = true;
   // Anything still running for this dialog is now stale, whatever it settles as.
   exportSession += 1;
+  settleTileChoice('cancel');
   if (exportAbort) {
     exportAbort.abort();
     exportAbort = null;
@@ -2604,6 +2647,12 @@ async function startExport() {
       // Bound to this run: a run that failed still has tile windows settling,
       // and their counts must not walk the bar of the retry that replaced it.
       onProgress: function (p) { if (exportSession === session) onExportProgress(p); },
+      // Missing tiles stop the export at the door: the user decides whether to
+      // keep loading, take the gaps, or walk away. A stale session cancels.
+      confirmTiles: function (missing) {
+        if (exportSession !== session) return 'cancel';
+        return askTileChoice(missing);
+      },
       signal: ac.signal
     });
     // Cancelled, closed, or superseded: drop the result, blob URL and all.
@@ -2712,6 +2761,17 @@ function wire() {
     navigator.share({ files: [exportFile], title: 'My trip reel' }).catch(function () {
       // A dismissed share sheet rejects. Nothing to clean up.
     });
+  });
+  dom.exTilesRetry.addEventListener('click', function () {
+    showPane('progress');
+    settleTileChoice('retry');
+  });
+  dom.exTilesGo.addEventListener('click', function () {
+    showPane('progress');
+    settleTileChoice('continue');
+  });
+  dom.exTilesCancel.addEventListener('click', function () {
+    settleTileChoice('cancel');
   });
   dom.exErrClose.addEventListener('click', closeDialog);
   dom.exRetry.addEventListener('click', startExport);

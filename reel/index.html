@@ -228,6 +228,16 @@
         </div>
       </div>
 
+      <div class="ex-pane" id="exTiles" hidden>
+        <p class="ex-stage" id="exTilesMsg"></p>
+        <p class="ex-note">The video only looks right once every map tile on the route is in. Keep trying, or export now with blank patches.</p>
+        <div class="ex-acts">
+          <button id="exTilesRetry" class="btn btn-primary btn-wide" type="button">Keep trying</button>
+          <button id="exTilesGo" class="btn btn-ghost btn-wide" type="button">Export anyway</button>
+          <button id="exTilesCancel" class="btn btn-ghost btn-wide" type="button">Cancel</button>
+        </div>
+      </div>
+
       <div class="ex-pane" id="exError" hidden>
         <p class="ex-stage" id="exErrorMsg"></p>
         <div class="ex-acts">
@@ -240,7 +250,7 @@
 
   <div id="live" class="live" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/reel/js/main.js"></script>
+  <script type="module" src="/reel/js/main.js?v=e1"></script>
 
   <!-- Vercel Web Analytics. Served same-origin under /_vercel/. -->
   <script defer src="/_vercel/insights/script.js"></script>

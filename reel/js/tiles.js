@@ -35,7 +35,17 @@ const MAX_LOADED = 700;
  * The ceiling keeps a pathological plan from pinning the whole world.
  */
 // The 256 px tiles decode to roughly 0.26 MB each, so 3200 pinned bounds decoded-tile memory near 850 MB worst case.
-const MAX_PINNED = 3200;
+// Phones get a lower ceiling: an iPhone tab dies long before 850 MB of decoded tiles.
+const LOW_MEMORY_DEVICE = (function () {
+  if (typeof navigator === 'undefined') return false;
+  const mem = Number(navigator.deviceMemory);
+  if (mem > 0 && mem <= 4) return true;
+  const ua = navigator.userAgent || '';
+  if (/iPhone|iPod|iPad/.test(ua)) return true;
+  // iPadOS reports itself as a Mac; the touch points give it away.
+  return /Macintosh/.test(ua) && Number(navigator.maxTouchPoints) > 1;
+})();
+const MAX_PINNED = LOW_MEMORY_DEVICE ? 1400 : 3200;
 
 /** Ceiling on prefetch concurrency, to stay polite to the tile hosts. */
 const MAX_CONCURRENCY = 24;
@@ -174,12 +184,19 @@ export class TileCache {
    * result itself.
    *
    * @param {Array<{z: number, x: number, y: number}>} list Tiles to check.
+   * @param {{ignoreFailed?: boolean}} [opts] With `ignoreFailed`, tiles the
+   *   loader has given up on for now, exhausted or cooling down between
+   *   attempts, are not reported: the caller has decided to live with the
+   *   gaps, so a hopeless tile must stop reading as work to wait on. Without
+   *   the skip, every backoff expiry resurrects the dead tiles into another
+   *   doomed round of attempts and the caller stalls on each one.
    * @returns {Array<{z: number, x: number, y: number}>} The subset still to load.
    */
-  missing(list) {
+  missing(list, opts) {
     /** @type {Array<{z: number, x: number, y: number}>} */
     const out = [];
     if (this.disposed) return out;
+    const ignoreFailed = Boolean(opts && opts.ignoreFailed);
     const source = Array.isArray(list) ? list : [];
     let seen = null;
     for (let i = 0; i < source.length; i++) {
@@ -190,6 +207,10 @@ export class TileCache {
       const wx = ((it.x % n) + n) % n;
       const key = it.z + '/' + wx + '/' + it.y;
       if (this._resident(key)) continue;
+      if (ignoreFailed) {
+        const entry = this.entries.get(key);
+        if (entry && (entry.state === 'failed' || entry.state === 'cooldown')) continue;
+      }
       if (!seen) seen = new Set();
       if (seen.has(key)) continue;
       seen.add(key);
@@ -290,6 +311,34 @@ export class TileCache {
       else this.pinned.set(key, held - 1);
     }
     this._evict();
+  }
+
+  /**
+   * How many tiles this cache can promise to hold at once.
+   *
+   * The exporter's whole-plan preload only makes sense for a plan that fits
+   * under the pin ceiling: past it, pins are refused, the LRU eats the
+   * overflow, and "is the whole plan resident" can never come true.
+   * @returns {number} The pin ceiling.
+   */
+  pinCapacity() {
+    return MAX_PINNED;
+  }
+
+  /**
+   * Let every failed or cooling tile try again right away.
+   *
+   * The exporter calls this when the user answers a missing-tiles prompt with
+   * try-again: a human pressing retry must not sit out the machine's own
+   * backoff clocks. Attempt bookkeeping stays; only the waits are cleared, so
+   * the usual reset path in _retryIfDue keeps the failed counter honest.
+   * @returns {void}
+   */
+  forgive() {
+    if (this.disposed) return;
+    this.entries.forEach(function (entry) {
+      if (entry.state === 'failed' || entry.state === 'cooldown') entry.retryAt = 0;
+    });
   }
 
   /**
