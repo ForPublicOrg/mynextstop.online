@@ -21,10 +21,10 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js?v=e2';
-import { roadKey } from './routes.js?v=e2';
-import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e2';
-import { MODE_META, drawVehicle } from './vehicles.js?v=e2';
+} from './geo.js?v=e3';
+import { roadKey } from './routes.js?v=e3';
+import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e3';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e3';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;
@@ -88,28 +88,32 @@ const ELLIPSIS = '…';
  * Keep-out insets per format, in unit pixels, for every layer that has to stay
  * readable once the video is posted.
  *
- * The Reels player does two things to a 9:16 file. On a phone taller than
- * 16:9 it scales the video up to fill the screen height, which shaves a strip
- * off each side. Then it lays its own chrome over the frame: a header across
- * the top, the caption, audio row and tab bar across the bottom, and the
- * like / comment / share rail down the right, from mid height to the caption.
- * Anything drawn inside those bands is cropped or covered. The camera padding
- * in buildTimeline keeps the route out of them; these insets keep the chips,
- * the title card and the credits out too. Square and wide frames are not
- * posted that way, so they only keep a modest edge margin.
+ * On a phone taller than 16:9 the Reels player scales a 9:16 file up to fill
+ * the screen height, which shaves a strip off each side; the top and bottom
+ * are shown whole (checked on real uploads, Sep 2026). So the sides carry a
+ * wide inset and the top and bottom only the margin the frame itself needs:
+ * chips stay under the header line at the top, and the credits keep a small
+ * edge margin at the bottom. Square and wide frames are not posted that way,
+ * so they keep a modest margin all round.
  *
- * `rail` is the width of the right hand action column, measured from the
- * right edge; it applies between half height and the bottom inset.
+ * `rail` is the width of a right hand action column, measured from the right
+ * edge, applied between half height and the bottom inset. Unused for now: the
+ * uploads showed cropping, not covering, and a rail band pulls the route off
+ * centre.
  */
 const SAFE = {
-  '9x16': { top: 220, bottom: 420, left: 120, right: 120, rail: 200 },
-  '1x1': { top: 48, bottom: 48, left: 48, right: 48, rail: 0 },
-  '16x9': { top: 48, bottom: 48, left: 48, right: 48, rail: 0 }
+  '9x16': { top: 180, bottom: 40, left: 120, right: 120, rail: 0 },
+  '1x1': { top: 48, bottom: 40, left: 48, right: 48, rail: 0 },
+  '16x9': { top: 48, bottom: 40, left: 48, right: 48, rail: 0 }
 };
+
+/** Height of the credit lines above their baseline, plus a gap, in unit pixels. */
+const CREDIT_CLEAR = 36;
 
 /**
  * Keep-out rectangles for a frame: the four edge bands and the action rail,
- * in drawing pixels. A label that touches any of them is off limits.
+ * in drawing pixels. A label that touches any of them is off limits. The
+ * bottom band is raised by the credits' own height so labels stay off them.
  *
  * @param {{w: number, h: number}} dims Frame size in pixels.
  * @param {{top: number, bottom: number, left: number, right: number, rail: number}} safe Insets in unit pixels.
@@ -119,7 +123,7 @@ const SAFE = {
 function keepOutRects(dims, safe, u) {
   const rects = [
     { left: 0, top: 0, w: dims.w, h: safe.top * u },
-    { left: 0, top: dims.h - safe.bottom * u, w: dims.w, h: safe.bottom * u },
+    { left: 0, top: dims.h - (safe.bottom + CREDIT_CLEAR) * u, w: dims.w, h: (safe.bottom + CREDIT_CLEAR) * u },
     { left: 0, top: 0, w: safe.left * u, h: dims.h },
     { left: dims.w - safe.right * u, top: 0, w: safe.right * u, h: dims.h }
   ];
@@ -617,8 +621,8 @@ export function buildTimeline(project) {
   const modes = Array.isArray(p.modes) ? p.modes : [];
 
   // Camera padding: the route itself never enters a keep-out band, with room
-  // for the pin on top. The Reels action rail widens the right hand side of
-  // a 9:16 frame; the other formats are wider than their insets already.
+  // for the pin on top. Today every inset sits inside the percentages, so
+  // this only matters if SAFE grows.
   const clear = 40 * u;
   const pad = {
     top: Math.max(dims.h * 0.14, safe.top * u + clear),
@@ -1886,9 +1890,8 @@ function drawTitleCard(ctx, tl, alpha) {
  * other. It borrows that credit's ink and contrast shadow, which keeps it
  * legible over light and dark imagery on every theme.
  *
- * Both credits sit on the upper edge of the bottom keep-out band, not on the
- * frame edge: on a posted reel the frame edge is under the caption, and the
- * sides are shaved on tall phones, so text there was cut or hidden.
+ * Both credits sit inside the side insets: the Reels player shaves the sides
+ * of a 9:16 file on tall phones, and text 20 px from the edge was being cut.
  *
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.

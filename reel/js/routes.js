@@ -13,7 +13,7 @@
  * detour can never break a preview or an export.
  */
 
-import { haversineKm, safeLatLng, douglasPeuckerIndices } from './geo.js?v=e2';
+import { haversineKm, safeLatLng, douglasPeuckerIndices } from './geo.js?v=e3';
 
 /**
  * Router endpoints, one per supported profile. The profile segment of the

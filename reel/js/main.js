@@ -8,16 +8,16 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e2';
-import { MODE_META, normalizeMode } from './vehicles.js?v=e2';
-import { TileCache } from './tiles.js?v=e2';
-import { haversineKm } from './geo.js?v=e2';
+import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e3';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e3';
+import { TileCache } from './tiles.js?v=e3';
+import { haversineKm } from './geo.js?v=e3';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js?v=e2';
-import { exportVideo, detectExportSupport } from './exporter.js?v=e2';
-import { createSearch } from './search.js?v=e2';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e2';
+} from './scene.js?v=e3';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e3';
+import { createSearch } from './search.js?v=e3';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e3';
 
 /* ------------------------------------------------------------------ *
  * constants
