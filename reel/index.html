@@ -99,7 +99,7 @@
             <ol class="empty-steps">
               <li><span class="step-n">1</span> Add your stops</li>
               <li><span class="step-n">2</span> Pick a style</li>
-              <li><span class="step-n">3</span> Export for Reels</li>
+              <li><span class="step-n">3</span> Download for Reels</li>
             </ol>
             <button id="sampleBtn" class="btn btn-ghost" type="button">Load a sample trip</button>
           </div>
@@ -218,6 +218,7 @@
       <div class="ex-pane" id="exDone" hidden>
         <video id="exVideo" class="ex-video" controls loop muted playsinline></video>
         <p class="ex-meta" id="exMeta"></p>
+        <p class="ex-note">The download started on its own. If nothing arrived, tap Download video.</p>
         <p class="ex-note">No audio track: add trending audio in Instagram or TikTok when you post.</p>
         <p class="ex-note" id="exFallbackNote" hidden>Exported as WebM because this browser cannot write MP4. Chrome, Edge or Safari can.</p>
         <p class="ex-note" id="exTileNote" hidden></p>
@@ -230,10 +231,10 @@
 
       <div class="ex-pane" id="exTiles" hidden>
         <p class="ex-stage" id="exTilesMsg"></p>
-        <p class="ex-note">The video only looks right once every map tile on the route is in. Keep trying, or export now with blank patches.</p>
+        <p class="ex-note">The video only looks right once every map tile on the route is in. Keep trying, or download it now with blank patches.</p>
         <div class="ex-acts">
           <button id="exTilesRetry" class="btn btn-primary btn-wide" type="button">Keep trying</button>
-          <button id="exTilesGo" class="btn btn-ghost btn-wide" type="button">Export anyway</button>
+          <button id="exTilesGo" class="btn btn-ghost btn-wide" type="button">Download anyway</button>
           <button id="exTilesCancel" class="btn btn-ghost btn-wide" type="button">Cancel</button>
         </div>
       </div>
@@ -250,7 +251,7 @@
 
   <div id="live" class="live" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/reel/js/main.js?v=e1"></script>
+  <script type="module" src="/reel/js/main.js?v=e2"></script>
 
   <!-- Vercel Web Analytics. Served same-origin under /_vercel/. -->
   <script defer src="/_vercel/insights/script.js"></script>

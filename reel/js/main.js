@@ -8,16 +8,16 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e1';
-import { MODE_META, normalizeMode } from './vehicles.js?v=e1';
-import { TileCache } from './tiles.js?v=e1';
-import { haversineKm } from './geo.js?v=e1';
+import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e2';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e2';
+import { TileCache } from './tiles.js?v=e2';
+import { haversineKm } from './geo.js?v=e2';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js?v=e1';
-import { exportVideo, detectExportSupport } from './exporter.js?v=e1';
-import { createSearch } from './search.js?v=e1';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e1';
+} from './scene.js?v=e2';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e2';
+import { createSearch } from './search.js?v=e2';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e2';
 
 /* ------------------------------------------------------------------ *
  * constants
@@ -2212,7 +2212,7 @@ function syncExportButtons() {
     const btn = buttons[i];
     btn.textContent = '';
     btn.appendChild(icon(ICONS.download));
-    btn.appendChild(make('span', null, exporting ? 'Exporting' : 'Export video'));
+    btn.appendChild(make('span', null, exporting ? 'Preparing video' : 'Download video'));
     btn.disabled = !ready;
   }
   if (state.stops.length < 2) dom.exportHint.textContent = 'Add at least 2 stops';
@@ -2239,10 +2239,10 @@ function showPane(pane) {
   dom.exDone.hidden = pane !== 'done';
   dom.exTiles.hidden = pane !== 'tiles';
   dom.exError.hidden = pane !== 'error';
-  if (pane === 'progress') dom.exTitle.textContent = 'Exporting your reel';
+  if (pane === 'progress') dom.exTitle.textContent = 'Preparing your video';
   else if (pane === 'done') dom.exTitle.textContent = 'Your reel is ready';
   else if (pane === 'tiles') dom.exTitle.textContent = 'Waiting for map tiles';
-  else dom.exTitle.textContent = 'Export did not finish';
+  else dom.exTitle.textContent = 'The video did not finish';
 }
 
 /** Resolver for the missing-tiles question the exporter is waiting on. */
@@ -2487,16 +2487,67 @@ function onExportProgress(p) {
 }
 
 /**
+ * The reel's name, as the title card shows it: the trip title if there is
+ * one, otherwise "first stop to last stop".
+ * @returns {string} may be empty when there are no stops yet
+ */
+function reelHeading() {
+  const given = state.title.trim();
+  if (given) return given;
+  if (state.stops.length < 2) return '';
+  const first = state.stops[0];
+  const last = state.stops[state.stops.length - 1];
+  const a = first.label || first.name || '';
+  const b = last.label || last.name || '';
+  return a && b ? a + ' to ' + b : '';
+}
+
+/**
+ * File name for the download, from the reel's heading. Characters no file
+ * system accepts are dropped, and a name with nothing left falls back to the
+ * site's own.
+ * @param {string} ext container extension, without the dot
+ * @returns {string} for example "Golden Triangle.mp4"
+ */
+function reelFileName(ext) {
+  let base = reelHeading()
+    .replace(/[<>:"/\\|?*\u0000-\u001f\u007f]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[. ]+$/, '')
+    .slice(0, 80)
+    .trim();
+  if (!base) base = 'mynextstop-reel';
+  return base + '.' + ext;
+}
+
+/**
+ * Save the finished file without a second tap. The link is a real anchor
+ * with a download attribute, so a click on it is the same thing the user
+ * would do by hand; a browser that swallows the synthetic click still has
+ * the link itself on the pane.
+ */
+function autoDownload() {
+  try {
+    dom.exDownload.click();
+    announce('Downloading ' + dom.exDownload.download);
+  } catch (err) {
+    // The pane's own button is the fallback.
+  }
+}
+
+/**
  * @param {Object} result the exporter result
  */
 function showResult(result) {
   revokeExportUrl();
+  const fileName = reelFileName(result.ext);
   exportUrl = URL.createObjectURL(result.blob);
   dom.exVideo.src = exportUrl;
-  dom.exMeta.textContent = fmtSize(result.blob.size) + ', ' + fmtTime(result.seconds)
+  dom.exMeta.textContent = fileName + ', ' + fmtSize(result.blob.size) + ', ' + fmtTime(result.seconds)
     + ', ' + result.width + 'x' + result.height;
   dom.exDownload.href = exportUrl;
-  dom.exDownload.download = 'mynextstop-reel.' + result.ext;
+  dom.exDownload.download = fileName;
   dom.exFallbackNote.hidden = result.ext !== 'webm';
 
   // The system share sheet is how a phone gets the file into Photos and then
@@ -2504,7 +2555,7 @@ function showResult(result) {
   // Progressive: the button only appears where files can actually be shared.
   if (typeof File === 'function' && navigator.share && typeof navigator.canShare === 'function') {
     try {
-      const file = new File([result.blob], 'mynextstop-reel.' + result.ext, { type: result.mimeType });
+      const file = new File([result.blob], fileName, { type: result.mimeType });
       if (navigator.canShare({ files: [file] })) {
         exportFile = file;
         dom.exShare.hidden = false;
@@ -2524,13 +2575,14 @@ function showResult(result) {
   }
 
   showPane('done');
+  autoDownload();
   dom.exDownload.focus();
 }
 
 /** Internal exporter codes, said the way a person would say them. */
 const EXPORT_ERROR_COPY = {
   'export-unsupported': 'This browser cannot record video. Try a recent Chrome, Edge, Safari or Firefox.',
-  'bad-timeline': 'This route could not be turned into a video. Try removing a stop, then export again.',
+  'bad-timeline': 'This route could not be turned into a video. Try removing a stop, then try again.',
   'canvas-unavailable': 'The video canvas could not start. Reload the page, then try again.',
   'muxer-empty': 'The video came out empty. Try again, or try a shorter route.',
   'recorder-empty': 'The recording came out empty. Try again, and keep this tab in front while it runs.'
@@ -2758,7 +2810,7 @@ function wire() {
   dom.exClose.addEventListener('click', closeDialog);
   dom.exShare.addEventListener('click', function () {
     if (!exportFile || !navigator.share) return;
-    navigator.share({ files: [exportFile], title: 'My trip reel' }).catch(function () {
+    navigator.share({ files: [exportFile], title: reelHeading() || 'My trip reel' }).catch(function () {
       // A dismissed share sheet rejects. Nothing to clean up.
     });
   });

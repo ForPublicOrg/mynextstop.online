@@ -21,10 +21,10 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js?v=e1';
-import { roadKey } from './routes.js?v=e1';
-import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e1';
-import { MODE_META, drawVehicle } from './vehicles.js?v=e1';
+} from './geo.js?v=e2';
+import { roadKey } from './routes.js?v=e2';
+import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e2';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e2';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;
@@ -84,8 +84,51 @@ const D_VEHICLE_OUT = 0.25;
 const CHIP_MAX_CHARS = 24;
 const ELLIPSIS = '…';
 
-/** Top safe margin for chips, in unit pixels. */
-const TOP_SAFE = 180;
+/**
+ * Keep-out insets per format, in unit pixels, for every layer that has to stay
+ * readable once the video is posted.
+ *
+ * The Reels player does two things to a 9:16 file. On a phone taller than
+ * 16:9 it scales the video up to fill the screen height, which shaves a strip
+ * off each side. Then it lays its own chrome over the frame: a header across
+ * the top, the caption, audio row and tab bar across the bottom, and the
+ * like / comment / share rail down the right, from mid height to the caption.
+ * Anything drawn inside those bands is cropped or covered. The camera padding
+ * in buildTimeline keeps the route out of them; these insets keep the chips,
+ * the title card and the credits out too. Square and wide frames are not
+ * posted that way, so they only keep a modest edge margin.
+ *
+ * `rail` is the width of the right hand action column, measured from the
+ * right edge; it applies between half height and the bottom inset.
+ */
+const SAFE = {
+  '9x16': { top: 220, bottom: 420, left: 120, right: 120, rail: 200 },
+  '1x1': { top: 48, bottom: 48, left: 48, right: 48, rail: 0 },
+  '16x9': { top: 48, bottom: 48, left: 48, right: 48, rail: 0 }
+};
+
+/**
+ * Keep-out rectangles for a frame: the four edge bands and the action rail,
+ * in drawing pixels. A label that touches any of them is off limits.
+ *
+ * @param {{w: number, h: number}} dims Frame size in pixels.
+ * @param {{top: number, bottom: number, left: number, right: number, rail: number}} safe Insets in unit pixels.
+ * @param {number} u Unit scale.
+ * @returns {{left: number, top: number, w: number, h: number}[]} Rectangles.
+ */
+function keepOutRects(dims, safe, u) {
+  const rects = [
+    { left: 0, top: 0, w: dims.w, h: safe.top * u },
+    { left: 0, top: dims.h - safe.bottom * u, w: dims.w, h: safe.bottom * u },
+    { left: 0, top: 0, w: safe.left * u, h: dims.h },
+    { left: dims.w - safe.right * u, top: 0, w: safe.right * u, h: dims.h }
+  ];
+  if (safe.rail > 0) {
+    const top = dims.h * 0.5;
+    rects.push({ left: dims.w - safe.rail * u, top: top, w: safe.rail * u, h: dims.h - safe.bottom * u - top });
+  }
+  return rects;
+}
 
 /**
  * Screen distance, in unit pixels, at or under which the route gradient is
@@ -569,14 +612,19 @@ export function buildTimeline(project) {
   const format = FORMATS[p.format] ? p.format : '9x16';
   const dims = { w: FORMATS[format].w, h: FORMATS[format].h };
   const u = Math.min(dims.w, dims.h) / 1080;
+  const safe = SAFE[format];
   const speed = SPEED_MULTIPLIER[p.speed] || 1;
   const modes = Array.isArray(p.modes) ? p.modes : [];
 
+  // Camera padding: the route itself never enters a keep-out band, with room
+  // for the pin on top. The Reels action rail widens the right hand side of
+  // a 9:16 frame; the other formats are wider than their insets already.
+  const clear = 40 * u;
   const pad = {
-    top: dims.h * 0.14,
-    bottom: dims.h * 0.22,
-    left: dims.w * 0.16,
-    right: dims.w * 0.16
+    top: Math.max(dims.h * 0.14, safe.top * u + clear),
+    bottom: Math.max(dims.h * 0.22, safe.bottom * u + clear),
+    left: Math.max(dims.w * 0.16, safe.left * u + clear),
+    right: Math.max(dims.w * 0.16, Math.max(safe.right, safe.rail) * u + clear)
   };
 
   // Legs, with world coordinates chained so longitudes stay continuous. The
@@ -705,6 +753,8 @@ export function buildTimeline(project) {
     format: format,
     dims: dims,
     u: u,
+    safe: safe,
+    keepOut: keepOutRects(dims, safe, u),
     speed: speed,
     duration: duration,
     stops: stops,
@@ -1641,15 +1691,17 @@ function drawChips(ctx, tl, t, view) {
   const padY = 12 * u;
   const pinR = 10 * u;
   const gap = 16 * u;
-  const margin = 24 * u;
-  const topLimit = TOP_SAFE * u;
-  // The credits sit on the bottom edge; labels stay off them.
-  const bottomLimit = dims.h - 56 * u;
+  const safe = tl.safe;
+  const margin = Math.max(safe.left, safe.right) * u;
+  const keepOut = tl.keepOut;
   const placed = [];
 
+  // Inside the frame, and clear of every band the Reels player crops or
+  // covers (see SAFE). The credits live on the bottom band's upper edge, so
+  // this keeps labels off them as well.
   const inFrame = function (r) {
-    return r.left >= margin && r.left + r.w <= dims.w - margin &&
-      r.top >= topLimit && r.top + r.h <= bottomLimit;
+    if (r.left < 0 || r.top < 0 || r.left + r.w > dims.w || r.top + r.h > dims.h) return false;
+    return !collides(r, keepOut, 0);
   };
 
   ctx.save();
@@ -1736,7 +1788,7 @@ function drawTitleCard(ctx, tl, alpha) {
   const stops = tl.stops;
   const fam = theme.chip.serif ? SERIF : SANS;
 
-  const maxCardW = dims.w * 0.82;
+  const maxCardW = Math.min(dims.w * 0.82, dims.w - (tl.safe.left + tl.safe.right) * u);
   const padX = 48 * u;
   const padY = 36 * u;
   const innerMax = maxCardW - padX * 2;
@@ -1834,6 +1886,10 @@ function drawTitleCard(ctx, tl, alpha) {
  * other. It borrows that credit's ink and contrast shadow, which keeps it
  * legible over light and dark imagery on every theme.
  *
+ * Both credits sit on the upper edge of the bottom keep-out band, not on the
+ * frame edge: on a posted reel the frame edge is under the caption, and the
+ * sides are shaved on tall phones, so text there was cut or hidden.
+ *
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
  * @returns {void}
@@ -1851,7 +1907,7 @@ function drawWatermark(ctx, tl) {
   ctx.shadowColor = isLightColor(ink) ? 'rgba(0,0,0,.7)' : 'rgba(255,255,255,.7)';
   setShadow(ctx, 0, u, u);
   ctx.fillStyle = ink;
-  ctx.fillText('mynextstop.online', 20 * u, dims.h - 20 * u);
+  ctx.fillText('mynextstop.online', tl.safe.left * u, dims.h - tl.safe.bottom * u);
   ctx.restore();
 }
 
@@ -1874,7 +1930,8 @@ function drawAttribution(ctx, tl) {
   ctx.shadowColor = isLightColor(ink) ? 'rgba(0,0,0,.7)' : 'rgba(255,255,255,.7)';
   setShadow(ctx, 0, u, u);
   ctx.fillStyle = ink;
-  ctx.fillText(tl.theme.attribution, dims.w - 20 * u, dims.h - 20 * u);
+  const inset = Math.max(tl.safe.right, tl.safe.rail) * u;
+  ctx.fillText(tl.theme.attribution, dims.w - inset, dims.h - tl.safe.bottom * u);
   ctx.restore();
 }
 
