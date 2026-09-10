@@ -1,10 +1,10 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e3';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e3';
-import { icon } from './icons.js?v=e3';
-import { CITIES, nearestCity } from './cities.js?v=e3';
-import { locate, inIndia } from './geo.js?v=e3';
-import { store } from './store.js?v=e3';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e3';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e4';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e4';
+import { icon } from './icons.js?v=e4';
+import { CITIES, nearestCity } from './cities.js?v=e4';
+import { locate, inIndia } from './geo.js?v=e4';
+import { store } from './store.js?v=e4';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e4';
 
 // ----- state -----
 let DESTS = [];
@@ -762,7 +762,9 @@ function measureSheet() {
   const half = body.querySelector('.sheet-next-row') || body.firstElementChild;
   const head = body.querySelector('.card-head');
   let hHalf = half ? Math.min(bottomOf(half) + pad, H * 0.55) : H * 0.4;
-  let hPeek = head ? bottomOf(head) + 14 : hHalf;
+  // the peek stops right under the title row (name and description):
+  // just enough to say a card is here, the rest of the screen is map
+  let hPeek = head ? bottomOf(head) + 6 : hHalf;
   hHalf = Math.round(Math.max(hHalf, hPeek));
   hPeek = Math.round(hPeek);
   sheetH = [hPeek, hHalf];

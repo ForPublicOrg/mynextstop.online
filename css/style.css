@@ -413,7 +413,7 @@ a.chip { text-decoration: none; }
 .sheet:not(.is-expanded) .sheet-body { overflow: hidden; }
 
 .sheet-handle {
-  flex: 0 0 auto; padding: 10px 0 6px; display: grid; place-items: center; width: 100%;
+  flex: 0 0 auto; padding: 8px 0 4px; display: grid; place-items: center; width: 100%;
   touch-action: none;
 }
 .sheet-handle span {
