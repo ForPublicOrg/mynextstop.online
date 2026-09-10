@@ -148,5 +148,5 @@ export function longWeekends(holidays, today, horizon = 150) {
 export function fmtRange(start, end) {
   const sameMonth = start.getMonth() === end.getMonth();
   const s = `${start.getDate()}${sameMonth ? '' : ' ' + MONTHS[start.getMonth()]}`;
-  return `${s}–${end.getDate()} ${MONTHS[end.getMonth()]}`;
+  return `${s} to ${end.getDate()} ${MONTHS[end.getMonth()]}`;
 }

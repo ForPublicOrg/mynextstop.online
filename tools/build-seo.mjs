@@ -10,7 +10,7 @@
 // four season-specific "why now" lines, the vibe, the hub, is also written
 // out as a plain HTML page they can read:
 //
-//   /places/<id>              589 destination guides
+//   /places/<id>              one destination guide per catalogue entry
 //   /india/<state>             36 state guides
 //   /best-time-to-visit/<mon>  12 month guides
 //   /themes/<category>         16 theme guides
@@ -27,7 +27,8 @@ import { fileURLToPath } from 'node:url';
 import {
   MONTHS, seasonOf, seasonStatus, haversineKm, roadEstimate, festivalMonth,
 } from '../js/engine.js';
-import { CATEGORY_LABEL } from '../js/themes.js';
+import { CATEGORY_LABEL, spotKind } from '../js/themes.js';
+import { icon as glyph } from '../js/icons.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
@@ -168,8 +169,10 @@ const breadcrumbLd = crumbs => ({
   })),
 });
 
-const FOOT_LINKS = [
-  ['All 589 destinations', '/places'],
+// set once the catalogue is loaded, so the footer never quotes a stale count
+let TOTAL = 0;
+const footLinks = () => [
+  [`All ${TOTAL} destinations`, '/places'],
   ['By state', '/india'],
   ['By month', '/best-time-to-visit'],
   ['By theme', '/themes'],
@@ -247,7 +250,7 @@ ${main}
       <a class="btn btn-primary" href="/">${ic('map')} Open the live season map</a>
     </p>
     <nav class="foot-nav" aria-label="Footer">
-      ${FOOT_LINKS.map(([l, h]) => `<a href="${h}">${esc(l)}</a>`).join('')}
+      ${footLinks().map(([l, h]) => `<a href="${h}">${esc(l)}</a>`).join('')}
     </nav>
     <p class="foot-fine">
       ${BRAND} is a free, open-source season map for travelling India. No sign-up, no
@@ -380,6 +383,41 @@ const byName = (a, b) => a.name.localeCompare(b.name);
 
 // ---------- destination page ----------
 
+// The local places once you are there. Each one links to a Google Maps
+// search scoped to the destination: the catalogue does not carry a
+// coordinate per spot, and a scoped search is what a reader would type.
+const baseName = d => deDash(d.name).split('(')[0].trim();
+const spotMapHref = (d, s) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${deDash(s.name)}, ${baseName(d)}, ${d.state}`)}`;
+const spotDist = s => s.km > 0 ? `${s.km} km out` : 'in town';
+
+function spotsHtml(d) {
+  const spots = Array.isArray(d.spots) ? d.spots : [];
+  if (!spots.length) return '';
+  const name = baseName(d);
+  // leading blank line: the caller splices this straight after a section so
+  // a destination without spots emits nothing, not a stray blank line
+  return `
+
+      <section class="sec">
+        <h2>Things to do in ${txt(name)}</h2>
+        <p class="prose">The local places worth your time in and around ${txt(name)}, with how far each sits from the centre. Tap a name to open it in Google Maps.</p>
+        <ul class="spots">
+          ${spots.map(s => {
+            const k = spotKind(s.kind);
+            return `<li class="spot-card">
+            <span class="cat-badge" style="background:${k.color}1f;color:${k.color}" title="${esc(k.label)}">${glyph(k.icon)}</span>
+            <div class="spot-body">
+              <h3><a href="${spotMapHref(d, s)}" target="_blank" rel="noopener">${txt(s.name)}</a></h3>
+              <p class="spot-kind">${esc(k.label)} · ${esc(spotDist(s))}</p>
+              <p class="spot-text">${txt(s.note)}</p>
+            </div>
+          </li>`;
+          }).join('')}
+        </ul>
+      </section>`;
+}
+
 function destTitle(d) {
   return fitTitle(`Best time to visit ${deDash(d.name)}`,
     [`, ${d.state}`, ` | ${BRAND}`]);
@@ -415,6 +453,12 @@ function destFaq(d) {
   if (d.festival) {
     qas.push([`Is there a festival in ${name}?`,
       `${sentence(d.festival)} Time a trip around it and you see the place at its loudest, but book beds early.`]);
+  }
+  const spots = Array.isArray(d.spots) ? d.spots : [];
+  if (spots.length >= 2) {
+    const short = baseName(d);
+    qas.push([`What are the best things to do in ${short}?`,
+      `${joinWords(spots.slice(0, 6).map(s => deDash(s.name)))}${spots.length > 6 ? ', and more' : ''}. ${sentence(deDash(spots[0].note))}`]);
   }
   return qas;
 }
@@ -503,6 +547,14 @@ function destPage(d, all) {
       touristType: cats.map(catLabel),
       isAccessibleForFree: true,
       publicAccess: true,
+      ...((d.spots || []).length ? {
+        containsPlace: d.spots.map(s => ({
+          '@type': 'TouristAttraction',
+          name: jtxt(s.name),
+          description: jtxt(s.note),
+          hasMap: spotMapHref(d, s),
+        })),
+      } : {}),
     },
     faqLd(qas),
   ];
@@ -542,7 +594,7 @@ function destPage(d, all) {
       <section class="sec">
         <h2>What ${txt(name)} is actually like</h2>
         <p class="prose">${txt(d.vibe)}</p>
-      </section>
+      </section>${spotsHtml(d)}
 
       <section class="sec">
         <h2>Getting to ${txt(name)}</h2>
@@ -1092,6 +1144,7 @@ function pageFile(url) {
 function build() {
   const raw = JSON.parse(fs.readFileSync(DATA, 'utf8'));
   const all = raw.slice().sort(byName);
+  TOTAL = all.length;
   // lastmod tracks the catalogue, not the run: a rebuild that changes nothing
   // must not tell Google the whole site moved.
   const lastmod = fs.statSync(DATA).mtime.toISOString().slice(0, 10);

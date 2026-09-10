@@ -4,6 +4,7 @@
 //   node tools/verify-destinations.mjs            # schema + geo + elevation
 //   node tools/verify-destinations.mjs --offline  # schema only, no network
 //   node tools/verify-destinations.mjs --only=leh,kaza
+//   node tools/verify-destinations.mjs --no-spots # skip geocoding local places
 //
 // Offline it checks the schema and the season logic. Online it also asks
 // two public APIs whether the data is telling the truth about the map:
@@ -13,6 +14,9 @@
 //     from the coordinate we ship?
 //   · Open-Meteo elevation (Copernicus DEM). Is `alt` the real ground height
 //     at that point?
+//   · Photon again for every local place in `spots`: does OpenStreetMap know
+//     a place of that name anywhere near the destination? (A miss is only a
+//     nudge: many small viewpoints and homestay villages are not in OSM.)
 // Results are cached in tools/.geo-cache.json so re-runs are cheap; delete it
 // to re-query. Nothing here runs in the browser. It is a contributor tool.
 //
@@ -29,12 +33,18 @@ const UA = 'mynextstop.online-data-check (https://mynextstop.online)';
 const argv = process.argv.slice(2);
 const FILE = argv.find(a => !a.startsWith('--')) || path.join(ROOT, 'data', 'destinations.json');
 const OFFLINE = argv.includes('--offline');
+const NO_SPOTS = argv.includes('--no-spots');
 const ONLY = (argv.find(a => a.startsWith('--only=')) || '').replace('--only=', '').split(',').filter(Boolean);
 
 const STATES = ['Andaman & Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra & Nagar Haveli and Daman & Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'];
 const CATS = ['mountains', 'beach', 'heritage', 'spiritual', 'wildlife', 'trek', 'backpacker', 'desert', 'island', 'lake', 'waterfall', 'city', 'offbeat', 'party', 'culture', 'snow'];
 const MODES = ['flight', 'train', 'road'];
-const KEYS = ['id', 'name', 'state', 'lat', 'lng', 'alt', 'category', 'tagline', 'peakMonths', 'shoulderMonths', 'avoidMonths', 'festival', 'why', 'days', 'budget', 'solo', 'crowd', 'vibe', 'hub', 'modes'];
+const KEYS = ['id', 'name', 'state', 'lat', 'lng', 'alt', 'category', 'tagline', 'peakMonths', 'shoulderMonths', 'avoidMonths', 'festival', 'why', 'days', 'budget', 'solo', 'crowd', 'vibe', 'hub', 'modes', 'spots'];
+// local places inside a destination: mirrors SPOT_KIND in js/themes.js
+const SPOT_KEYS = ['name', 'kind', 'note', 'km'];
+const SPOT_KINDS = ['temple', 'gurudwara', 'monastery', 'church', 'mosque', 'shrine', 'ghat', 'fort', 'palace', 'museum', 'heritage', 'market', 'food', 'nightlife', 'viewpoint', 'waterfall', 'lake', 'river', 'dam', 'beach', 'island', 'dune', 'trek', 'walk', 'village', 'garden', 'park', 'tea', 'wildlife', 'cave', 'hotspring', 'activity'];
+const SPOTS_MAX = 10;
+const DASH = /[–—]/;   // en dash, em dash: the house style uses neither
 const SEASONS = ['winter', 'summer', 'monsoon', 'autumn'];
 const SEASON_MONTHS = { winter: [12, 1, 2], summer: [3, 4, 5], monsoon: [6, 7, 8, 9], autumn: [10, 11] };
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -135,7 +145,7 @@ function offlineChecks(data) {
         }
         // a season the engine will never offer must read as a clear "not now"
         if (SEASON_MONTHS[s].every(m => av.has(m))) {
-          const warns = /avoid|skip|don't|do not|shut|clos|cancel|unreliab|dangerous|risk|brutal|not the time|stay away|washed|landslide|unbearable|punishing|miserable|rough|suspend|off-limits|flood|waterlog|steam|worst|swelter|bake|slick|mud|leech|humid|drench|downpour|deluge|snowbound|cut off|inaccessible|furnace|no shade|stifling|nothing to|nothing here|dead season|lethal|guesswork|slips|spate|buried|unreachable|impassable|dry rock|bare|stranded|no point|off the table|thin out|sees nothing|grimy|sticky|useless|barefoot-only|blistering|slush|lottery|sit this season out|sit it out|pointless|red flag/i.test(t);
+          const warns = /avoid|skip|don't|do not|shut|clos|cancel|unreliab|dangerous|risk|brutal|not the time|stay away|washed|landslide|unbearable|punishing|miserable|rough|suspend|off-limits|flood|waterlog|steam|worst|swelter|bake|slick|mud|leech|humid|drench|downpour|deluge|snowbound|cut off|inaccessible|furnace|no shade|stifling|nothing to|nothing here|dead season|lethal|guesswork|slips|spate|buried|unreachable|impassable|dry rock|bare|stranded|no point|off the table|thin out|sees nothing|grimy|sticky|useless|barefoot-only|blistering|slush|lottery|sit this season out|sit it out|pointless|red flag|under snow|sealed|no way in|no bed|blocked|not the season|no jeep/i.test(t);
           if (!warns) add(id, 'MED', 'season-logic', `${s} is entirely in avoidMonths but why.${s} does not read as a warning`);
         }
       }
@@ -159,6 +169,37 @@ function offlineChecks(data) {
     }
     if (d.festival && !MONTH_NAMES.some(m => d.festival.toLowerCase().includes(m.toLowerCase()))) {
       add(id, 'HIGH', 'festival-month', `festival "${d.festival}" has no month the app can parse`);
+    }
+    for (const k of ['name', 'tagline', 'vibe', 'hub', 'festival']) {
+      if (typeof d[k] === 'string' && DASH.test(d[k])) add(id, 'LOW', 'dash', `${k} uses an em or en dash`);
+    }
+    if (d.why) for (const s of SEASONS) if (typeof d.why[s] === 'string' && DASH.test(d.why[s])) add(id, 'LOW', 'dash', `why.${s} uses an em or en dash`);
+
+    // local places: the things to do once you are there
+    if (!Array.isArray(d.spots)) add(id, 'HIGH', 'bad-spots', 'spots missing or not an array');
+    else {
+      if (d.spots.length > SPOTS_MAX) add(id, 'MED', 'bad-spots', `${d.spots.length} spots, want at most ${SPOTS_MAX}`);
+      if (d.crowd === 3 && d.spots.length < 3) add(id, 'LOW', 'few-spots', `a busy destination with only ${d.spots.length} local places`);
+      const names = new Set();
+      d.spots.forEach((s, i) => {
+        const at = `spots[${i}]`;
+        if (!s || typeof s !== 'object') { add(id, 'HIGH', 'bad-spots', `${at} is not an object`); return; }
+        for (const k of SPOT_KEYS) if (!(k in s)) add(id, 'HIGH', 'bad-spots', `${at} missing "${k}"`);
+        for (const k of Object.keys(s)) if (!SPOT_KEYS.includes(k)) add(id, 'HIGH', 'bad-spots', `${at} has unexpected key "${k}"`);
+        if (typeof s.name !== 'string' || s.name.trim().length < 3 || s.name.length > 48) add(id, 'HIGH', 'bad-spots', `${at} name "${s.name}" (want 3-48 chars)`);
+        else {
+          const key = s.name.trim().toLowerCase();
+          if (names.has(key)) add(id, 'MED', 'bad-spots', `${at} "${s.name}" listed twice`); else names.add(key);
+          if (DASH.test(s.name)) add(id, 'LOW', 'dash', `${at} name uses an em or en dash`);
+        }
+        if (!SPOT_KINDS.includes(s.kind)) add(id, 'HIGH', 'bad-spots', `${at} unknown kind "${s.kind}"`);
+        if (typeof s.note !== 'string' || !s.note.trim()) add(id, 'HIGH', 'bad-spots', `${at} note missing`);
+        else {
+          if (s.note.length < 40 || s.note.length > 140) add(id, 'LOW', 'text-length', `${at} note is ${s.note.length} chars (want 40-140)`);
+          if (DASH.test(s.note)) add(id, 'LOW', 'dash', `${at} note uses an em or en dash`);
+        }
+        if (!Number.isInteger(s.km) || s.km < 0 || s.km > 80) add(id, 'HIGH', 'bad-spots', `${at} km=${s.km} (want an integer 0-80)`);
+      });
     }
   }
 
@@ -249,6 +290,45 @@ async function onlineChecks(data) {
     const hint = geo[d.id]?.locality ? ` [coordinate is in ${geo[d.id].locality}]` : '';
     if (use.dkm > 40) add(d.id, 'MED', 'coord-far', `${Math.round(use.dkm)} km from OSM's "${use.name}"${hint}`);
     else if (use.dkm > 18) add(d.id, 'LOW', 'coord-off', `${Math.round(use.dkm)} km from OSM's "${use.name}"${hint}`);
+  }
+  saveCache();
+
+  if (NO_SPOTS) return;
+  // Local places. OSM is patchy for small viewpoints and hamlets, so a miss
+  // is only a nudge; but a name that OSM does know, and only knows far away,
+  // is most likely attached to the wrong destination.
+  const total = data.reduce((a, d) => a + ((d.spots || []).length), 0);
+  n = 0;
+  for (const d of data) {
+    if (typeof d.lat !== 'number') continue;
+    for (const s of d.spots || []) {
+      if (!s || typeof s.name !== 'string') continue;
+      const q = `${s.name.split('(')[0].trim()}, ${d.state}, India`;
+      const j = await getJSON(`https://photon.komoot.io/api/?limit=8&q=${encodeURIComponent(q)}`, 350);
+      process.stderr.write(`spot check ${++n}/${total}\r`);
+      if (n % 25 === 0) saveCache();
+      if (!j) continue;
+      const feats = (j.features || []).filter(f => f.properties?.countrycode === 'IN');
+      if (!feats.length) { add(d.id, 'LOW', 'spot-no-geocode', `OpenStreetMap has no match for spot "${s.name}"`); continue; }
+      let best = Infinity, bestName = '';
+      for (const f of feats) {
+        const [lng, lat] = f.geometry.coordinates;
+        const dkm = km(d.lat, d.lng, lat, lng);
+        if (dkm < best) { best = dkm; bestName = f.properties.name; }
+      }
+      const said = Number.isInteger(s.km) ? s.km : 0;
+      // Photon answers something for almost any query. A far match that
+      // carries the spot's own name is a real signal (a homonym elsewhere,
+      // and nothing of that name near the destination); a far match with an
+      // unrelated name only says OSM does not know this spot.
+      const norm = t => String(t || '').toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+      const want = norm(s.name.split('(')[0]), got = norm(bestName);
+      const sameName = want && got && (got.includes(want) || want.includes(got));
+      if (best > Math.max(100, said * 3)) {
+        if (sameName) add(d.id, 'MED', 'spot-far', `spot "${s.name}" nearest OSM match is ${Math.round(best)} km away ("${bestName}"), record says ${said} km`);
+        else add(d.id, 'LOW', 'spot-no-geocode', `OpenStreetMap has no match for spot "${s.name}" (nearest guess "${bestName}", ${Math.round(best)} km)`);
+      } else if (best > Math.max(35, said * 2.5)) add(d.id, 'LOW', 'spot-off', `spot "${s.name}" nearest OSM match is ${Math.round(best)} km away, record says ${said} km`);
+    }
   }
   saveCache();
 }

@@ -378,8 +378,8 @@ a.chip { text-decoration: none; }
 
 /* ----- bottom sheet -----
    Fixed-height panel moved ONLY via transform: collapsed is the same panel
-   translated down until just the peek strip shows. Every frame of a slide
-   or drag is compositor-only. JS measures the peek and keeps the resting
+   translated down until just the half card shows. Every frame of a slide
+   or drag is compositor-only. JS measures the half card and keeps the resting
    translateY inline (px); the transform below is the pre-JS position. */
 .sheet {
   position: absolute; left: 0; right: 0; margin-inline: auto;
@@ -390,7 +390,7 @@ a.chip { text-decoration: none; }
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -6px 30px rgba(10, 12, 14, .18);
   display: flex; flex-direction: column;
-  transform: translateY(calc(100% - var(--peek-h, 130px)));
+  transform: translateY(calc(100% - var(--peek-h, 300px)));
   transition: transform .3s cubic-bezier(.32,.72,.25,1);
   will-change: transform;
 }
@@ -398,11 +398,11 @@ a.chip { text-decoration: none; }
 .sheet.is-expanded { transform: translateY(0); }
 .sheet.is-dragging { transition: none; }
 
-/* collapsed = slim peek strip; expanded = the full card.
-   .show-full lags .is-expanded on collapse so the card content is still
-   visible while the sheet slides down. */
-.sheet:not(.show-full) .sheet-full { display: none; }
-.sheet.show-full .sheet-peek { display: none; }
+/* collapsed = the half card (the answer card and its next-row, the rest
+   below the fold); expanded = everything, scrollable. Only the expanded
+   sheet scrolls: at rest the card is the top of the sheet and a wheel or
+   finger on it pulls the sheet, not the content. */
+.sheet:not(.is-expanded) .sheet-body { overflow: hidden; }
 
 .sheet-handle {
   flex: 0 0 auto; padding: 10px 0 6px; display: grid; place-items: center; width: 100%;
@@ -420,21 +420,6 @@ a.chip { text-decoration: none; }
 
 .sheet-empty { padding: 14px 6px 24px; color: var(--muted); font-size: 14px; text-align: center; }
 .sheet-empty b { display: block; color: var(--ink); margin-bottom: 4px; font-size: 15px; }
-
-/* peek strip */
-.sheet-peek { display: flex; flex-direction: column; gap: 3px; padding: 0 2px 4px; cursor: pointer; }
-.peek-row1 { display: flex; align-items: center; gap: 9px; min-width: 0; }
-.peek-name {
-  font-size: 18px; font-weight: 700; letter-spacing: -.01em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
-}
-.peek-dot { width: 8px; height: 8px; border-radius: 99px; display: inline-block; flex: 0 0 auto; }
-.peek-btns { margin-left: auto; display: inline-flex; gap: 7px; flex: 0 0 auto; }
-.peek-next { flex: 0 0 auto; padding: 8px 16px; font-size: 13.5px; border-radius: 999px; }
-.peek-next .ic { width: 14px; height: 14px; }
-.peek-row2 { font-size: 13px; color: var(--muted); }
-.peek-row2 b { color: var(--ink); font-weight: 600; }
-.peek-season { font-weight: 600; }
 
 .btn-back {
   display: grid; place-items: center;
@@ -466,8 +451,11 @@ a.chip { text-decoration: none; }
 .card-glyph .ic { width: 23px; height: 23px; }
 .card-name { font-size: 24px; font-weight: 700; letter-spacing: -.02em; text-shadow: 0 2px 14px rgba(0, 0, 0, .3); }
 .card-state { font-size: 13px; color: rgba(255, 255, 255, .92); margin-top: 2px; }
-.card-dist { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.card-dist { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .card-dist .ic { width: 15px; height: 15px; opacity: .9; }
+.card-dist b { font-weight: 800; }
+.sheet-card { cursor: pointer; }
+.sheet.is-expanded .sheet-card { cursor: default; }
 
 .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
 .badge {
@@ -513,6 +501,25 @@ a.chip { text-decoration: none; }
 .card-act:active { transform: translateY(0) scale(.97); }
 .card-act .ic { color: var(--accent); }
 .card-act.is-done { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* local places: what to do once you are there. Plain rows on the panel,
+   the kind badge borrows its category colour so the list reads as one
+   system with the chips and cards. */
+.sheet-spots { display: flex; flex-direction: column; }
+.spot-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.spot {
+  display: flex; gap: 11px; align-items: flex-start;
+  padding: 9px 11px 10px 9px; border-radius: 12px;
+  background: var(--panel-2); color: var(--ink); text-decoration: none;
+  transition: background .12s ease, transform .12s ease;
+}
+.spot:hover { background: var(--accent-soft); }
+.spot:active { transform: scale(.985); }
+.spot .cat-badge { margin-top: 1px; }
+.spot-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.spot-name { font-size: 14px; font-weight: 600; line-height: 1.25; }
+.spot-meta { font-size: 11.5px; font-weight: 500; color: var(--muted); }
+.spot-note { font-size: 12.5px; line-height: 1.42; color: var(--muted); margin-top: 3px; }
 
 /* alternates: small colorful category tiles */
 .sheet-alts { padding-bottom: 6px; }

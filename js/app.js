@@ -1,10 +1,10 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e1';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground } from './themes.js?v=e1';
-import { icon } from './icons.js?v=e1';
-import { CITIES, nearestCity } from './cities.js?v=e1';
-import { locate, inIndia } from './geo.js?v=e1';
-import { store } from './store.js?v=e1';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e1';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e2';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e2';
+import { icon } from './icons.js?v=e2';
+import { CITIES, nearestCity } from './cities.js?v=e2';
+import { locate, inIndia } from './geo.js?v=e2';
+import { store } from './store.js?v=e2';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e2';
 
 // ----- state -----
 let DESTS = [];
@@ -51,12 +51,16 @@ const LOCATE_LABEL = btnLabel($('btnLocate')).textContent;
 
 // The curated data is written elsewhere; keep its em-dashes out of the UI
 // at render time instead of editing the catalogue.
-const deDash = s => typeof s === 'string' ? s.replace(/\s*—\s*/g, ', ') : s;
+const deDash = s => typeof s === 'string' ? s.replace(/\s*[—–]\s*/g, ', ') : s;
 function cleanDest(d) {
   for (const k of ['name', 'tagline', 'vibe', 'festival', 'hub']) if (d[k]) d[k] = deDash(d[k]);
   if (d.why) for (const k of Object.keys(d.why)) d.why[k] = deDash(d.why[k]);
+  d.spots = Array.isArray(d.spots) ? d.spots.filter(s => s && s.name && s.note) : [];
+  for (const s of d.spots) { s.name = deDash(s.name); s.note = deDash(s.note); }
   return d;
 }
+// the catalogue is first-party, but spot notes are free prose: keep them inert
+const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // ----- boot -----
 init();
@@ -425,6 +429,33 @@ function modeFacts(d) {
   }).join('');
 }
 
+// The local places once you are there: temples, viewpoints, falls, the
+// market. Each row opens a Google Maps search for the spot scoped to the
+// destination, which is more reliable than a coordinate we would have to
+// hand-verify for thousands of small places.
+function spotsHtml(d) {
+  const spots = d.spots || [];
+  if (!spots.length) return '';
+  const base = d.name.split('(')[0].trim();
+  const rows = spots.map(s => {
+    const k = spotKind(s.kind);
+    const q = encodeURIComponent(`${s.name}, ${base}, ${d.state}`);
+    const dist = s.km > 0 ? `${s.km} km` : 'in town';
+    return `<li><a class="spot" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener">
+        ${spotBadge(s)}
+        <span class="spot-main">
+          <span class="spot-name">${esc(s.name)}</span>
+          <span class="spot-meta">${k.label} · ${dist}</span>
+          <span class="spot-note">${esc(s.note)}</span>
+        </span>
+      </a></li>`;
+  }).join('');
+  return `<div class="sheet-spots">
+      <div class="alt-head"><h3>Local places</h3><span class="alt-count">${spots.length} in and around ${esc(base)}</span></div>
+      <ul class="spot-list">${rows}</ul>
+    </div>`;
+}
+
 // Where would you go next FROM the pick: the dashed onward arcs.
 function onwardHops(d) {
   return rank(DESTS, { lat: d.lat, lng: d.lng }, S.month, {
@@ -510,18 +541,6 @@ function renderSheet(item) {
   const statusWord = STATUS_WORD[status];
 
   body.innerHTML = `
-    <div class="sheet-peek" id="sheetPeek" role="button" aria-label="Expand details">
-      <div class="peek-row1">
-        <span class="peek-name">${d.name}</span>
-        <i class="peek-dot" style="background:${statusDot}" title="${statusWord}"></i>
-        <span class="peek-btns">
-          ${!S.pinned && pos > 0 ? `<button class="btn-back" id="btnPrevPeek" aria-label="Previous pick">${icon('chevronLeft')}</button>` : ''}
-          <button class="btn btn-primary peek-next" id="btnAnotherPeek">${S.pinned ? 'My picks' : `Next ${icon('arrowRight')}`}</button>
-        </span>
-      </div>
-      <div class="peek-row2">${S.pinned ? '' : `<b>#${pos + 1}</b> · `}${travelText(roadKm, hours)} · <span class="peek-season" style="color:${statusDot}">${statusWord}</span></div>
-    </div>
-
     <div class="sheet-full">
       <div class="sheet-card" style="background:${cardBackground(d)}">
         <div class="card-head">
@@ -532,7 +551,7 @@ function renderSheet(item) {
           </div>
         </div>
         <div class="badge-row">${statusBadge}${festBadge}${lwBadge}</div>
-        <div class="card-dist">${icon('pin')} ${travelText(roadKm, hours)} from ${S.origin.name}</div>
+        <div class="card-dist">${icon('pin')} ${S.pinned ? '' : `<b>#${pos + 1}</b> · `}${travelText(roadKm, hours)} from ${S.origin.name} · <span style="color:${statusDot}" title="${statusWord}">●</span></div>
         <div class="why">${why}</div>
         <div class="facts">
           <span class="fact">${icon('calendar')} ${d.days}${d.days === 1 ? ' day' : '+ days'}</span>
@@ -561,17 +580,18 @@ function renderSheet(item) {
         </div>
       </div>
 
+      ${spotsHtml(d)}
+
       <div class="sheet-alts">
         <div class="alt-head"><h3>Also in reach</h3><span class="alt-count">${S.ranked.length} in range</span></div>
         <div class="alt-grid" id="altList"></div>
       </div>
     </div>`;
 
-  $('sheetPeek').onclick = e => { if (!e.target.closest('.btn, .btn-back')) toggleSheet(true); };
-  $('btnAnotherPeek').onclick = nextPick;
   $('btnAnother').onclick = nextPick;
-  const bp = $('btnPrevPeek'); if (bp) bp.onclick = prevPick;
   const bp2 = $('btnPrev'); if (bp2) bp2.onclick = prevPick;
+  // tapping the card itself (not a control inside it) pulls the sheet up
+  body.querySelector('.sheet-card').onclick = e => { if (!e.target.closest('a, button')) toggleSheet(true); };
   $('actShare').onclick = () => shareDest(d, item);
   $('actSave').onclick = () => {
     const on = store.toggleSaved(d.id);
@@ -591,6 +611,7 @@ function renderSheet(item) {
   const start = S.pinned ? 0 : (S.idx % Math.max(S.ranked.length, 1)) + 1;
   for (let j = start; j < S.ranked.length && list.children.length < 6; j++) {
     const it = S.ranked[j];
+    if (it.d.id === d.id) continue;   // a pinned place is not its own alternate
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'alt-card';
@@ -606,7 +627,12 @@ function renderSheet(item) {
   if (!list.children.length) list.innerHTML = '<p class="saved-empty">Nothing else in range. Widen it or change the month.</p>';
 
   measurePeek();
+  // the docked desktop panel has the room, so it opens in full; a phone
+  // rests at the half card and pulls up for the rest
+  if (isDesktop()) setSheetState(true, true);
 }
+
+const isDesktop = () => matchMedia('(min-width: 900px)').matches;
 
 function nextPick() {
   if (S.pinned) { S.pinned = null; render(true); return; }
@@ -625,31 +651,31 @@ function prevPick() {
 
 // ----- bottom sheet: transform-only, finger-driven -----
 // The sheet is a fixed-height panel slid via translateY, so every frame of a
-// toggle or drag is compositor work only. Two classes with different lifetimes:
-// .is-expanded is the target position; .show-full is the content, kept on
-// through a collapse so the card is still visible while it slides away.
+// toggle or drag is compositor work only. Two rest states: the half card
+// (the answer card and its "show me another" row, the rest of the sheet
+// below the fold) and fully expanded. .is-expanded is the target position;
+// .show-full marks the content as scrollable, kept on through a collapse so
+// nothing jumps while the sheet slides away.
 let sheetSettleTimer = null;
 let sheetCollapsedY = 0;  // px the sheet sits below translateY(0) when collapsed
 
-// Collapsed offset = sheet height minus peek height. Measured after each
-// render (content-dependent). The resting transform is applied inline in px;
-// the CSS transition animates it. A calc(var()) transform is not reliably
-// re-resolved by Chrome when the variable changes.
+// Collapsed offset = sheet height minus the half-card height. Measured after
+// each render (content-dependent). The resting transform is applied inline
+// in px; the CSS transition animates it. A calc(var()) transform is not
+// reliably re-resolved by Chrome when the variable changes.
 function measurePeek() {
   const sheet = $('sheet'), body = $('sheetBody');
   if (!sheet.clientHeight) return;  // map screen hidden, keep last value
-  const hadFull = sheet.classList.contains('show-full');
-  if (hadFull) sheet.classList.remove('show-full');
-  const ref = $('sheetPeek') || body.firstElementChild;
+  // offsetTop is layout position, so a scrolled body does not skew it
+  const ref = body.querySelector('.sheet-next-row') || body.firstElementChild;
   if (ref) {
     const pad = parseFloat(getComputedStyle(body).paddingBottom) || 12;
-    let h = ref.getBoundingClientRect().bottom - sheet.getBoundingClientRect().top + pad;
-    h = Math.min(Math.round(h), Math.round(sheet.clientHeight * 0.45));
+    let h = ref.offsetTop + ref.offsetHeight + pad;
+    h = Math.min(Math.round(h), Math.round(sheet.clientHeight * 0.55));
     sheetCollapsedY = Math.max(0, sheet.offsetHeight - h);
-    // the map's locate button is anchored to the peek strip
+    // the map's locate button is anchored to the resting sheet
     document.documentElement.style.setProperty('--peek-h', h + 'px');
   }
-  if (hadFull) sheet.classList.add('show-full');
   // apply immediately: retargeting an in-flight snap keeps it one smooth
   // motion; only an active finger drag owns the transform exclusively
   if (!sheet.classList.contains('is-dragging')) applySheetTransform();
@@ -669,7 +695,7 @@ function setSheetState(expand, instant = false) {
   applySheetTransform();
   $('sheetHandle').setAttribute('aria-label', expand ? 'Collapse details' : 'Expand details');
   // reduced motion kills the transition, so the move IS instant: settle now
-  // rather than leaving the full card cropped in the peek strip for 400ms
+  // rather than leaving the sheet mid-way for 400ms
   if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { settleSheet(); return; }
   sheet.classList.add('is-moving');
   // transitionend is the normal path; the timer is a safety net
@@ -678,7 +704,10 @@ function setSheetState(expand, instant = false) {
 function settleSheet() {
   const sheet = $('sheet');
   sheet.classList.remove('is-moving');
-  if (!sheet.classList.contains('is-expanded')) sheet.classList.remove('show-full');
+  if (!sheet.classList.contains('is-expanded')) {
+    sheet.classList.remove('show-full');
+    $('sheetBody').scrollTop = 0;   // the half card is the top of the sheet
+  }
   applySheetTransform();  // pick up any re-measure that happened mid-flight
 }
 

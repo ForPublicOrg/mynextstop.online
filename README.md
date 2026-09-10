@@ -10,7 +10,7 @@ backend, no planning spiral.
 ## How it works
 
 1. **📍 One tap**: browser GPS (or type your city; your location never leaves the page).
-2. **The engine ranks 589 curated Indian destinations**, every state and union
+2. **The engine ranks 745 curated Indian destinations**, every state and union
    territory covered, by:
    - **Season honesty**: every place has peak / shoulder / avoid months. Places in
      `avoidMonths` (landslide season, 45 °C plains, closed parks, rough seas) are *never*
@@ -49,7 +49,7 @@ Zero-framework static frontend: the same pattern as
 - `index.html` + `css/style.css` + vanilla ES modules in `js/`
 - `js/engine.js`: pure ranking logic (season scoring, haversine, road estimates,
   long-weekend detection). No DOM, unit-testable.
-- `data/destinations.json`: 589 curated destinations across all 36 states and union
+- `data/destinations.json`: 745 curated destinations across all 36 states and union
   territories: coordinates, peak/shoulder/avoid months, four season-specific "why now"
   lines, solo score, budget, transport hub, altitude, signature festival. Beauty first:
   hill stations, valleys, waterfalls, beaches, gorges and one-bus-a-day villages. A
@@ -63,8 +63,8 @@ Zero-framework static frontend: the same pattern as
   16 category glyphs + transport modes), all `currentColor` SVG. No emoji, no icon fonts.
 - Leaflet + Esri canvas basemap tiles (theme-aware light/dark, no API key), with India's
   official boundary drawn as a corrective overlay (see DATA-LICENSE.md).
-- `tools/build-seo.mjs`: generates the readable half of the site, 657 static pages
-  (589 destination guides, 36 state guides, 12 month guides, 16 theme guides, four
+- `tools/build-seo.mjs`: generates the readable half of the site, 813 static pages
+  (745 destination guides, 36 state guides, 12 month guides, 16 theme guides, four
   browse indexes) plus the sitemaps, straight out of `data/destinations.json`. Output
   is committed, so deploy is still "upload the folder". See **Search & indexing**.
 - `css/pages.css` + `js/page.js`: the guide pages' thin layer on top of the app's
@@ -88,7 +88,7 @@ can read:
 
 | URL | What it is | Count |
 | --- | --- | --- |
-| `/places/<id>` | One destination: season strip, the four season-specific "why now" lines, vibe, how to get there, trip facts, nearby places | 589 |
+| `/places/<id>` | One destination: season strip, the four season-specific "why now" lines, vibe, how to get there, trip facts, nearby places | 745 |
 | `/india/<state>` | Best places in a state, with the months it is actually strong | 36 |
 | `/best-time-to-visit/<month>` | Best places in India that month, **and where not to go** | 12 |
 | `/themes/<category>` | Best beaches / treks / heritage / offbeat, and so on | 16 |
@@ -103,7 +103,7 @@ Each page carries a unique title and description, a canonical, `BreadcrumbList` 
 either `TouristAttraction` (with real coordinates) or `ItemList`, plus a `FAQPage`
 whose answers are visible on the page. Every destination links to its state, its
 themes, its peak months and its eight nearest neighbours, so the catalogue is one
-connected graph rather than 589 orphans, and `/` links into it so the front door is
+connected graph rather than 745 orphans, and `/` links into it so the front door is
 not a dead end. A guide page's call to action opens `/?to=<id>`, which drops you on
 the live map with that place selected.
 
@@ -131,6 +131,18 @@ welcome: the whole dataset is one readable JSON file.
 those months. It is for real blockers, a closed park gate, a snowed-in pass,
 cancelled ferries, 45 °C. Not for "it's a bit less nice then".
 
+`spots` is the list of local places once you are there: the temple, the
+viewpoint, the falls, the market, the one walk everyone does. Each spot is
+`{ name, kind, note, km }`: a proper name, one of the 32 `kind` keys in
+[js/themes.js](js/themes.js) (`temple`, `viewpoint`, `waterfall`, `market`,
+`trek`, `tea`, ...), a one-line note with one practical detail, and the rough
+road distance from the destination's own coordinate (`0` = in town). The app
+lists them under the pick and the guide page renders them as "Things to do in
+X"; each links to a Google Maps search scoped to the destination. Only real,
+specific, correctly named places belong here: a short list beats an invented
+entry, and a neighbouring catalogue destination is never a spot (it is
+already shown as "nearby").
+
 Everything that can be checked by machine, is:
 
 ```bash
@@ -141,9 +153,13 @@ node tools/build-seo.mjs --check     # are the generated pages in sync with it?
 It validates the schema and the season logic, then asks OpenStreetMap whether
 each coordinate really sits in the state it claims and how far it is from the
 named place, and asks the Copernicus DEM (via Open-Meteo) whether `alt` is the
-real ground height there. `--offline` skips the network checks. Run it before
-opening a data PR: it is how the catalogue caught its own coordinates that had
-drifted into Bangladesh and Nepal.
+real ground height there. It then geocodes every local place in `spots` and
+flags any that OpenStreetMap only knows far away from its destination (a
+likely mix-up), or not at all (a nudge: small viewpoints and hamlets are often
+missing from OSM). `--offline` skips the network checks, `--no-spots` skips
+just the spot geocoding, which is the slow part. Run it before opening a data
+PR: it is how the catalogue caught its own coordinates that had drifted into
+Bangladesh and Nepal.
 
 ## Contributing
 
