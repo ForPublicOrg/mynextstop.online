@@ -10,7 +10,7 @@
 // repaint tile pixels, so India's official national boundary
 // (data/india-border.geojson) is drawn as a thin line on top, colored to
 // match the basemap's own admin lines.
-import { seasonStatus, travelText } from './engine.js?v=e2';
+import { seasonStatus, travelText } from './engine.js?v=e3';
 
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
@@ -34,7 +34,7 @@ const ROUTE_COLOR = { light: '#0e7a6c', dark: '#2fae9c' };
 const CASING_OPACITY = { light: 0.85, dark: 0.4 };
 
 let map = null, dotsLayer = null, routeLayer = null, tiles = null, tileLabels = null, borderLayer = null;
-let loading = null, onSelect = null;
+let loading = null, onSelect = null, onTap = null;
 let theme = 'light';
 // season dots are cached and patched in place: rebuilding every marker on
 // each "Next" tap was DOM/GC churn for a change that touches two dots
@@ -118,9 +118,10 @@ export function setMapTheme(t) {
   dotsSig = '';  // dot ring color is theme-dependent: next update rebuilds
 }
 
-export async function initMap(el, selectCallback, initialTheme = 'light') {
+export async function initMap(el, selectCallback, initialTheme = 'light', tapCallback = null) {
   await loadLeaflet();
   onSelect = selectCallback;
+  onTap = tapCallback;
   theme = initialTheme === 'dark' ? 'dark' : 'light';
   if (map) return;
   const L = window.L;
@@ -138,6 +139,9 @@ export async function initMap(el, selectCallback, initialTheme = 'light') {
   routeLayer = L.layerGroup().addTo(map);
   // bound once: this is the only place a map is ever created
   map.on('zoomend', updateRouteLabel);
+  // a tap on bare map (dots, the route and the controls stop the event
+  // before it gets here): the sheet gets out of the way
+  map.on('click', () => onTap && onTap());
   if (location.hostname === 'localhost') window.__map = map;  // dev-only probe
 }
 
@@ -179,7 +183,7 @@ function drawDots(dests, month) {
     const status = seasonStatus(d, month);
     const m = L.circleMarker([d.lat, d.lng], dotStyle(status));
     m.bindTooltip(d.name, { direction: 'top', offset: [0, -8], opacity: 0.94 });
-    m.on('click', () => onSelect && onSelect(d));
+    m.on('click', e => { L.DomEvent.stopPropagation(e); onSelect && onSelect(d); });
     m.addTo(dotsLayer);
     dotMarkers.set(d.id, { marker: m, status });
   }
@@ -224,11 +228,14 @@ function updateRouteLabel() {
 function fitRoute(a, b, onward) {
   const bounds = window.L.latLngBounds([a, b]);
   for (const o of onward) bounds.extend([o.d.lat, o.d.lng]);
-  const pads = {
-    paddingTopLeft: [36, 130],
-    paddingBottomRight: [36, Math.min(window.innerHeight * 0.32, 260)],
-    maxZoom: 9,
-  };
+  // keep the trip clear of the chrome: the top bar, and the sheet where it
+  // actually rests (a phone's sheet height rides in --peek-h; the desktop
+  // panel is docked down the right edge)
+  const desktop = window.matchMedia('(min-width: 900px)').matches;
+  const sheetH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--peek-h')) || 0;
+  const pads = desktop
+    ? { paddingTopLeft: [40, 110], paddingBottomRight: [440, 40], maxZoom: 9 }
+    : { paddingTopLeft: [30, 130], paddingBottomRight: [30, Math.min(sheetH + 24, window.innerHeight * 0.6)], maxZoom: 9 };
   safeFit(() => {
     if (reducedMotion()) map.fitBounds(bounds, { ...pads, animate: false });
     else map.flyToBounds(bounds, { ...pads, duration: 0.7 });
@@ -284,9 +291,9 @@ export function updateMap(state) {
     // to any season dot sitting inside the corridor (topmost layer wins).
     const frame = () => fitRoute(a, b, onward);
     L.polyline(pts, { weight: 24, opacity: 0.001, interactive: true, className: 'route-hit' })
-      .addTo(routeLayer).on('click', frame).bringToBack();
+      .addTo(routeLayer).on('click', e => { L.DomEvent.stopPropagation(e); frame(); }).bringToBack();
     const tipEl = line.getTooltip() && line.getTooltip().getElement();
-    if (tipEl) tipEl.addEventListener('click', frame);
+    if (tipEl) tipEl.addEventListener('click', e => { e.stopPropagation(); frame(); });
     updateRouteLabel();
 
     // onward hints: where you'd go NEXT from there: the "next stop" chain.

@@ -1,10 +1,10 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e2';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e2';
-import { icon } from './icons.js?v=e2';
-import { CITIES, nearestCity } from './cities.js?v=e2';
-import { locate, inIndia } from './geo.js?v=e2';
-import { store } from './store.js?v=e2';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e2';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e3';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e3';
+import { icon } from './icons.js?v=e3';
+import { CITIES, nearestCity } from './cities.js?v=e3';
+import { locate, inIndia } from './geo.js?v=e3';
+import { store } from './store.js?v=e3';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e3';
 
 // ----- state -----
 let DESTS = [];
@@ -30,6 +30,13 @@ let pendingPin = null;
 // True until an origin is settled. The launch fix arrives late, so it must
 // check this before overruling a city the user typed while it was in flight.
 let booting = true;
+// Resolves true once the catalogue is in memory, false if it never arrives.
+// The search box works before that (the city list is in-module), so a city
+// picked early waits on this instead of blocking the typing.
+let dataReady = null;
+// A launch fix that landed while the user was mid-typing: held here rather
+// than yanking the screen away, and used by the next locate tap for free.
+let lateFix = null, lateFixAt = 0;
 
 const DIST_KM = { nearby: 150, weekend: 450, long: 900, anywhere: Infinity };
 const DIST_LABEL = [
@@ -77,35 +84,10 @@ async function init() {
   setLocating(true);
   const fix = requestFix();
 
-  try {
-    const [d, h] = await Promise.all([
-      fetch('data/destinations.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
-      fetch('data/holidays.json').then(r => r.json()).catch(() => []),
-    ]);
-    if (!Array.isArray(d) || !d.length) throw 0;
-    DESTS = d.map(cleanDest);
-    HOLIDAYS = h;
-  } catch {
-    // persistent error state, distinct from "no results for these filters"
-    setLocating(false);
-    $('btnLocate').disabled = true;
-    $('homeSearch').disabled = true;
-    $('heroNote').innerHTML =
-      'Couldn’t load destinations. Check your connection. ' +
-      '<button id="btnRetry" class="btn-link">Retry</button>';
-    $('btnRetry').onclick = () => location.reload();
-    $('screen-map').hidden = true;
-    $('screen-home').hidden = false;
-    return;
-  }
+  dataReady = loadData();
+  if (!(await dataReady)) return;
 
   buildMoodChips();  // needs DESTS: chips reflect categories actually in the data
-  if (WANT_ID) pendingPin = DESTS.find(d => d.id === WANT_ID) || null;
-
-  // The catalogue is in memory, so typing a city can now rank something. The
-  // locate CTA stays disabled a little longer: it is mid-wait, and setLocating
-  // releases it if that wait comes back empty.
-  $('homeSearch').disabled = false;
 
   // keep the origin dialog's input above the iOS keyboard: the keyboard
   // shrinks only the visual viewport, not the layout viewport fixed
@@ -125,6 +107,38 @@ async function init() {
   settleOrigin(await fix);
 }
 
+// The catalogue download. On a phone this is the slow part of the launch
+// (it is bigger than everything else put together), which is why nothing
+// above waits for it except the things that need the data itself.
+async function loadData() {
+  try {
+    const [d, h] = await Promise.all([
+      fetch('data/destinations.json').then(r => { if (!r.ok) throw 0; return r.json(); }),
+      fetch('data/holidays.json').then(r => r.json()).catch(() => []),
+    ]);
+    if (!Array.isArray(d) || !d.length) throw 0;
+    DESTS = d.map(cleanDest);
+    HOLIDAYS = h;
+    if (WANT_ID) pendingPin = DESTS.find(x => x.id === WANT_ID) || null;
+    // a list typed out while this was downloading only knew the cities
+    if (!$('homeResults').hidden) renderResults($('homeSearch').value, $('homeResults'));
+    return true;
+  } catch {
+    // persistent error state, distinct from "no results for these filters"
+    setLocating(false);
+    $('btnLocate').disabled = true;
+    $('homeSearch').disabled = true;
+    $('homeResults').hidden = true;
+    $('heroNote').innerHTML =
+      'Couldn’t load destinations. Check your connection. ' +
+      '<button id="btnRetry" class="btn-link">Retry</button>';
+    $('btnRetry').onclick = () => location.reload();
+    $('screen-map').hidden = true;
+    $('screen-home').hidden = false;
+    return false;
+  }
+}
+
 // ----- UI scaffolding -----
 function buildMonthSel() {
   const sel = $('monthSel');
@@ -136,7 +150,10 @@ function buildMonthSel() {
     sel.appendChild(opt);
   }
   sel.value = S.month;
-  sel.onchange = () => { S.month = +sel.value; S.idx = 0; S.pinned = null; render(true); };
+  // the chip shows the choice; the select itself is the invisible hit area
+  const paint = () => { $('monthLabel').textContent = (S.month === now.getMonth() + 1 ? 'Now · ' : '') + MONTHS[S.month - 1]; };
+  paint();
+  sel.onchange = () => { S.month = +sel.value; S.idx = 0; S.pinned = null; paint(); render(true); };
 }
 
 function buildDistChips() {
@@ -206,6 +223,14 @@ function wireEvents() {
   $('themeBtnMap').onclick = toggleTheme;
   $('savedBtn').onclick = openSavedDlg;
   $('originSearch').oninput = e => renderResults(e.target.value, $('originResults'));
+  // Enter (or the keyboard's Go) takes the top match. Left alone, the
+  // method="dialog" form would submit and close the dialog with nothing chosen.
+  $('originSearch').addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const first = $('originResults').querySelector('.origin-item');
+    if (first) first.click();
+  });
   $('sheetHandle').onclick = () => toggleSheet();
   wireSheetDrag();
   wireHomeSearch();
@@ -213,6 +238,17 @@ function wireEvents() {
     e.preventDefault();
     $('screen-map').hidden = true;
     $('screen-home').hidden = false;
+    // the map is still there behind this screen: offer the way back, so a
+    // stray tap on the logo never costs another locate
+    if (S.origin && DESTS.length) {
+      const note = $('heroNote');
+      note.textContent = '';
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn-link';
+      b.textContent = `Back to the map, from ${S.origin.name}`;
+      b.onclick = () => enterMap();
+      note.append(b);
+    }
   };
   $('homeBtn').onclick = goHome;
   document.querySelector('.brand').onclick = goHome;
@@ -229,13 +265,35 @@ function wireHomeSearch() {
   const show = () => {
     renderResults(input.value, box);
     box.hidden = false;
+    fitResults();
   };
   input.addEventListener('focus', show);
   input.addEventListener('input', show);
+  input.addEventListener('keydown', e => {
+    // Enter takes the top match; Escape puts the list away
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const first = box.querySelector('.origin-item');
+      if (first) first.click();
+    }
+    if (e.key === 'Escape') { box.hidden = true; input.blur(); }
+  });
   // hide when tapping anywhere outside the search area
   document.addEventListener('pointerdown', e => {
     if (!e.target.closest('.home-search-wrap')) box.hidden = true;
   });
+  // The list must end above the phone keyboard, which only shrinks the
+  // visual viewport: size it to what is actually visible below the box.
+  const vv = window.visualViewport;
+  function fitResults() {
+    if (!vv || box.hidden) return;
+    const room = vv.offsetTop + vv.height - box.getBoundingClientRect().top - 8;
+    box.style.maxHeight = Math.max(132, Math.min(320, room)) + 'px';
+  }
+  if (vv) {
+    vv.addEventListener('resize', fitResults);
+    vv.addEventListener('scroll', fitResults);
+  }
 }
 
 // <dialog> fallback for browsers without showModal (older iOS Safari, WebViews):
@@ -263,7 +321,14 @@ async function enterMap() {
   $('screen-home').hidden = true;
   $('screen-map').hidden = false;
   try {
-    await initMap($('mapEl'), d => { S.pinned = d; S.idx = 0; render(true); }, effectiveTheme());
+    await initMap($('mapEl'),
+      // a dot: it becomes the answer, and a sheet parked at the peek rises
+      // to show it
+      d => { S.pinned = d; S.idx = 0; if (sheetLevel === 0) setSheetLevel(1); render(true); },
+      effectiveTheme(),
+      // bare map: on a phone the sheet drops to the peek so the map is the
+      // whole screen; the docked desktop panel never covers the map
+      () => { if (!isDesktop() && sheetLevel > 0) setSheetLevel(0); });
   } catch {
     // don't strand the user on a blank map screen: back to home, retryable
     $('screen-map').hidden = true;
@@ -295,7 +360,18 @@ function settleOrigin(pos) {
   setLocating(false);
   if (!booting) return;   // a city was typed while the fix was in flight: it stands
 
-  if (pos && inIndia(pos)) { setOrigin(originFrom(pos)); return; }
+  if (pos && inIndia(pos)) {
+    const input = $('homeSearch');
+    if (document.activeElement === input && input.value.trim()) {
+      // mid-typing: hold the fix instead of yanking the screen away; the
+      // locate button uses it without a second wait
+      lateFix = pos; lateFixAt = Date.now();
+      $('heroNote').textContent = `Location found, ${originFrom(pos).name}. Tap Use my location, or keep typing.`;
+      return;
+    }
+    setOrigin(originFrom(pos));
+    return;
+  }
 
   const why = pos
     ? 'You seem to be outside India. '
@@ -339,7 +415,9 @@ async function doLocate(btn = $('btnLocate')) {
   if (label) label.textContent = 'Locating…';
   btn.disabled = true;
   try {
-    const pos = await locate();
+    const held = lateFix && Date.now() - lateFixAt < 120000 ? lateFix : null;
+    lateFix = null;
+    const pos = held || await locate();
     if (!inIndia(pos)) {
       toast('You seem to be outside India. Type where you’ll start instead.');
       openOriginDlg();
@@ -356,14 +434,20 @@ async function doLocate(btn = $('btnLocate')) {
   }
 }
 
-function setOrigin(o) {
+async function setOrigin(o) {
   booting = false;
   S.origin = o;
   store.origin = o;
   S.idx = 0;
+  $('homeResults').hidden = true;
+  if (!DESTS.length) {
+    // chosen before the catalogue landed: say so, and carry on when it does
+    $('heroNote').textContent = `Loading places near ${o.name}…`;
+    if (!(await dataReady)) return;   // the error state is already on screen
+    if (S.origin !== o) return;       // a later choice superseded this one
+  }
   S.pinned = pendingPin;   // a /?to= deep link survives the detour through this dialog
   pendingPin = null;
-  $('homeResults').hidden = true;
   enterMap();
 }
 
@@ -509,8 +593,8 @@ function renderSheet(item) {
         <b>Nothing in range for ${MONTHS[S.month - 1]}.</b>
         Widen the filters, pick another month, or tap any dot.
       </div>`;
-    setSheetState(false, true);
-    measurePeek();
+    measureSheet();
+    setSheetLevel(Math.min(sheetLevel, 1), true);
     return;
   }
 
@@ -590,8 +674,8 @@ function renderSheet(item) {
 
   $('btnAnother').onclick = nextPick;
   const bp2 = $('btnPrev'); if (bp2) bp2.onclick = prevPick;
-  // tapping the card itself (not a control inside it) pulls the sheet up
-  body.querySelector('.sheet-card').onclick = e => { if (!e.target.closest('a, button')) toggleSheet(true); };
+  // tapping the card itself (not a control inside it) pulls the sheet up a level
+  body.querySelector('.sheet-card').onclick = e => { if (!e.target.closest('a, button')) setSheetLevel(sheetLevel + 1); };
   $('actShare').onclick = () => shareDest(d, item);
   $('actSave').onclick = () => {
     const on = store.toggleSaved(d.id);
@@ -626,10 +710,11 @@ function renderSheet(item) {
   }
   if (!list.children.length) list.innerHTML = '<p class="saved-empty">Nothing else in range. Widen it or change the month.</p>';
 
-  measurePeek();
+  measureSheet();
   // the docked desktop panel has the room, so it opens in full; a phone
-  // rests at the half card and pulls up for the rest
-  if (isDesktop()) setSheetState(true, true);
+  // keeps whatever level it was at (the half card to begin with) and pulls
+  // up for the rest
+  if (isDesktop()) setSheetLevel(2, true);
 }
 
 const isDesktop = () => matchMedia('(min-width: 900px)').matches;
@@ -651,49 +736,61 @@ function prevPick() {
 
 // ----- bottom sheet: transform-only, finger-driven -----
 // The sheet is a fixed-height panel slid via translateY, so every frame of a
-// toggle or drag is compositor work only. Two rest states: the half card
-// (the answer card and its "show me another" row, the rest of the sheet
-// below the fold) and fully expanded. .is-expanded is the target position;
-// .show-full marks the content as scrollable, kept on through a collapse so
-// nothing jumps while the sheet slides away.
+// toggle or drag is compositor work only. Three rest levels on a phone:
+//   0  peek: the handle and the card's title row; the map has the screen
+//   1  half: the answer card and its "show me another" row
+//   2  full: everything, scrollable
+// The desktop panel is docked and only knows 1 and 2. sheetY holds the
+// translateY (px) of each level, measured after every render since the
+// card's height depends on its content.
 let sheetSettleTimer = null;
-let sheetCollapsedY = 0;  // px the sheet sits below translateY(0) when collapsed
+let sheetLevel = 1;
+let sheetY = [0, 0, 0];      // translateY per level
+let sheetH = [110, 300];     // visible height at peek / half
 
-// Collapsed offset = sheet height minus the half-card height. Measured after
-// each render (content-dependent). The resting transform is applied inline
-// in px; the CSS transition animates it. A calc(var()) transform is not
-// reliably re-resolved by Chrome when the variable changes.
-function measurePeek() {
+// The resting transform is applied inline in px; the CSS transition animates
+// it. A calc(var()) transform is not reliably re-resolved by Chrome when the
+// variable changes.
+function measureSheet() {
   const sheet = $('sheet'), body = $('sheetBody');
   if (!sheet.clientHeight) return;  // map screen hidden, keep last value
-  // offsetTop is layout position, so a scrolled body does not skew it
-  const ref = body.querySelector('.sheet-next-row') || body.firstElementChild;
-  if (ref) {
-    const pad = parseFloat(getComputedStyle(body).paddingBottom) || 12;
-    let h = ref.offsetTop + ref.offsetHeight + pad;
-    h = Math.min(Math.round(h), Math.round(sheet.clientHeight * 0.55));
-    sheetCollapsedY = Math.max(0, sheet.offsetHeight - h);
-    // the map's locate button is anchored to the resting sheet
-    document.documentElement.style.setProperty('--peek-h', h + 'px');
-  }
+  const H = sheet.offsetHeight;
+  const pad = parseFloat(getComputedStyle(body).paddingBottom) || 12;
+  // offsetTop is layout position (relative to the sheet), so a scrolled
+  // body does not skew it
+  const bottomOf = el => el.offsetTop + el.offsetHeight;
+  const half = body.querySelector('.sheet-next-row') || body.firstElementChild;
+  const head = body.querySelector('.card-head');
+  let hHalf = half ? Math.min(bottomOf(half) + pad, H * 0.55) : H * 0.4;
+  let hPeek = head ? bottomOf(head) + 14 : hHalf;
+  hHalf = Math.round(Math.max(hHalf, hPeek));
+  hPeek = Math.round(hPeek);
+  sheetH = [hPeek, hHalf];
+  sheetY = [Math.max(0, H - hPeek), Math.max(0, H - hHalf), 0];
+  syncPeekVar();
   // apply immediately: retargeting an in-flight snap keeps it one smooth
   // motion; only an active finger drag owns the transform exclusively
   if (!sheet.classList.contains('is-dragging')) applySheetTransform();
 }
 
-function applySheetTransform() {
-  const sheet = $('sheet');
-  sheet.style.transform = sheet.classList.contains('is-expanded')
-    ? 'translateY(0px)' : `translateY(${sheetCollapsedY}px)`;
+// the map's locate button and its credit line ride on the resting sheet
+function syncPeekVar() {
+  document.documentElement.style.setProperty('--peek-h', sheetH[Math.min(sheetLevel, 1)] + 'px');
 }
 
-function setSheetState(expand, instant = false) {
+function applySheetTransform() {
+  $('sheet').style.transform = `translateY(${sheetY[sheetLevel]}px)`;
+}
+
+function setSheetLevel(level, instant = false) {
   const sheet = $('sheet');
   clearTimeout(sheetSettleTimer);
-  if (expand) sheet.classList.add('show-full');
-  sheet.classList.toggle('is-expanded', expand);
+  sheetLevel = Math.max(isDesktop() ? 1 : 0, Math.min(2, level));
+  sheet.classList.toggle('is-expanded', sheetLevel === 2);
+  sheet.classList.toggle('is-peek', sheetLevel === 0);
+  syncPeekVar();
   applySheetTransform();
-  $('sheetHandle').setAttribute('aria-label', expand ? 'Collapse details' : 'Expand details');
+  $('sheetHandle').setAttribute('aria-label', sheetLevel === 2 ? 'Collapse details' : 'Expand details');
   // reduced motion kills the transition, so the move IS instant: settle now
   // rather than leaving the sheet mid-way for 400ms
   if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { settleSheet(); return; }
@@ -704,16 +801,15 @@ function setSheetState(expand, instant = false) {
 function settleSheet() {
   const sheet = $('sheet');
   sheet.classList.remove('is-moving');
-  if (!sheet.classList.contains('is-expanded')) {
-    sheet.classList.remove('show-full');
-    $('sheetBody').scrollTop = 0;   // the half card is the top of the sheet
-  }
+  if (sheetLevel < 2) $('sheetBody').scrollTop = 0;   // the card is the top of the sheet
   applySheetTransform();  // pick up any re-measure that happened mid-flight
 }
 
+// the handle steps through the levels: peek, half, full, and back to half
 function toggleSheet(force) {
-  const sheet = $('sheet');
-  setSheetState(force !== undefined ? force : !sheet.classList.contains('is-expanded'));
+  if (force === true) return setSheetLevel(2);
+  if (force === false) return setSheetLevel(1);
+  setSheetLevel(sheetLevel === 2 ? 1 : sheetLevel + 1);
 }
 
 function wireSheetDrag() {
@@ -742,18 +838,18 @@ function wireSheetDrag() {
     const dy = p.clientY - sy, dx = p.clientX - sx;
     if (mode === null) {
       if (Math.abs(dy) < 9 && Math.abs(dx) < 9) return;
-      const expanded = sheet.classList.contains('is-expanded');
+      const expanded = sheetLevel === 2;
       const vertical = Math.abs(dy) > Math.abs(dx) * 1.2;
       // expanded + content scrolled (or an upward pull) = a scroll, not a drag
       if (!vertical || (expanded && !(dy > 0 && body.scrollTop <= 0))) { mode = 'scroll'; return; }
       mode = 'drag';
-      range = Math.max(1, sheetCollapsedY);
-      base = expanded ? 0 : range;
+      range = Math.max(1, sheetY[isDesktop() ? 1 : 0]);
+      base = sheetY[sheetLevel];
       // if grabbed mid-animation, pick up from the actual current position
       const t = getComputedStyle(sheet).transform;
-      if (t && t !== 'none') { try { base = new DOMMatrixReadOnly(t).m42; } catch { /* keep class-based base */ } }
+      if (t && t !== 'none') { try { base = new DOMMatrixReadOnly(t).m42; } catch { /* keep level-based base */ } }
       clearTimeout(sheetSettleTimer);
-      sheet.classList.add('is-dragging', 'is-moving', 'show-full');
+      sheet.classList.add('is-dragging', 'is-moving');
       sy = p.clientY;  // re-anchor so the sheet doesn't jump to the slop distance
     }
     if (e.cancelable) e.preventDefault();
@@ -772,8 +868,14 @@ function wireSheetDrag() {
     // a mouse drag released over a button must not count as a click on it
     sheet.addEventListener('click', swallowClick, { capture: true, once: true });
     setTimeout(() => sheet.removeEventListener('click', swallowClick, { capture: true }), 120);
-    // a flick wins over position; otherwise snap to the nearer state
-    setSheetState(Math.abs(vel) > 0.35 ? vel < 0 : cur < range / 2);
+    // a flick moves one level in its direction; otherwise snap to the nearest
+    let target;
+    if (Math.abs(vel) > 0.35) {
+      target = vel > 0 ? (sheetY[1] > cur + 1 ? 1 : 0) : (sheetY[1] < cur - 1 ? 1 : 2);
+    } else {
+      target = [0, 1, 2].reduce((b, i) => Math.abs(sheetY[i] - cur) < Math.abs(sheetY[b] - cur) ? i : b, 0);
+    }
+    setSheetLevel(target);
   };
 
   sheet.addEventListener('touchstart', start, { passive: true });
@@ -787,7 +889,7 @@ function wireSheetDrag() {
   let rsTimer = null;
   window.addEventListener('resize', () => {
     clearTimeout(rsTimer);
-    rsTimer = setTimeout(() => { if (!$('screen-map').hidden) measurePeek(); }, 150);
+    rsTimer = setTimeout(() => { if (!$('screen-map').hidden) measureSheet(); }, 150);
   });
 }
 

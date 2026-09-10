@@ -42,14 +42,14 @@
   <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
         crossorigin="anonymous" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" />
 
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="modulepreload" href="js/app.js?v=e2" />
-  <link rel="modulepreload" href="js/engine.js?v=e2" />
-  <link rel="modulepreload" href="js/map.js?v=e2" />
-  <link rel="modulepreload" href="js/geo.js?v=e2" />
-  <link rel="modulepreload" href="js/store.js?v=e2" />
-  <link rel="modulepreload" href="js/cities.js?v=e2" />
-  <link rel="modulepreload" href="js/themes.js?v=e2" />
+  <link rel="stylesheet" href="css/style.css?v=e3" />
+  <link rel="modulepreload" href="js/app.js?v=e3" />
+  <link rel="modulepreload" href="js/engine.js?v=e3" />
+  <link rel="modulepreload" href="js/map.js?v=e3" />
+  <link rel="modulepreload" href="js/geo.js?v=e3" />
+  <link rel="modulepreload" href="js/store.js?v=e3" />
+  <link rel="modulepreload" href="js/cities.js?v=e3" />
+  <link rel="modulepreload" href="js/themes.js?v=e3" />
 
   <script type="application/ld+json">
   {
@@ -110,7 +110,7 @@
         <div class="home-search-wrap">
           <div class="home-search">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
-            <input id="homeSearch" type="search" placeholder="Where are you now?" autocomplete="off" enterkeyhint="search" disabled />
+            <input id="homeSearch" type="search" placeholder="Where are you now?" autocomplete="off" enterkeyhint="search" />
           </div>
           <div id="homeResults" class="search-results" role="listbox" hidden></div>
         </div>
@@ -145,23 +145,29 @@
           <button id="homeBtn" class="bar-home" aria-label="Home">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
           </button>
+          <!-- the whole bar is the button: the search glyph at its end is
+               part of it, not a decoration next to it -->
           <button id="originBtn" class="bar-origin" title="Change starting point">
             <span id="originLabel">…</span>
+            <svg class="ic bar-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
           </button>
-          <svg class="ic bar-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20.5 20.5-4.6-4.6"/></svg>
         </div>
         <div class="chip-row">
+          <!-- The native <select> sits invisibly over the chip at 16px so iOS
+               never zooms into it; the visible label is the span. -->
           <label class="chip chip-month" title="Plan for a different month">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10.5h17"/></svg>
+            <span id="monthLabel" class="chip-label">…</span>
+            <svg class="ic chip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
             <select id="monthSel" aria-label="Travel month"></select>
           </label>
-          <button id="filterBtn" class="chip" aria-label="Filters">
+          <button id="filterBtn" class="chip" aria-label="Filters" title="Filters">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21v-6M5 9V3M12 21v-9M12 6V3M19 21v-3M19 12V3"/><path d="M2.5 15h5M9.5 8.5h5M16.5 18h5"/></svg>
-            Filters<span id="filterCount" class="filter-count" hidden></span>
+            <span class="chip-label chip-label-opt">Filters</span><span id="filterCount" class="filter-count" hidden></span>
           </button>
-          <button id="savedBtn" class="chip" aria-label="Saved places">
+          <button id="savedBtn" class="chip" aria-label="Saved places" title="Saved places">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.4 4.8 13a4.9 4.9 0 0 1 7-6.9l.2.2.2-.2a4.9 4.9 0 0 1 7 6.9z"/></svg>
-            Saved
+            <span class="chip-label chip-label-opt">Saved</span>
           </button>
           <a class="chip" href="/reel" aria-label="Make a trip reel">
             <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M8 4.5v15M16 4.5v15M3.5 9h4.5M3.5 15h4.5M16 9h4.5M16 15h4.5"/></svg>
@@ -244,7 +250,7 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=e2"></script>
+  <script type="module" src="js/app.js?v=e3"></script>
 
   <!-- Vercel Web Analytics. Served same-origin under /_vercel/, so the
        existing CSP covers it without a new script-src or connect-src. -->

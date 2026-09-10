@@ -246,10 +246,11 @@ body { -webkit-tap-highlight-color: transparent; }
 .bar-home:hover { background: var(--panel-2); }
 .bar-home .ic { width: 21px; height: 21px; }
 .bar-origin {
-  flex: 1; min-width: 0; text-align: left;
-  font-size: 15px; font-weight: 500; padding: 10px 4px;
+  flex: 1; min-width: 0; text-align: left; align-self: stretch;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 15px; font-weight: 500; padding: 0 4px;
 }
-#originLabel { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#originLabel { flex: 1; min-width: 0; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .bar-edit { width: 17px; height: 17px; color: var(--muted); flex: 0 0 auto; }
 
 .chip-row {
@@ -277,11 +278,18 @@ a.chip { text-decoration: none; }
   color: var(--accent); font-weight: 600;
 }
 .chip.is-on .ic, .chip.is-on small { color: inherit; }
+/* the month picker: a native <select> laid invisibly over the chip. It is
+   16px, so iOS opens the picker without zooming the page; the chip's span
+   carries the visible text and sets the width. */
+.chip-month { position: relative; }
 .chip-month select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; margin: 0; padding: 0; border: 0;
+  font-size: 16px; cursor: pointer;
   appearance: none; -webkit-appearance: none;
-  border: 0; background: transparent; color: var(--ink);
-  font: 500 13.5px/1 inherit; cursor: pointer; outline-offset: 3px;
 }
+.chip-month:focus-within { border-color: var(--accent); }
+.chip-month .chip-caret { width: 13px; height: 13px; margin-left: -2px; }
 .filter-count {
   background: var(--accent); color: var(--accent-ink);
   border-radius: 99px; min-width: 17px; height: 17px; padding: 0 4px;
@@ -600,6 +608,28 @@ dialog[open] { display: block; }
   max-width: 88vw; text-align: center;
 }
 .toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ----- phones ----- */
+/* The chip row has to fit in one line on a 360px screen with the Reel chip
+   whole: chips tighten first, then Filters and Saved go icon-only (their
+   glyphs are the universal ones, and both keep aria-label and title). */
+@media (max-width: 479px) {
+  .chip-row { gap: 6px; }
+  .chip-row .chip { padding: 8px 11px; font-size: 13px; }
+}
+@media (max-width: 419px) {
+  .chip-row .chip-label-opt { display: none; }
+}
+@media (max-width: 899px) {
+  /* the map credit stays readable above the sheet instead of under it */
+  .screen-map .leaflet-bottom.leaflet-left {
+    bottom: calc(var(--peek-h, 130px) + 2px);
+    transition: bottom .3s cubic-bezier(.32,.72,.25,1);
+  }
+}
+@media (max-height: 700px) {
+  .home { padding-top: 6vh; }
+}
 
 /* ----- desktop ----- */
 @media (min-width: 900px) {
