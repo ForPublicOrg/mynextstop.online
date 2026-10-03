@@ -1,10 +1,11 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e4';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e4';
-import { icon } from './icons.js?v=e4';
-import { CITIES, nearestCity } from './cities.js?v=e4';
-import { locate, inIndia } from './geo.js?v=e4';
-import { store } from './store.js?v=e4';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e4';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e5';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e5';
+import { icon } from './icons.js?v=e5';
+import { CITIES, nearestCity } from './cities.js?v=e5';
+import { locate, inIndia } from './geo.js?v=e5';
+import { store } from './store.js?v=e5';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e5';
+import { initInstall, mapShown } from './pwa.js?v=e5';
 
 // ----- state -----
 let DESTS = [];
@@ -76,6 +77,7 @@ async function init() {
   buildMonthSel();
   buildDistChips();
   wireEvents();
+  initInstall({ toast, openDlg });
 
   // Every launch asks the browser where the phone is now: a saved origin is
   // the fallback, not the default. Someone who used the site from Delhi last
@@ -210,6 +212,7 @@ function wireEvents() {
   wireDlgFallback($('originDlg'));
   wireDlgFallback($('savedDlg'));
   wireDlgFallback($('filterDlg'));
+  wireDlgFallback($('installDlg'));
   $('filterBtn').onclick = () => openDlg($('filterDlg'));
   $('btnLocate').onclick = () => doLocate($('btnLocate'));
   $('mapLocateBtn').onclick = () => doLocate($('mapLocateBtn'));
@@ -313,7 +316,7 @@ function wireDlgFallback(dlg) {
   });
 }
 function dialogOpen() {
-  return $('originDlg').hasAttribute('open') || $('savedDlg').hasAttribute('open') || $('filterDlg').hasAttribute('open');
+  return ['originDlg', 'savedDlg', 'filterDlg', 'installDlg'].some(id => $(id).hasAttribute('open'));
 }
 
 // ----- screens -----
@@ -338,6 +341,7 @@ async function enterMap() {
   }
   nudgeMap();
   render(true);
+  mapShown();
 }
 
 // ----- origin -----

@@ -33,6 +33,14 @@ const P = {
   train: '<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M9.5 17.5 7 21M14.5 17.5 17 21M7.5 21h9"/><path d="M9.5 14.2h.01M14.5 14.2h.01"/>',
   car: '<path d="M4.5 15.5 6.2 10a2 2 0 0 1 1.9-1.4h7.8a2 2 0 0 1 1.9 1.4l1.7 5.5"/><path d="M3.5 15.5h17V19h-17z"/><path d="M6.5 19v1.8M17.5 19v1.8M7 12.7h10" stroke-opacity=".55"/>',
 
+  // ----- install as an app (the steps borrow each browser's own glyphs) -----
+  install: '<rect x="5.5" y="2.5" width="13" height="19" rx="2.6"/><path d="M12 6.5v7M9 10.8l3 3 3-3M10.5 18h3"/>',
+  shareIos: '<path d="M8.5 9.5H7a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7.5a2 2 0 0 0-2-2h-1.5"/><path d="M12 14V3M8.3 6.5 12 2.8l3.7 3.7"/>',
+  addSquare: '<rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><path d="M12 8v8M8 12h8"/>',
+  moreVert: '<circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/>',
+  moreHoriz: '<circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/>',
+  external: '<path d="M14 4h6v6M20 4l-8.5 8.5"/><path d="M18 14v4a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 4 18V9a2.5 2.5 0 0 1 2.5-2.5h4"/>',
+
   // ----- local places (spot kinds that have no category glyph) -----
   shop: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5.5 12v8.5h13V12M10 20.5v-5h4v5"/>',
   food: '<path d="M4 12.5h16a8 8 0 0 1-16 0z"/><path d="M8 20.5h8"/><path d="M9.5 4.5c-.8 1.3.8 2.2 0 3.5M12.5 4.5c-.8 1.3.8 2.2 0 3.5M15.5 4.5c-.8 1.3.8 2.2 0 3.5"/>',

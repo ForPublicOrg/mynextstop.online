@@ -1,13 +1,37 @@
 {
+  "id": "/",
   "name": "my next stop",
   "short_name": "next stop",
-  "description": "Where should you travel next in India — from right here, right now.",
-  "start_url": "/",
+  "description": "Where should you travel next in India, from right here, right now.",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "start_url": "/?source=app",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#faf6ef",
+  "background_color": "#f7f8fa",
   "theme_color": "#0e7a6c",
+  "categories": ["travel", "navigation"],
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Make a trip reel",
+      "short_name": "Trip reel",
+      "url": "/reel?source=app",
+      "icons": [{ "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "All destinations",
+      "short_name": "Destinations",
+      "url": "/places?source=app",
+      "icons": [{ "src": "/icon-maskable-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "related_applications": [
+    { "platform": "webapp", "url": "https://mynextstop.online/site.webmanifest" }
   ]
 }

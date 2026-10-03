@@ -69,6 +69,13 @@ Zero-framework static frontend: the same pattern as
   is committed, so deploy is still "upload the folder". See **Search & indexing**.
 - `css/pages.css` + `js/page.js`: the guide pages' thin layer on top of the app's
   design tokens. The app's CSS is untouched by them.
+- `js/pwa.js` + `sw.js` + `site.webmanifest`: installs as an app. Phones in a browser
+  tab get an "Install app" pill on the home screen and a button on the map: Chromium's
+  own install prompt where there is one, step-by-step instructions on iPhone, Firefox
+  and in-app browsers (Instagram, Facebook). The service worker opens the installed app
+  on a weak signal or none: the shell, catalogue and Leaflet are cached, only the map
+  tiles need a connection. On localhost it stays off unless the URL carries `?sw=1`, so
+  local edits are never served from a stale cache.
 - No cookies, no accounts. Geolocation is used in-page only.
 
 ## Deploy

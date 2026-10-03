@@ -33,6 +33,8 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <!-- the home screen name on iPhone; without it iOS takes the whole <title> -->
+  <meta name="apple-mobile-web-app-title" content="next stop" />
   <link rel="manifest" href="site.webmanifest" />
 
   <!-- Leaflet is on the critical path of the map-first UI: preload it -->
@@ -42,14 +44,16 @@
   <link rel="preload" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" as="style"
         crossorigin="anonymous" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" />
 
-  <link rel="stylesheet" href="css/style.css?v=e4" />
-  <link rel="modulepreload" href="js/app.js?v=e4" />
-  <link rel="modulepreload" href="js/engine.js?v=e4" />
-  <link rel="modulepreload" href="js/map.js?v=e4" />
-  <link rel="modulepreload" href="js/geo.js?v=e4" />
-  <link rel="modulepreload" href="js/store.js?v=e4" />
-  <link rel="modulepreload" href="js/cities.js?v=e4" />
-  <link rel="modulepreload" href="js/themes.js?v=e4" />
+  <link rel="stylesheet" href="css/style.css?v=e5" />
+  <link rel="modulepreload" href="js/app.js?v=e5" />
+  <link rel="modulepreload" href="js/engine.js?v=e5" />
+  <link rel="modulepreload" href="js/map.js?v=e5" />
+  <link rel="modulepreload" href="js/geo.js?v=e5" />
+  <link rel="modulepreload" href="js/store.js?v=e5" />
+  <link rel="modulepreload" href="js/cities.js?v=e5" />
+  <link rel="modulepreload" href="js/themes.js?v=e5" />
+  <link rel="modulepreload" href="js/icons.js?v=e5" />
+  <link rel="modulepreload" href="js/pwa.js?v=e5" />
 
   <script type="application/ld+json">
   {
@@ -100,7 +104,13 @@
           <svg class="ic brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polygon points="15.5,8.5 13.7,13.7 8.5,15.5 10.3,10.3" fill="currentColor" stroke="none"/></svg>
           <span class="brand-name">my next stop</span>
         </a>
-        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"></button>
+        <div class="home-top-acts">
+          <!-- phones in a browser tab only: js/pwa.js decides -->
+          <button id="installBtn" class="install-pill" hidden>
+            <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="2.5" width="13" height="19" rx="2.6"/><path d="M12 6.5v7M9 10.8l3 3 3-3M10.5 18h3"/></svg>
+            Install app</button>
+          <button id="themeBtn" class="icon-btn" aria-label="Toggle theme"></button>
+        </div>
       </header>
 
       <div class="home">
@@ -177,6 +187,10 @@
       </div>
 
       <button id="themeBtnMap" class="icon-btn map-theme-btn" aria-label="Toggle theme"></button>
+      <button id="installBtnMap" class="icon-btn map-install-btn" aria-label="Install app" title="Install app" hidden>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="2.5" width="13" height="19" rx="2.6"/><path d="M12 6.5v7M9 10.8l3 3 3-3M10.5 18h3"/></svg>
+        <span class="map-install-label" aria-hidden="true">Install app</span>
+      </button>
 
       <aside id="sheet" class="sheet" aria-live="polite">
         <button class="sheet-handle" id="sheetHandle" aria-label="Expand details"><span></span></button>
@@ -248,9 +262,26 @@
     </form>
   </dialog>
 
+  <!-- install by hand: Safari, in-app browsers, and Chromium before its
+       own prompt is ready. js/pwa.js fills the steps for the browser. -->
+  <dialog id="installDlg" class="dlg">
+    <form method="dialog" class="dlg-form">
+      <div class="dlg-head">
+        <h2>Install my next stop</h2>
+        <button value="cancel" class="icon-btn" aria-label="Close">✕</button>
+      </div>
+      <div class="install-app">
+        <img src="icon-192.png" alt="" width="56" height="56" />
+        <p>Open it from your home screen, full screen, like any other app. No app store, nothing to sign up for.</p>
+      </div>
+      <ol id="installSteps" class="install-steps"></ol>
+      <button value="ok" class="btn btn-primary btn-wide">Got it</button>
+    </form>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=e4"></script>
+  <script type="module" src="js/app.js?v=e5"></script>
 
   <!-- Vercel Web Analytics. Served same-origin under /_vercel/, so the
        existing CSP covers it without a new script-src or connect-src. -->
