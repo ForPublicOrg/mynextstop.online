@@ -158,8 +158,9 @@ node tools/verify-destinations.mjs   # is the data telling the truth?
 node tools/build-seo.mjs --check     # are the generated pages in sync with it?
 ```
 
-It validates the schema and the season logic, then asks OpenStreetMap whether
-each coordinate really sits in the state it claims and how far it is from the
+It validates the schema and the season logic, flags any spot that carries the
+name of another catalogue destination within 100 km, then asks OpenStreetMap
+whether each coordinate really sits in the state it claims and how far it is from the
 named place, and asks the Copernicus DEM (via Open-Meteo) whether `alt` is the
 real ground height there. It then geocodes every local place in `spots` and
 flags any that OpenStreetMap only knows far away from its destination (a

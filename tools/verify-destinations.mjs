@@ -7,7 +7,8 @@
 //   node tools/verify-destinations.mjs --no-spots # skip geocoding local places
 //   node tools/verify-destinations.mjs batch.json --cache=batch-cache.json
 //
-// Offline it checks the schema and the season logic. Online it also asks
+// Offline it checks the schema, the season logic, and that no local place in
+// `spots` is really a neighbouring catalogue destination. Online it also asks
 // two public APIs whether the data is telling the truth about the map:
 //   · Reverse geocoding (cached BigDataCloud answers, Photon for fresh
 //     lookups): does the coordinate sit in the state the record claims?
@@ -51,6 +52,23 @@ const KEYS = ['id', 'name', 'state', 'lat', 'lng', 'alt', 'category', 'tagline',
 const SPOT_KEYS = ['name', 'kind', 'note', 'km'];
 const SPOT_KINDS = ['temple', 'gurudwara', 'monastery', 'church', 'mosque', 'shrine', 'ghat', 'fort', 'palace', 'museum', 'heritage', 'market', 'food', 'nightlife', 'viewpoint', 'waterfall', 'lake', 'river', 'dam', 'beach', 'island', 'dune', 'trek', 'walk', 'village', 'garden', 'park', 'tea', 'wildlife', 'cave', 'hotspring', 'activity'];
 const SPOTS_MAX = 10;
+// words that say what a place is, not which place it is: dropped before
+// comparing a spot's name with a nearby destination's
+const GENERIC_WORDS = new Set(['temple', 'temples', 'fort', 'monastery', 'gompa', 'lake', 'falls', 'waterfall', 'beach',
+  'island', 'cave', 'caves', 'dam', 'palace', 'museum', 'national', 'park', 'wildlife', 'sanctuary', 'hill', 'hills',
+  'peak', 'viewpoint', 'point', 'valley', 'village', 'market', 'ghat', 'church', 'mosque', 'mandir', 'the', 'of',
+  'sri', 'shri', 'devi', 'and', 'old', 'new', 'top', 'river', 'tiger', 'reserve', 'bird', 'trek', 'pass', 'mount',
+  'mt', 'complex', 'group', 'site', 'ruins', 'town', 'bazaar', 'math', 'mutt', 'dargah', 'garden', 'tea', 'estate']);
+// spots that only share a district, river or hill name with a destination
+// within 100 km, checked by hand: "record id|spot name"
+const OK_SPOT_NAMES = new Set([
+  'lepakshi|Lepakshi Nandi', 'dambuk|Dibang River', 'manas|Manas River', 'panimur-falls|Kopili River',
+  'mundeshwari|Baijnath Temple, Kaimur', 'jagdalpur|Bastar Palace', 'bhuj|Kutch Museum', 'palitana|Talaja Caves',
+  'iruppu-falls|Brahmagiri Wildlife Sanctuary', 'drass|Kargil War Memorial', 'leh|Hemis Monastery',
+  'gwalior|Siddhachal Jain Caves', 'mitaoli-padavali|Bateshwar Temple Group', 'shillong|Umiam Lake',
+  'mount-tiyi|Doyang River', 'garadia-mahadev|Chambal Riverfront', 'bhadrachalam|Godavari Ghat',
+  'kathmandu-durbar-square|Patan Durbar Square', 'bumthang|Bumthang Brewery',
+]);
 const DASH = /[–—]/;   // en dash, em dash: the house style uses neither
 const SEASONS = ['winter', 'summer', 'monsoon', 'autumn'];
 const SEASON_MONTHS = { winter: [12, 1, 2], summer: [3, 4, 5], monsoon: [6, 7, 8, 9], autumn: [10, 11] };
@@ -218,6 +236,32 @@ function offlineChecks(data) {
       if (dkm < 5) add(a.id, 'HIGH', 'too-close', `${Math.round(dkm)} km from ${b.id}: same place?`);
       else if (dkm < 12) add(a.id, 'LOW', 'too-close', `${Math.round(dkm)} km from ${b.id}`);
     }
+  }
+
+  // a neighbouring catalogue destination is never a spot, it is already shown
+  // as "nearby": flag a spot whose name carries the name, bracketed alias or id
+  // of a destination within 100 km
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, ' ').trim();
+  const core = s => s.split(' ').filter(w => !GENERIC_WORDS.has(w)).join(' ');
+  const has = (hay, needle) => (' ' + hay + ' ').includes(' ' + needle + ' ');
+  const letters = s => s.replace(/ /g, '').length;
+  const places = data.filter(d => typeof d.lat === 'number' && typeof d.name === 'string' && typeof d.id === 'string').map(d => {
+    const v = [d.name.replace(/\(.*?\)/g, ' ').split(/[/,]/), [...d.name.matchAll(/\(([^)]*)\)/g)].map(m => m[1].split(/[/,]/)).flat(), d.id.replace(/-/g, ' ')]
+      .flat().map(norm).filter(x => letters(x) >= 4);
+    return { d, v, c: v.map(core).filter(x => letters(x) >= 4) };
+  });
+  for (const { d } of places) {
+    if (!Array.isArray(d.spots)) continue;
+    const near = places.filter(p => p.d.id !== d.id && km(d.lat, d.lng, p.d.lat, p.d.lng) <= 100);
+    d.spots.forEach((s, i) => {
+      if (typeof s?.name !== 'string' || OK_SPOT_NAMES.has(`${d.id}|${s.name}`)) return;
+      const sn = norm(s.name), sc = core(sn);
+      for (const p of near) {
+        if (!p.v.some(x => has(sn, x)) && !p.c.some(x => has(sc, x) || (letters(sc) >= 5 && has(x, sc)))) continue;
+        add(d.id, 'MED', 'spot-is-destination', `spots[${i}] "${s.name}" looks like ${p.d.id}, a destination ${Math.round(km(d.lat, d.lng, p.d.lat, p.d.lng))} km away (OK_SPOT_NAMES if not)`);
+      }
+    });
   }
 }
 
