@@ -65,12 +65,40 @@ export function travelText(roadKm, hours) {
   return `${roadKm} km · ${time}${hint}`;
 }
 
+// How much of a place's appeal survives the trip there, 0..1, by estimated
+// road km. A smooth hill curve, half-way at 1100 km with a long tail: a day
+// trip keeps nearly all of it, a weekend drive about three quarters, an
+// overnight train about half, a flight-length trip a third. It is the same
+// curve whichever reach chip is on. The chips are hard limits, not a taste
+// for distance, so "Anywhere" prefers near exactly as "Weekend" does and
+// only lets more places in.
+export function ease(roadKm) {
+  return 1 / (1 + Math.pow(roadKm / 1100, 1.2));
+}
+
+// Reach tiers on the chips' own cuts: quick hop, weekend, long weekend,
+// beyond. Variety in the deck is spread across these, scoring ignores them.
+export function tierOf(roadKm) {
+  return roadKm <= 150 ? 0 : roadKm <= 450 ? 1 : roadKm <= 900 ? 2 : 3;
+}
+
+const SEASON_WEIGHT = { peak: 1, shoulder: 0.55, off: 0.28 };
+const kindOf = d => (d.category || [])[0] || '';
+
 /**
- * The answer. Returns ranked [{d, km, roadKm, hours, status, score}].
- * opts: { maxKm, moods:[], excludeIds:Set, seed, hereKm }
+ * The answer. Returns the deck: [{d, km, roadKm, hours, status, score, tier}],
+ * best first. opts: { maxKm, moods:[], excludeIds:Set, seed, hereKm, variety }
+ *
+ * A place's score is multiplicative: season fit × ease of getting there ×
+ * what the place itself brings (solo-friendliness, a festival this month).
+ * Multiplying is the point. Adding the parts let a far place in peak
+ * season with a festival outscore every in-season place a few hours away,
+ * which is how "Anywhere" from Nagpur used to open with Mysuru, Kolkata and
+ * Nepal. Now a peak place 1300 km out scores about what a shoulder place
+ * 300 km out does, and the near in-season places sit on top.
  */
 export function rank(dests, origin, month, opts = {}) {
-  const { maxKm = Infinity, moods = [], excludeIds = new Set(), seed = 0, hereKm = 25 } = opts;
+  const { maxKm = Infinity, moods = [], excludeIds = new Set(), seed = 0, hereKm = 25, variety = true } = opts;
   const out = [];
   for (const d of dests) {
     const km = haversineKm(origin.lat, origin.lng, d.lat, d.lng);
@@ -82,21 +110,45 @@ export function rank(dests, origin, month, opts = {}) {
     const status = seasonStatus(d, month);
     if (status === 'avoid') continue;             // honest engine: never suggest a bad-time place
 
-    let score = 0;
-    if (status === 'peak') score += 44;
-    else if (status === 'shoulder') score += 18;
-    else score -= 8;
-    // closer is better, scaled to the chosen range so "Anywhere" still prefers near
-    const scale = Number.isFinite(maxKm) ? maxKm : 2400;
-    score += 26 * Math.max(0, 1 - roadKm / scale);
-    score += ((d.solo || 3) - 3) * 5;             // solo-traveller friendliness
-    if (festivalMonth(d) === month) score += 14;  // signature festival this month
-    score += jitter(d.id, seed);
+    let quality = 1 + 0.08 * ((d.solo || 3) - 3);   // solo-traveller friendliness, ±16%
+    if (festivalMonth(d) === month) quality += 0.3; // signature festival this month
+    const score = 100 * SEASON_WEIGHT[status] * ease(roadKm) * quality + jitter(d.id, seed);
 
-    out.push({ d, km: Math.round(km), roadKm, hours, status, score });
+    out.push({ d, km: Math.round(km), roadKm, hours, status, score, tier: tierOf(roadKm) });
   }
   out.sort((a, b) => b.score - a.score);
-  return out;
+  return variety ? vary(out) : out;
+}
+
+// The deck people actually flip through. Pure score order reads like a
+// list sorted by one column: six Madhya Pradesh temples in a row, or every
+// pick the same four hours out. An editor would mix it, so each slot takes
+// the best remaining place after a discount for repeating what the last
+// three picks already were: the same reach tier (strongest, it is what
+// lets one big-trip standout follow a run of weekend drives), the same
+// state, the same kind of place. Discounts are fractions of a three-pick
+// window, so the top pick is never touched and a weaker place can only
+// jump a stronger one when the stronger one is the third of a kind.
+// Only the top 200 are worth the work; whatever is past that stays in
+// score order.
+const VARY = { tier: 0.35, state: 0.2, kind: 0.15, window: 3, pool: 200 };
+function vary(items) {
+  const pool = items.slice(0, VARY.pool), rest = items.slice(VARY.pool), deck = [];
+  while (pool.length) {
+    const last = deck.slice(-VARY.window);
+    const frac = f => last.filter(f).length / VARY.window;
+    let best = 0, bestAdj = -Infinity;
+    for (let i = 0; i < pool.length; i++) {
+      const c = pool[i];
+      const adj = c.score
+        * (1 - VARY.tier * frac(p => p.tier === c.tier))
+        * (1 - VARY.state * frac(p => p.d.state === c.d.state))
+        * (1 - VARY.kind * frac(p => kindOf(p.d) === kindOf(c.d)));
+      if (adj > bestAdj) { bestAdj = adj; best = i; }
+    }
+    deck.push(pool.splice(best, 1)[0]);
+  }
+  return deck.concat(rest);
 }
 
 // Nearest destination the user is basically standing in (for "You're in X")

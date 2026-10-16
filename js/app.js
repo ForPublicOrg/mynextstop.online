@@ -1,11 +1,11 @@
-import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e5';
-import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e5';
-import { icon } from './icons.js?v=e5';
-import { CITIES, nearestCity } from './cities.js?v=e5';
-import { locate, inIndia } from './geo.js?v=e5';
-import { store } from './store.js?v=e5';
-import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e5';
-import { initInstall, mapShown } from './pwa.js?v=e5';
+import { MONTHS, seasonOf, rank, whereAmI, longWeekends, fmtRange, seasonStatus, roadEstimate, travelText, festivalMonth, haversineKm } from './engine.js?v=e6';
+import { CATEGORY_LABEL, catBadge, catIcon, cardBackground, spotKind, spotBadge } from './themes.js?v=e6';
+import { icon } from './icons.js?v=e6';
+import { CITIES, nearestCity } from './cities.js?v=e6';
+import { locate, inIndia } from './geo.js?v=e6';
+import { store } from './store.js?v=e6';
+import { initMap, updateMap, nudgeMap, setMapTheme } from './map.js?v=e6';
+import { initInstall, mapShown } from './pwa.js?v=e6';
 
 // ----- state -----
 let DESTS = [];

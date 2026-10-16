@@ -116,7 +116,7 @@ async function cacheFirst(event, req, url) {
   return res;
 }
 
-// app.js?v=e5 landing retires app.js?v=e4
+// app.js?v=e6 landing retires app.js?v=e5
 async function dropOldTags(cache, url) {
   if (url.origin !== self.location.origin) return;
   for (const k of await cache.keys()) {

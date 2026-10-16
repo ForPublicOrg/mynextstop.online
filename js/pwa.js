@@ -8,7 +8,7 @@
 // round button under the map's theme toggle that says "Install app" for a
 // few seconds on arrival. Closing the prompt or the steps rests the map
 // button for SNOOZE_MS; the home pill is always there for later.
-import { icon } from './icons.js?v=e5';
+import { icon } from './icons.js?v=e6';
 
 const $ = id => document.getElementById(id);
 const ua = navigator.userAgent;
