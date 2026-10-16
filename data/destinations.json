@@ -1729,10 +1729,10 @@
     "km": 1
    },
    {
-    "name": "Penukonda Fort",
-    "kind": "fort",
-    "note": "Vijayanagara's second capital under a granite hill, with Gagan Mahal and a Jain temple in town; half a day, little shade",
-    "km": 38
+    "name": "Madhavaraya Temple, Gorantla",
+    "kind": "temple",
+    "note": "ASI protected Vishnu temple of the Vijayanagara period; Ramayana reliefs on the pillars and a large stepped well in front",
+    "km": 31
    }
   ]
  },
@@ -2097,12 +2097,6 @@
   ],
   "spots": [
    {
-    "name": "Pulicat Lake",
-    "kind": "lake",
-    "note": "Brackish lagoon whose north end starts below Sullurpeta; flamingos and waders in winter, boats from the fishing villages",
-    "km": 30
-   },
-   {
     "name": "Satish Dhawan Space Centre",
     "kind": "museum",
     "note": "ISRO's launch site on Sriharikota; the space museum needs prior permission and launch gallery seats are booked online",
@@ -2113,6 +2107,12 @@
     "kind": "temple",
     "note": "Sullurpeta's goddess temple and the town's centre of gravity; busiest on Sundays, and the beds and buses are here too",
     "km": 20
+   },
+   {
+    "name": "Srikalahasti Temple",
+    "kind": "temple",
+    "note": "Shiva temple of the Vayu (air) linga, one of the five element shrines; famous for Rahu Ketu pooja and open even during eclipses",
+    "km": 40
    }
   ]
  },
@@ -2164,18 +2164,6 @@
   ],
   "spots": [
    {
-    "name": "Alampur Navabrahma Temples",
-    "kind": "heritage",
-    "note": "Nine Badami Chalukya temples by the Tungabhadra with the Jogulamba shrine beside them; ASI site, an hour, little shade",
-    "km": 45
-   },
-   {
-    "name": "Mahanandi",
-    "kind": "temple",
-    "note": "Shiva temple whose three tanks run with clear spring water you can stand in; bathe first, shoes stay well outside",
-    "km": 45
-   },
-   {
     "name": "Konda Reddy Fort",
     "kind": "fort",
     "note": "Kurnool's old gate tower stranded in the middle of the traffic, lit at night; ten minutes, the inside is usually shut",
@@ -2186,6 +2174,12 @@
     "kind": "wildlife",
     "note": "Grassland kept for the great Indian bustard, though blackbuck and harriers are what you see; ask the range office",
     "km": 35
+   },
+   {
+    "name": "Ketavaram Rock Paintings",
+    "kind": "heritage",
+    "note": "Prehistoric figures of deer, bulls, foxes and people painted on rock near Kurnool airport; the approach road is not motorable, so walk in",
+    "km": 11
    }
   ]
  },
@@ -3046,12 +3040,6 @@
     "kind": "cave",
     "note": "Low cave where the seer Veera Brahmendra Swamy is said to have written his prophecies; you crawl the last stretch, take a torch.",
     "km": 0
-   },
-   {
-    "name": "Mahanandi",
-    "kind": "temple",
-    "note": "Shiva temple with three spring fed pools of glass clear water you can stand in; the usual pairing with Yaganti, allow half a day.",
-    "km": 70
    }
   ]
  },
@@ -4402,12 +4390,6 @@
     "km": 11
    },
    {
-    "name": "Dirang Dzong",
-    "kind": "fort",
-    "note": "Old stone dzong village above the Dirang river with traditional Monpa houses, on the way in.",
-    "km": 22
-   },
-   {
     "name": "Sangti Valley",
     "kind": "village",
     "note": "Broad river valley near Dirang where black-necked cranes winter; quiet farm walks and riverside picnics.",
@@ -4418,12 +4400,6 @@
     "kind": "viewpoint",
     "note": "High ridge about 28 km up the Mandala road from Dirang, known for wide mountain views; cold and windy, carry layers.",
     "km": 55
-   },
-   {
-    "name": "Dirang Hot Water Spring",
-    "kind": "hotspring",
-    "note": "Roadside hot spring pools at Dirang, a warm soak after a cold day on the trails.",
-    "km": 28
    }
   ]
  },
@@ -4932,12 +4908,6 @@
     "km": 2
    },
    {
-    "name": "Pobitora Wildlife Sanctuary",
-    "kind": "wildlife",
-    "note": "Grassland with the densest rhino population anywhere; jeep safaris morning and afternoon, booked at the gate, shut in monsoon.",
-    "km": 50
-   },
-   {
     "name": "Deepor Beel",
     "kind": "lake",
     "note": "Ramsar wetland on the city edge with pelicans and storks in winter; the railway embankment is the easiest place to watch from.",
@@ -5090,12 +5060,6 @@
     "kind": "temple",
     "note": "Shiva temple on Madanachal hill with a half buried monolithic lingam; quieter than Hayagriva, and the climb opens the river up.",
     "km": 2
-   },
-   {
-    "name": "Madan Kamdev",
-    "kind": "heritage",
-    "note": "Scattered 10th century temple ruins with erotic carvings, called Assam's Khajuraho; open dawn to dusk, free, hardly visited.",
-    "km": 27
    }
   ]
  },
@@ -5695,12 +5659,6 @@
     "km": 5
    },
    {
-    "name": "Charaideo Maidams",
-    "kind": "heritage",
-    "note": "Ahom royal burial mounds, a Unesco site since 2024; shared taxis to Sonari pass the gate, allow two hours with the museum.",
-    "km": 28
-   },
-   {
     "name": "Gargaon Palace",
     "kind": "palace",
     "note": "Kareng Ghar of 1752, the Ahom court palace, with a stair up to the roof terrace; usually empty, the caretaker holds the key.",
@@ -5979,12 +5937,6 @@
     "kind": "river",
     "note": "The river that forms the falls, spreading over a wide rock bed; stay off wet ledges and away from the main flow.",
     "km": 0
-   },
-   {
-    "name": "Umrangso",
-    "kind": "village",
-    "note": "Hill town at the Kopili hydro project, the nearest place for fuel, food and a basic room.",
-    "km": 34
    },
    {
     "name": "Lanka",
@@ -6293,12 +6245,6 @@
     "kind": "temple",
     "note": "Hilltop temple at Hajo sacred to Hindus and Buddhists alike, with sweeping views over the paddy plains.",
     "km": 40
-   },
-   {
-    "name": "Sualkuchi",
-    "kind": "village",
-    "note": "Assam's silk weaving village on the Brahmaputra, where looms clatter in almost every house.",
-    "km": 39
    }
   ]
  },
@@ -7590,16 +7536,16 @@
     "km": 15
    },
    {
-    "name": "Mundeshwari Temple",
-    "kind": "temple",
-    "note": "Octagonal stone hilltop temple often called one of India's oldest working shrines.",
-    "km": 17
-   },
-   {
     "name": "Shergarh Fort",
     "kind": "fort",
     "note": "Sher Shah's hill fort above the Durgavati valley, with long walls and underground chambers to explore.",
-    "km": 20
+    "km": 49
+   },
+   {
+    "name": "Karamchat Dam",
+    "kind": "dam",
+    "note": "Earthen dam across the Durgavati between the Shergarh and Rajdeo hills, opened in 2014; come at sunrise or sunset for the views",
+    "km": 48
    }
   ]
  },
@@ -7652,18 +7598,18 @@
     "name": "Tomb of Bakhtiyar Khan",
     "kind": "heritage",
     "note": "Domed tomb at Chainpur built in the manner of Sher Shah's Sasaram mausoleum, near the old Chainpur fort.",
-    "km": 17
+    "km": 24
    },
    {
-    "name": "Rajdari Falls",
-    "kind": "waterfall",
-    "note": "Stepped falls in Chandraprabha sanctuary just across the Uttar Pradesh border, with Devdari close by.",
-    "km": 20
-   },
-   {
-    "name": "Mundeshwari Temple",
+    "name": "Harsu Brahm Temple, Chainpur",
     "kind": "temple",
-    "note": "Octagonal stone hilltop temple often called one of India's oldest working shrines.",
+    "note": "Chainpur shrine to Harsu Brahm, the deified spirit of a Brahmin priest, where people come to be rid of spirits; busiest in the Navratri fair",
+    "km": 24
+   },
+   {
+    "name": "Latif Shah Dam",
+    "kind": "dam",
+    "note": "One of India's oldest dams, finished in 1921 across the Karmanasa near Chakia; the Sufi saint Latif Shah's tomb stands beside it",
     "km": 21
    }
   ]
@@ -8257,12 +8203,6 @@
     "kind": "temple",
     "note": "The rajas' goddess temple beside the palace and the heart of the 75 day Bastar Dussehra; shoes off at the gate, no photos.",
     "km": 0
-   },
-   {
-    "name": "Tirathgarh Falls",
-    "kind": "waterfall",
-    "note": "Wide stepped falls in Kanger Valley park, hundreds of steps to the base; buy the park ticket at the gate, closed in monsoon.",
-    "km": 38
    },
    {
     "name": "Kutumsar Caves",
@@ -10008,12 +9948,6 @@
     "km": 13
    },
    {
-    "name": "Cabo de Rama Fort",
-    "kind": "fort",
-    "note": "Portuguese fort on a cliff with sea on three sides, free to walk into; go for sunset, and mind the unfenced edge.",
-    "km": 25
-   },
-   {
     "name": "Galgibaga Beach",
     "kind": "beach",
     "note": "Casuarina-backed turtle nesting beach with no shacks and no music; nesting runs November to March, keep off marked nests.",
@@ -11687,12 +11621,6 @@
     "kind": "heritage",
     "note": "Rock-cut Buddhist caves and Jain temples on a lone hill above Talaja town; steep steps, an hour up and back",
     "km": 40
-   },
-   {
-    "name": "Gopnath Beach",
-    "kind": "beach",
-    "note": "Black rock and cliffs over an empty Saurashtra beach with an old Shiva temple; no food stalls, buy lunch at Talaja",
-    "km": 65
    }
   ]
  },
@@ -11766,12 +11694,6 @@
     "kind": "lake",
     "note": "Big stone lined Mughal era tank on the town edge with steps down all four sides; walkers at dusk, nothing to pay",
     "km": 2
-   },
-   {
-    "name": "Siddhpur Bohra Havelis",
-    "kind": "heritage",
-    "note": "Pastel Dawoodi Bohra streets and the ruined Rudra Mahalaya nearby; buses every half hour, two hours is enough",
-    "km": 25
    }
   ]
  },
@@ -13560,12 +13482,6 @@
     "kind": "lake",
     "note": "Glacial lake under Kailash at 4080 m, 13 km on foot above Hadsar; only try it in a day if you are already acclimatised",
     "km": 26
-   },
-   {
-    "name": "Kugti",
-    "kind": "village",
-    "note": "Last village up the Budhil with Gaddi houses and the Kelang Wazir temple; shared jeeps reach Hadsar, the rest is rough",
-    "km": 22
    }
   ]
  },
@@ -15001,12 +14917,6 @@
     "kind": "village",
     "note": "The world's highest post office, where the postmaster stamps and sends your card; carry change, delivery takes weeks",
     "km": 16
-   },
-   {
-    "name": "Kibber",
-    "kind": "village",
-    "note": "Stone village above a limestone canyon, the base for snow leopard tracking in winter; sanctuary trails start behind it",
-    "km": 19
    }
   ]
  },
@@ -15913,12 +15823,6 @@
     "kind": "temple",
     "note": "Wood carved 11th century temple at Udaipur, the road junction for the valley; take a torch for the ceiling panels.",
     "km": 26
-   },
-   {
-    "name": "Triloknath Temple",
-    "kind": "temple",
-    "note": "White marble Avalokiteshvara revered by Hindus and Buddhists alike above Udaipur; the August Pauri fair fills it.",
-    "km": 35
    }
   ]
  },
@@ -16196,7 +16100,7 @@
   "festival": "Jul: Srikhand Mahadev yatra, about two weeks from Jaon village",
   "why": {
    "winter": "Dec-Feb are cold, clear and quiet at 1,450 m with snow on the ridges above and the Srikhand trail closed; the temples and lanes are yours",
-   "summer": "Mar-May is ideal for the village itself: apple and apricot blossom, the Parshuram and Ambika temples, the ancient stone lanes, and warm walks to Jaon before the yatra",
+   "summer": "Mar-May is ideal for the village itself: apple and apricot blossom, the Parshuram and Ambika temples, the ancient stone lanes, and warm quiet days at Jaon before the yatra",
    "monsoon": "July is the fortnight of the Srikhand yatra from Jaon, hard and crowded, with rain on the lower trail; Aug is wet, Sep dries and the meadows on the trail turn gold",
    "autumn": "Oct-Nov the best trekking weather to Bhim Dwari and Srikhand before the snow, the village harvesting apples, cool nights and empty homestays"
   },
@@ -16205,7 +16109,7 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "Village homestays, a PWD rest house and a temple dharamshala; farmers and priests, evenings of woodsmoke and a Sutlej gorge far below",
-  "hub": "Shimla-Rampur bus 5 h, then Rampur-Nirmand bus 1 h up the hill; Jaon, the trek start, is 8 km on",
+  "hub": "Shimla-Rampur bus 5 h, then Rampur-Nirmand bus 1 h up the hill; Jaon, the trek start, is about 30 km on via Bagipul",
   "modes": [
    "road"
   ],
@@ -16238,13 +16142,13 @@
     "name": "Jaon",
     "kind": "village",
     "note": "Base village of the Shrikhand yatra, a trek of over 30 km one way; the first camp, Singhgad, is 3 km on",
-    "km": 26
+    "km": 30
    },
    {
     "name": "Parvati Bagh",
     "kind": "trek",
     "note": "Flower meadow camp about 28 km up the Shrikhand route from Jaon, 3 km past Bhim Dwari; Brahma Kamal grows here",
-    "km": 54
+    "km": 58
    }
   ]
  },
@@ -18127,12 +18031,6 @@
     "km": 3
    },
    {
-    "name": "Tulail Valley",
-    "kind": "village",
-    "note": "String of Dard log house villages up the valley east of Dawar; transport is a few shared sumos, carry photo ID for the posts.",
-    "km": 40
-   },
-   {
     "name": "Razdan Pass",
     "kind": "viewpoint",
     "note": "3300 m pass on the road in from Bandipora, open roughly May to November; no signal on the climb, fill fuel in Bandipora.",
@@ -18376,12 +18274,6 @@
     "km": 12
    },
    {
-    "name": "Bangus Valley",
-    "kind": "walk",
-    "note": "Wide alpine meadow bowl beyond Rajwar with Gujjar flocks and no buildings; jeep only, June to September, ID at the army post.",
-    "km": 40
-   },
-   {
     "name": "Chandigam",
     "kind": "village",
     "note": "Walnut and paddy village with an eco park and a few homestays; the orchard lanes are the best flat walk in the valley.",
@@ -18587,12 +18479,6 @@
     "kind": "temple",
     "note": "Kashmiri Pandit shrine at Tulmul around a spring said to change colour; vast crowds on Jyeshtha Ashtami in May or June.",
     "km": 15
-   },
-   {
-    "name": "Wular Lake",
-    "kind": "lake",
-    "note": "India's largest freshwater lake, open water and reed beds north of Manasbal; go from the Bandipora bund, windy after noon.",
-    "km": 20
    },
    {
     "name": "Andarkote",
@@ -20630,12 +20516,6 @@
     "kind": "village",
     "note": "Birthplace of the tribal hero Birsa Munda, with a memorial in this small Munda village.",
     "km": 23
-   },
-   {
-    "name": "Dassam Falls",
-    "kind": "waterfall",
-    "note": "The Kanchi river's big drop on the Ranchi to Tata road, a bigger and busier sight for a second day.",
-    "km": 39
    }
   ]
  },
@@ -20690,16 +20570,16 @@
     "km": 3
    },
    {
-    "name": "Netarhat",
-    "kind": "viewpoint",
-    "note": "The hill station on the plateau above, known for its sunrise and sunset points and its pine and sal forest.",
-    "km": 20
-   },
-   {
     "name": "Lodh Falls",
     "kind": "waterfall",
     "note": "Jharkhand's highest waterfall, the Burha river's long drop near Mahuadanr, best in the same Aug to Oct window.",
     "km": 27
+   },
+   {
+    "name": "Mahuadanr Wolf Sanctuary",
+    "kind": "wildlife",
+    "note": "India's first sanctuary for the Indian grey wolf, declared in 1976 around Mahuadanr; sightings are rare, so go with a forest guide",
+    "km": 36
    }
   ]
  },
@@ -21321,12 +21201,6 @@
     "kind": "lake",
     "note": "Irrigation lake under the Mullayanagiri ridge, good for an evening hour; the last stretch of road is rough",
     "km": 10
-   },
-   {
-    "name": "Bhadra Wildlife Sanctuary",
-    "kind": "wildlife",
-    "note": "Muthodi range jeep safaris for gaur, elephant and the odd tiger; book the 6 am drive at the Muthodi gate a day ahead",
-    "km": 35
    },
    {
     "name": "Ayyanakere",
@@ -24636,12 +24510,6 @@
     "km": 14
    },
    {
-    "name": "Champakulam St Mary's Church",
-    "kind": "church",
-    "note": "One of Kerala's oldest Syrian Christian parishes, on the Pamba where the Moolam boat race starts; go by canal boat if you can.",
-    "km": 16
-   },
-   {
     "name": "Karumadikuttan",
     "kind": "heritage",
     "note": "Black granite Buddha with its left side broken away, sitting beside a canal at Karumadi; free, and a five minute stop.",
@@ -26541,12 +26409,6 @@
     "kind": "waterfall",
     "note": "Forest falls two kilometres in on foot from Kallar with a guide; closed in heavy monsoon, carry salt for the leeches.",
     "km": 15
-   },
-   {
-    "name": "Agasthyakoodam",
-    "kind": "trek",
-    "note": "1868 m peak climbed from Bonacaud over two days; the season runs mid January to March and permits are booked online, they sell out.",
-    "km": 35
    },
    {
     "name": "Peppara Wildlife Sanctuary",
@@ -28663,12 +28525,6 @@
     "km": 20
    },
    {
-    "name": "Rangdum Monastery",
-    "kind": "monastery",
-    "note": "Fortress gompa alone on a hillock in a wide braided plain toward Zanskar; rough slow drive, and fuel stops back at Kargil",
-    "km": 60
-   },
-   {
     "name": "Kartse Khar Maitreya",
     "kind": "heritage",
     "note": "A 7 m Maitreya cut into a boulder near Sankoo, Kashmiri work of the 8th century; a few minutes off the valley road",
@@ -28963,12 +28819,6 @@
     "kind": "monastery",
     "note": "Zanskar's largest gompa, white cells stacked up the hillside opposite Padum; the climb to the top chapels takes an hour.",
     "km": 10
-   },
-   {
-    "name": "Phugtal Monastery",
-    "kind": "monastery",
-    "note": "Cave monastery built into a cliff mouth above the Tsarap; drive to Cha or Purne, then two to three hours in on foot.",
-    "km": 55
    },
    {
     "name": "Sani Monastery",
@@ -31992,12 +31842,6 @@
     "kind": "heritage",
     "note": "Mauryan era Buddhist stupas and painted rock shelters on a Vindhyan ridge off the Rewa to Prayagraj road.",
     "km": 25
-   },
-   {
-    "name": "Keoti Falls",
-    "kind": "waterfall",
-    "note": "The Mahana's 98 m drop into a deep gorge, an easy add on the drive back towards Rewa.",
-    "km": 38
    }
   ]
  },
@@ -32062,10 +31906,10 @@
     "km": 22
    },
    {
-    "name": "Khajuraho Western Group of Temples",
-    "kind": "temple",
-    "note": "The Chandela temples of the 10th to 12th centuries, the natural base for this trip, with the airport next door.",
-    "km": 72
+    "name": "Gulganj Fort",
+    "kind": "fort",
+    "note": "18th century Bundeli hilltop fort above Gulganj village, tied by legend to Gulbai; a state protected monument, recently conserved",
+    "km": 45
    }
   ]
  },
@@ -33020,12 +32864,6 @@
     "kind": "viewpoint",
     "note": "The old pass road falling to the Konkan, lined with monsoon waterfalls; the hairpins are narrow, no driving after dark",
     "km": 8
-   },
-   {
-    "name": "Radhanagari Wildlife Sanctuary",
-    "kind": "wildlife",
-    "note": "Gaur country in the Sahyadri reserve south of the pass; drive the Dajipur gate road at dusk, permits at the checkpost",
-    "km": 38
    },
    {
     "name": "Kalammawadi Dam",
@@ -35102,12 +34940,6 @@
     "km": 25
    },
    {
-    "name": "Ramtek Gad Mandir",
-    "kind": "temple",
-    "note": "Hilltop Rama temple above Ramtek town, the hill of Kalidasa's Meghaduta; steps up, best in the late afternoon",
-    "km": 35
-   },
-   {
     "name": "Khindsi Lake",
     "kind": "lake",
     "note": "Big lake below Ramtek with boats and a forest edge, the usual break on the Nagpur road; packed on Sundays",
@@ -35428,16 +35260,16 @@
     "km": 45
    },
    {
-    "name": "Renuka Devi Temple, Mahur",
-    "kind": "temple",
-    "note": "Shakti peeth on a Satpura ridge, one of the three and a half in Maharashtra; steep steps, buses go via Kinwat",
-    "km": 70
-   },
-   {
     "name": "Painganga Wildlife Sanctuary",
     "kind": "wildlife",
     "note": "Teak and gorge forest along the Penganga either side of the falls; no safari circuit, just the forest road",
     "km": 20
+   },
+   {
+    "name": "Pochera Falls",
+    "kind": "waterfall",
+    "note": "Forest falls of about 20 m near Boath on the Telangana side, a short walk from the road; best after the monsoon, do not swim in the pool",
+    "km": 63
    }
   ]
  },
@@ -36062,12 +35894,6 @@
     "km": 0
    },
    {
-    "name": "Naldurg Fort",
-    "kind": "fort",
-    "note": "Huge basalt water fort where the Nar and Madi falls pour over the dam wall; both only run after heavy rain.",
-    "km": 35
-   },
-   {
     "name": "Dharashiv Caves",
     "kind": "heritage",
     "note": "Seven rock-cut Jain and Buddhist caves in a scrub valley outside Dharashiv; take a rickshaw, there is no signage.",
@@ -36624,12 +36450,6 @@
     "kind": "river",
     "note": "The Simsang, called Someshwari further downstream; the sandbanks below town are the evening walk, no swimming in monsoon.",
     "km": 0
-   },
-   {
-    "name": "Wari Chora",
-    "kind": "river",
-    "note": "Emerald canyon between sheer cliffs, reached by jeep then a boat and a wade; go with a village guide, not in high water.",
-    "km": 40
    }
   ]
  },
@@ -37484,12 +37304,6 @@
     "kind": "market",
     "note": "Khasi wholesale market spilling down the hillside, best before noon; carry a small bag and watch your pockets in the crush",
     "km": 0
-   },
-   {
-    "name": "Laitlum Canyons",
-    "kind": "viewpoint",
-    "note": "Grass ridge dropping into a green gorge, 45 minutes out by taxi; cloud usually closes it in after 2 pm, so go early",
-    "km": 24
    },
    {
     "name": "Don Bosco Centre for Indigenous Cultures",
@@ -39422,7 +39236,7 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "Village council homestays with wood-fire kitchens and apple orchards; a few trekkers a week in season, nights silent and cold.",
-  "hub": "Dimapur air/rail to Kiphire by shared Sumo (10-12h via Kohima), Kiphire to Pungro 2h, then 20 km of rough road; ILP needed",
+  "hub": "Dimapur air/rail to Kiphire by shared Sumo (10-12h via Kohima), Kiphire to Pungro 2h, then 57 km of rough road; ILP needed",
   "modes": [
    "flight",
    "train",
@@ -39571,10 +39385,10 @@
     "km": 14
    },
    {
-    "name": "Doyang HEP Dam",
-    "kind": "dam",
-    "note": "Hydro dam whose reservoir draws huge Amur falcon flocks in Oct and Nov; birders base at Pangti nearby.",
-    "km": 30
+    "name": "Vankhosung Mission Compound",
+    "kind": "church",
+    "note": "American Baptist mission station about 4 km from Wokha town, the old base of mission work among the Lothas; the CMC hospital is here",
+    "km": 7
    }
   ]
  },
@@ -41360,22 +41174,22 @@
   ],
   "spots": [
    {
-    "name": "Padmasambhava Mahavihara, Jirang",
-    "kind": "monastery",
-    "note": "Huge gilded gompa built by the Tibetan settlement; open till about 5 pm, calm on weekdays, shoes off at the main hall.",
-    "km": 30
-   },
-   {
-    "name": "Chandragiri Tibetan Settlement",
-    "kind": "village",
-    "note": "Tibetan refugee camps with a carpet weaving unit and momo stalls; the co-op shop shuts over lunch, so go mid morning.",
-    "km": 28
-   },
-   {
     "name": "Taptapani Deer Park",
     "kind": "wildlife",
     "note": "Fenced spotted deer enclosure a short walk below the spring; ten minutes of your time, best in the late afternoon.",
     "km": 1
+   },
+   {
+    "name": "Mahuri Kalua Temple",
+    "kind": "temple",
+    "note": "Goddess shrine at the foot of a forested hill near Berhampur, with tourism department steps up to the original hilltop cave",
+    "km": 45
+   },
+   {
+    "name": "Budhi Thakurani Temple, Berhampur",
+    "kind": "temple",
+    "note": "Berhampur's presiding goddess; her Thakurani Yatra, held every two years, fills the town for about four weeks around April",
+    "km": 51
    }
   ]
  },
@@ -42244,16 +42058,16 @@
     "km": 1
    },
    {
-    "name": "Gurdwara Baoli Sahib, Goindwal",
-    "kind": "gurudwara",
-    "note": "The 84-step baoli Guru Amar Das sank in the 1550s; pilgrims recite at every step, buses from Harike take half an hour.",
-    "km": 25
-   },
-   {
     "name": "Gurdwara Darbar Sahib, Tarn Taran",
     "kind": "gurudwara",
     "note": "Guru Arjan's town, with the largest sarovar of any gurdwara; the masaya gathering draws thousands, otherwise calm.",
     "km": 33
+   },
+   {
+    "name": "Anglo Sikh War Memorial, Ferozeshah",
+    "kind": "museum",
+    "note": "Memorial to the soldiers of the Anglo Sikh wars of 1845 to 1849; the hall shows period weapons and four large battle paintings",
+    "km": 54
    }
   ]
  },
@@ -48215,12 +48029,6 @@
     "km": 12
    },
    {
-    "name": "Padmanabhapuram Palace",
-    "kind": "palace",
-    "note": "The Travancore kings' wooden palace, all polished floors and carved ceilings; closed Mondays, buses go via Thuckalay.",
-    "km": 40
-   },
-   {
     "name": "Gandhi Mandapam",
     "kind": "heritage",
     "note": "Memorial where Gandhi's ashes were kept, built so the sun falls on the spot each 2 October; free, five minutes from the jetty.",
@@ -49522,10 +49330,10 @@
     "km": 1
    },
    {
-    "name": "Nelapattu Bird Sanctuary",
-    "kind": "wildlife",
-    "note": "Pelican and painted stork colony nesting over an Andhra village tank; busiest December to February, walk in from the highway.",
-    "km": 20
+    "name": "Pulicat Lighthouse",
+    "kind": "viewpoint",
+    "note": "Working light on the Pazhaverkadu shore, first built in 1859; climb it for lagoon and sea views, tickets on the lighthouse department site",
+    "km": 1
    }
   ]
  },
@@ -51983,9 +51791,9 @@
   "id": "pilak",
   "name": "Pilak (Jolaibari)",
   "state": "Tripura",
-  "lat": 23.1612,
-  "lng": 91.6188,
-  "alt": 35,
+  "lat": 23.2051,
+  "lng": 91.5978,
+  "alt": 25,
   "category": [
    "heritage",
    "offbeat",
@@ -52015,7 +51823,7 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "Farmers and the chowkidar, nobody else; you sleep in a basic Santirbazar or Belonia lodge and the evening is a sweet shop and bed",
-  "hub": "Train from Agartala to Jolaibari on the Sabroom line, about 3 h, then an auto 5 km; NH8 buses run the same way via Udaipur",
+  "hub": "Train from Agartala to Jolaibari on the Sabroom line, about 3 h, then an auto 3 km; NH8 buses run the same way via Udaipur",
   "modes": [
    "train",
    "road"
@@ -52025,25 +51833,25 @@
     "name": "Shyam Sundar Tilla",
     "kind": "heritage",
     "note": "ASI protected brick Buddhist monastic complex with a cruciform shrine; a life size Avalokitesvara was found, about 9th or 10th century.",
-    "km": 7
+    "km": 1
    },
    {
     "name": "Thakurani Tilla",
     "kind": "heritage",
     "note": "ASI protected mound at Paschim Pilak; digs from 1998 to 2001 found a colossal Surya image and eight small brick temples.",
-    "km": 7
+    "km": 1
    },
    {
     "name": "Sundari Tilla",
     "kind": "heritage",
     "note": "Recently found stupa dated to the 11th century, with features close to Pala buildings in Bengal.",
-    "km": 6
+    "km": 2
    },
    {
     "name": "Basudeb Bari",
     "kind": "temple",
     "note": "Hindu temple at Pilak that keeps an 8th to 9th century image of the Buddhist goddess Marichi.",
-    "km": 6
+    "km": 2
    }
   ]
  },
@@ -54629,10 +54437,10 @@
     "km": 8
    },
    {
-    "name": "Rajdari Falls",
-    "kind": "waterfall",
-    "note": "Stepped falls in Chandraprabha Wildlife Sanctuary, with Devdari a short walk away.",
-    "km": 16
+    "name": "Kali Mandir, Chakia",
+    "kind": "temple",
+    "note": "Kali temple in Chakia town, said to have been built by a king of Banaras, with a large pond inside the temple campus",
+    "km": 32
    }
   ]
  },
@@ -55769,7 +55577,7 @@
   "solo": 2,
   "crowd": 1,
   "vibe": "One temple guest house, a dharamshala and two tea shops; you eat what the temple kitchen cooks and sleep to the river",
-  "hub": "Dehradun to Tyuni by bus 7 h via Chakrata, then 8 km shared jeep to Hanol; the last jeep goes by mid afternoon",
+  "hub": "Dehradun to Tyuni by bus 7 h via Chakrata, then 15 km shared jeep to Hanol; the last jeep goes by mid afternoon",
   "modes": [
    "train",
    "road"
@@ -55784,8 +55592,8 @@
    {
     "name": "Tyuni",
     "kind": "village",
-    "note": "Tehsil town on the Tons about 16 km from Hanol and 170 km from Dehradun; the bus and jeep stand for the temple",
-    "km": 16
+    "note": "Tehsil town on the Tons about 15 km from Hanol and 170 km from Dehradun; the bus and jeep stand for the temple",
+    "km": 15
    },
    {
     "name": "Jubbal Palace",
@@ -58062,12 +57870,6 @@
     "km": 28
    },
    {
-    "name": "Kapil Muni Temple (Gangasagar)",
-    "kind": "temple",
-    "note": "The Gangasagar mela shrine at the mouth of the Ganga; take the Chemaguri ferry from Namkhana and start early.",
-    "km": 35
-   },
-   {
     "name": "Jambudwip",
     "kind": "island",
     "note": "Uninhabited forest island offshore once used by fishing crews to dry the catch; landing is barred, boats pass it only.",
@@ -59486,18 +59288,6 @@
     "kind": "wildlife",
     "note": "ZSI aquarium at Digha holding Bay of Bengal species; small ticket, an hour is plenty, mornings before the bus groups",
     "km": 26
-   },
-   {
-    "name": "Chandaneswar Shiv Temple",
-    "kind": "temple",
-    "note": "Border shrine just inside Odisha, packed for the Chaitra Sankranti mela in mid April; shoes and phones stay at the counter",
-    "km": 35
-   },
-   {
-    "name": "Talsari Beach",
-    "kind": "beach",
-    "note": "Casuarina beach in Odisha where the Subarnarekha meets the sea; cross the creek by boat at low tide, carry your own water",
-    "km": 38
    }
   ]
  },
@@ -62824,12 +62614,6 @@
     "name": "Sengor",
     "kind": "village",
     "note": "Small herder settlement in the cloud forest below Thrumshing La, a noted stop for birders on the Mongar road.",
-    "km": 18
-   },
-   {
-    "name": "Jakar Dzong",
-    "kind": "fort",
-    "note": "Ridge-top Castle of the White Bird, rebuilt in 1667, watching over the Chamkhar valley about 2 h back by road.",
     "km": 18
    }
   ]
