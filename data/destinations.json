@@ -3943,6 +3943,249 @@
   ]
  },
  {
+  "id": "thembang",
+  "name": "Thembang",
+  "state": "Arunachal Pradesh",
+  "lat": 27.342,
+  "lng": 92.3873,
+  "alt": 2184,
+  "category": [
+   "heritage",
+   "culture",
+   "offbeat",
+   "trek"
+  ],
+  "tagline": "Walled Monpa village with an old dzong, stone gates and forest trails",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   5,
+   12,
+   1,
+   2
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Losar (Feb)",
+  "why": {
+   "winter": "Cold, clear days with frost on the dzong walls; Losar in Feb fills homes with visiting family and festive food.",
+   "summer": "Mar and Apr bring rhododendron colour to the ridges and dry trails toward Lagam; May turns hazy with early showers.",
+   "monsoon": "Avoid: heavy rain, leeches and landslides on the Bomdila to Dirang road make the forest trails slippery and unsafe.",
+   "autumn": "The best window: washed blue skies, harvest in the fields and firm paths for a guided walk on the old Bailey Trail."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Community-run homestays, butter tea by the hearth, Monpa elders and a few trekkers bound for the Bailey Trail",
+  "hub": "About 25 km by road from Dirang, off the Bomdila to Dirang highway; Tezpur airport is about 7 h. Arunachal ILP needed.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Thembang Dzong",
+    "kind": "fort",
+    "note": "The walled village itself, entered through its surviving north and south stone gates; on India's UNESCO tentative list.",
+    "km": 0
+   },
+   {
+    "name": "Lagam",
+    "kind": "village",
+    "note": "Brokpa herders' winter settlement higher up in the forest, about 11 km and a long day's walk; go with a village guide.",
+    "km": 11
+   },
+   {
+    "name": "Dirang Dzong",
+    "kind": "fort",
+    "note": "Old stone dzong village above the Dirang river with traditional Monpa houses, on the way in.",
+    "km": 22
+   },
+   {
+    "name": "Sangti Valley",
+    "kind": "village",
+    "note": "Broad river valley near Dirang where black-necked cranes winter; quiet farm walks and riverside picnics.",
+    "km": 32
+   },
+   {
+    "name": "Mandala Top",
+    "kind": "viewpoint",
+    "note": "High ridge about 28 km up the Mandala road from Dirang, known for wide mountain views; cold and windy, carry layers.",
+    "km": 55
+   },
+   {
+    "name": "Dirang Hot Water Spring",
+    "kind": "hotspring",
+    "note": "Roadside hot spring pools at Dirang, a warm soak after a cold day on the trails.",
+    "km": 28
+   }
+  ]
+ },
+ {
+  "id": "dambuk",
+  "name": "Dambuk",
+  "state": "Arunachal Pradesh",
+  "lat": 28.2689,
+  "lng": 95.6158,
+  "alt": 434,
+  "category": [
+   "offbeat",
+   "culture",
+   "party"
+  ],
+  "tagline": "Orange-orchard country on the Dibang, home of a December music festival",
+  "peakMonths": [
+   11,
+   12,
+   1
+  ],
+  "shoulderMonths": [
+   2,
+   3,
+   4,
+   10
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Orange Festival of Adventure and Music (Dec)",
+  "why": {
+   "winter": "Harvest time: Dec and Jan hang heavy with Khasi mandarins, and the December festival fills the valley with stages and tents.",
+   "summer": "Mar and Apr are green and quiet with rising rivers; by May heavy pre-monsoon rain starts cutting the riverside tracks.",
+   "monsoon": "Avoid: the Dibang floods, rain is relentless and the area becomes hard to reach as roads and river crossings wash out.",
+   "autumn": "Oct dries out slowly; by Nov the first oranges ripen and the gravel river banks are dry enough to explore."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Adi farming villages, orchard owners selling fruit by the sack, and a crowd of campers only at festival time",
+  "hub": "Roing is about 30 km away; Dibrugarh airport is about 190 km by road. Arunachal ILP needed for Indians.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Dibang River",
+    "kind": "river",
+    "note": "Wide braided river along the orchards, with gravel banks and islands that shift every flood season.",
+    "km": 1
+   },
+   {
+    "name": "Bomjir",
+    "kind": "village",
+    "note": "Village on the Roing to Dambuk road near the Dibang, an easy stop by the wide river bed on the drive in.",
+    "km": 17
+   },
+   {
+    "name": "Sally Lake",
+    "kind": "lake",
+    "note": "Quiet lake on the edge of Roing with a walking path; an easy evening stop on the Roing side.",
+    "km": 40
+   },
+   {
+    "name": "Mehao Lake",
+    "kind": "lake",
+    "note": "Forest lake inside Mehao Wildlife Sanctuary above Roing, reached on a steep uphill trek; go with a guide.",
+    "km": 45
+   },
+   {
+    "name": "Bhismaknagar Fort",
+    "kind": "fort",
+    "note": "Brick ruins of an old fort linked in legend to King Bhismaka, in forest near Roing; a short archaeology stop.",
+    "km": 60
+   }
+  ]
+ },
+ {
+  "id": "golden-pagoda-namsai",
+  "name": "Golden Pagoda (Namsai)",
+  "state": "Arunachal Pradesh",
+  "lat": 27.7725,
+  "lng": 95.9749,
+  "alt": 167,
+  "category": [
+   "spiritual",
+   "heritage",
+   "culture"
+  ],
+  "tagline": "Burmese-style gilded pagoda of the Tai Khamti on the Tengapani river",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Sangken (Apr)",
+  "why": {
+   "winter": "Dry, mild days and soft light on the gold domes; Dec to Feb is the most comfortable time to walk the 20 ha complex.",
+   "summer": "Sangken, the Tai Khamti water festival, splashes through mid Apr; Mar is pleasant, May turns hot, humid and stormy.",
+   "monsoon": "Skip if you can: heavy rain and flooded plains roads on the drive in, and the pagoda grounds stay soggy and humid.",
+   "autumn": "Oct clears up, and Nov has hosted Kathina, the pagoda's largest festival, with robe offerings to the monks."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Saffron-robed monks, Tai Khamti families at prayer and a tourist resort next door; calm, clean and unhurried",
+  "hub": "About 20 km from Namsai town: Dibrugarh airport is about 135 km, Tinsukia rail about 90 km. Arunachal ILP needed.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Tengapani River",
+    "kind": "river",
+    "note": "The Tengapani flows right past the pagoda; its stony banks make a cool walk in the dry months.",
+    "km": 0
+   },
+   {
+    "name": "World Peace Pagoda, Chongkham",
+    "kind": "temple",
+    "note": "White pagoda on a river island at Chongkham, the old Tai Khamti town on the highway; a quiet sunset stop.",
+    "km": 9
+   },
+   {
+    "name": "Lathao International Bana Meditation Centre",
+    "kind": "monastery",
+    "note": "Vipassana centre on Lal Pahad, the red hill at Lathao, with one of the tallest Buddha statues in the area.",
+    "km": 9
+   },
+   {
+    "name": "Namsai",
+    "kind": "market",
+    "note": "District town with markets, fuel, banks and hotels, the usual base for a night near the pagoda.",
+    "km": 20
+   }
+  ]
+ },
+ {
   "id": "bhairabkunda",
   "name": "Bhairabkunda",
   "state": "Assam",
@@ -5113,7 +5356,7 @@
    "wildlife",
    "offbeat"
   ],
-  "tagline": "Kopili reservoir town in Dima Hasao: hot springs, Amur falcon roosts, Panimur 33 km",
+  "tagline": "Blue Kopili reservoir in the Dima Hasao hills, with Amur falcon roosts in autumn",
   "peakMonths": [
    10,
    11,
@@ -5130,7 +5373,7 @@
   "avoidMonths": [],
   "festival": "Nov/Dec: Falcon Festival on the Umrangso golf field",
   "why": {
-   "winter": "Dec-Feb is dry and cool, 8-20 C, the reservoir at its bluest and the Garampani hot spring worth the soak; Panimur runs clear but thinner than in autumn",
+   "winter": "Dec-Feb is dry and cool, 8-20 C, with the reservoir at its bluest; Panimur runs clear but thinner than in autumn, so come for the light",
    "summer": "Mar-Apr are warm and hazy with the falls at their lowest; by May pre-monsoon storms arrive and the hill road up from Lanka starts to slip",
    "monsoon": "Jun-Sep Dima Hasao takes 2,000 mm plus of rain; Panimur becomes a brown roar you watch from a distance, roads cut up and leeches own the trails",
    "autumn": "Best window: Amur falcons roost in tens of thousands through Oct-Nov before the flight to Africa, and Panimur is at full milky width after the rains"
@@ -5146,6 +5389,459 @@
    "road"
   ],
   "spots": []
+ },
+ {
+  "id": "panimur-falls",
+  "name": "Panimur Falls",
+  "state": "Assam",
+  "lat": 25.7218,
+  "lng": 92.8227,
+  "alt": 86,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "Wide turquoise cascades of the Kopili river in the Dima Hasao hills",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   1
+  ],
+  "shoulderMonths": [
+   2,
+   3,
+   4
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Magh Purnima holy dip (Jan to Feb)",
+  "why": {
+   "winter": "Clear water turns turquoise over the rock shelves, and Dimasa pilgrims bathe here at Magh Purnima in Jan or Feb.",
+   "summer": "Mar is still pleasant for picnics on the rocks; Apr and May bring storms, rising water and slippery ledges.",
+   "monsoon": "Avoid: the Kopili rises fast and muddy, the rock shelves turn dangerous and the hill road up from Lanka slips.",
+   "autumn": "Peak flow meets settling weather: Oct and Nov show the falls at their fullest as the colour returns to the water."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Picnic groups from nearby towns on the rocks and little else; carry food and water, facilities are basic",
+  "hub": "Lanka railway station (Hojai) is about 38 km by road and Umrangso about 34 km; Guwahati airport is about 220 km.",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Kopili River",
+    "kind": "river",
+    "note": "The river that forms the falls, spreading over a wide rock bed; stay off wet ledges and away from the main flow.",
+    "km": 0
+   },
+   {
+    "name": "Umrangso",
+    "kind": "village",
+    "note": "Hill town at the Kopili hydro project, the nearest place for fuel, food and a basic room.",
+    "km": 34
+   },
+   {
+    "name": "Lanka",
+    "kind": "market",
+    "note": "Railway town on the plains with buses and taxis toward the falls; stock up on snacks and water here.",
+    "km": 38
+   },
+   {
+    "name": "Khandong Dam",
+    "kind": "dam",
+    "note": "NEEPCO's Kopili hydro dam beyond Umrangso, holding back the long Kopili reservoir among forested hills.",
+    "km": 43
+   }
+  ]
+ },
+ {
+  "id": "chakrashila",
+  "name": "Chakrashila Wildlife Sanctuary",
+  "state": "Assam",
+  "lat": 26.338,
+  "lng": 90.329,
+  "alt": 232,
+  "category": [
+   "wildlife",
+   "lake",
+   "offbeat"
+  ],
+  "tagline": "Low forested hills that shelter golden langurs, between two wetland lakes",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Bwisagu (Apr)",
+  "why": {
+   "winter": "Best for golden langurs feeding in the sunny canopy, with winter waterbirds on Dheer and Diplai beels in Dec and Jan.",
+   "summer": "Mar and Apr are still good for forest walks, and Bwisagu, the Bodo spring festival, fills villages with dance in Apr.",
+   "monsoon": "Avoid: Jul and Aug are the wettest months, trails turn to mud and leeches, and sightings become hard work.",
+   "autumn": "Oct dries the trails and Nov opens the best season, with clear mornings for spotting langurs from the hill paths."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Forest quiet, Bodo village homes on the fringes and very few outside visitors; arrange guides via forest staff",
+  "hub": "Kokrajhar town and railway station are about 10 km away; Guwahati airport is about 220 km by road.",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Dheer Beel",
+    "kind": "lake",
+    "note": "Large wetland on the sanctuary's flank, good for winter waterbirds and fishing boats at dawn.",
+    "km": 8
+   },
+   {
+    "name": "Kokrajhar",
+    "kind": "market",
+    "note": "Bodoland's main town, with markets, Bodo food stalls and hotels; the base for day visits into the sanctuary.",
+    "km": 10
+   },
+   {
+    "name": "Raimona National Park",
+    "kind": "park",
+    "note": "Newer national park on the Bhutan border with golden langurs and elephants; visitor facilities are still basic.",
+    "km": 60
+   }
+  ]
+ },
+ {
+  "id": "sri-surya-pahar",
+  "name": "Sri Surya Pahar",
+  "state": "Assam",
+  "lat": 26.1086,
+  "lng": 90.7081,
+  "alt": 70,
+  "category": [
+   "heritage",
+   "spiritual",
+   "offbeat"
+  ],
+  "tagline": "Boulder hill carved with Shiva lingas, Jain figures and Buddhist stupas",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   9,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Ideal: cool, dry days for scrambling between the carved boulders, with clear views over the Brahmaputra plains.",
+   "summer": "Mar is fine early in the day; by Apr heat and humidity build, and May is sticky with afternoon storms.",
+   "monsoon": "Jun to Aug bring heavy rain and slippery rock paths; Sep eases off, with lush green slopes around the carvings.",
+   "autumn": "Oct and Nov are pleasant again, the hill is green and the site museum is a cool break between climbs."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Local pilgrims at the Surya temple, a small ASI museum and quiet paths; eat and sleep in Goalpara town",
+  "hub": "About 13 km south-east of Goalpara town and its railway station; Guwahati airport is about 110 km by road.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "ASI Site Museum, Surya Pahar",
+    "kind": "museum",
+    "note": "Small ASI museum of finds from the 1992 to 2001 excavations, terracotta plaques and sculpture; see it first.",
+    "km": 0
+   },
+   {
+    "name": "Urpad Beel",
+    "kind": "lake",
+    "note": "Large wetland at Agia west of Goalpara town, busiest with migratory waterbirds in the cold months.",
+    "km": 25
+   },
+   {
+    "name": "Pancharatna",
+    "kind": "village",
+    "note": "Village west of Goalpara near the Brahmaputra, with Buddhist remains recorded by archaeologists.",
+    "km": 29
+   }
+  ]
+ },
+ {
+  "id": "charaideo-moidams",
+  "name": "Charaideo Moidams",
+  "state": "Assam",
+  "lat": 26.9406,
+  "lng": 94.8757,
+  "alt": 132,
+  "category": [
+   "heritage",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Grassy royal burial mounds of the Ahom kings, a UNESCO World Heritage site",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   9,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Me-Dam-Me-Phi (Jan)",
+  "why": {
+   "winter": "Cool, dry and golden; on 31 Jan the Me-Dam-Me-Phi ancestor rites of the Ahom are held at the royal mounds.",
+   "summer": "Mar and Apr are green and warm, good for the walk among the mounds; May heat and storms shorten the day.",
+   "monsoon": "Jun to Aug are wet and humid with mud on the paths; Sep softens, and the mounds stay a vivid green.",
+   "autumn": "Oct and Nov are clear and comfortable, with the best light for photographs over the mound field."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Quiet lawns, ticket booths and a few school groups; stay and eat in Sivasagar or Sonari, nothing fancy on site",
+  "hub": "About 28 km east of Sivasagar; Dibrugarh airport is about 80 km by road, Simaluguri Junction rail about 15 km.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Kareng Ghar, Gargaon",
+    "kind": "palace",
+    "note": "Ahom royal palace at Gargaon, the old capital, rebuilt in brick in the 18th century; climb up for plains views.",
+    "km": 17
+   },
+   {
+    "name": "Sonari",
+    "kind": "market",
+    "note": "Charaideo's small district town ringed by tea gardens; the nearest place for supplies and a meal.",
+    "km": 18
+   },
+   {
+    "name": "Sivadol",
+    "kind": "temple",
+    "note": "Tall 18th-century Shiva temple on the bank of the Sivasagar tank, the heart of the Ahom capital.",
+    "km": 29
+   },
+   {
+    "name": "Talatal Ghar",
+    "kind": "palace",
+    "note": "Ahom palace complex in Sivasagar with brick corridors and levels below ground.",
+    "km": 28
+   },
+   {
+    "name": "Rang Ghar",
+    "kind": "heritage",
+    "note": "Two-storey Ahom royal pavilion in Sivasagar from which kings watched buffalo fights and Bihu games.",
+    "km": 28
+   }
+  ]
+ },
+ {
+  "id": "madan-kamdev",
+  "name": "Madan Kamdev",
+  "state": "Assam",
+  "lat": 26.3197,
+  "lng": 91.7408,
+  "alt": 74,
+  "category": [
+   "heritage",
+   "offbeat"
+  ],
+  "tagline": "Hillside of carved temple ruins in forest, called the Khajuraho of Assam",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   9,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Best: cool mornings among the 9th to 10th century carvings, soft light on the stone and few other visitors.",
+   "summer": "Mar and Apr are warm but fine early; May brings heat, humidity and storms, so go first thing.",
+   "monsoon": "Jun to Aug are wet, hot and muddy on the hill paths; Sep eases, and the forest around the ruins is lush.",
+   "autumn": "Oct and Nov are pleasant again, a good half-day trip out of Guwahati with clear views from the hillock."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Families on day trips from Guwahati, a small site museum and tea stalls at Baihata Chariali; no stays on site",
+  "hub": "About 35 km north of Guwahati via Baihata Chariali; Guwahati railway station is about 27 km, the airport about 37 km.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Madan Kamdev Museum",
+    "kind": "museum",
+    "note": "Small museum at the site with sculptures recovered from the ruins; see it first to read the carvings better.",
+    "km": 0
+   },
+   {
+    "name": "Baihata Chariali",
+    "kind": "market",
+    "note": "Busy highway junction with dhabas and buses, and the turn-off for the ruins.",
+    "km": 4
+   },
+   {
+    "name": "Kamakhya Temple",
+    "kind": "temple",
+    "note": "Major Shakti Peetha on Nilachal hill in Guwahati; the Ambubachi Mela in Jun draws vast crowds.",
+    "km": 26
+   },
+   {
+    "name": "Hayagriva Madhava Temple",
+    "kind": "temple",
+    "note": "Hilltop temple at Hajo sacred to Hindus and Buddhists alike, with sweeping views over the paddy plains.",
+    "km": 40
+   },
+   {
+    "name": "Sualkuchi",
+    "kind": "village",
+    "note": "Assam's silk weaving village on the Brahmaputra, where looms clatter in almost every house.",
+    "km": 39
+   }
+  ]
+ },
+ {
+  "id": "biswanath-ghat",
+  "name": "Biswanath Ghat",
+  "state": "Assam",
+  "lat": 26.6615,
+  "lng": 93.1658,
+  "alt": 84,
+  "category": [
+   "spiritual",
+   "heritage",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Brahmaputra temple village called Gupta Kashi, a national Best Tourism Village",
+  "peakMonths": [
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Bohag Bihu mela (Apr)",
+  "why": {
+   "winter": "The river drops and the ruined Shiva temple at the Burhiganga confluence emerges, so worship and visitors return.",
+   "summer": "A mela on the third day of Bohag Bihu in mid Apr is the liveliest day; by May the river rises and heat builds.",
+   "monsoon": "Avoid: the Brahmaputra floods, the confluence temple sits underwater and riverside paths and fields are cut off.",
+   "autumn": "Oct and Nov are clear and dry; the river is still high but falling, and the sunsets over the water are superb."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Village homestays, river-fish lunches and morning puja bells; most hotels are in Biswanath Chariali nearby",
+  "hub": "About 7 km south of Biswanath Chariali and its railway station; Tezpur airport is about 55 km by road.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Biswanath Temple",
+    "kind": "temple",
+    "note": "Shiva temple that gives the ghat its Gupta Kashi name; the old shrine at the river confluence is a winter-only visit.",
+    "km": 0
+   },
+   {
+    "name": "Bhiragaon",
+    "kind": "village",
+    "note": "Village where, by a custom begun in 1684 under King Gadadhar Singha, the Shiva idol is carried for a day of worship.",
+    "km": 5
+   },
+   {
+    "name": "Biswanath Chariali",
+    "kind": "market",
+    "note": "District town with hotels, taxis and tea-garden roads; the base for most visitors to the ghat.",
+    "km": 7
+   },
+   {
+    "name": "Nagshankar Temple",
+    "kind": "temple",
+    "note": "Old Shiva temple at Sootea, 15 km west of Biswanath Chariali, with a pond of rare black softshell turtles.",
+    "km": 22
+   }
+  ]
  },
  {
   "id": "barabar-caves",
@@ -6184,6 +6880,135 @@
   ]
  },
  {
+  "id": "telhar-kund",
+  "name": "Telhar Kund (Kaimur)",
+  "state": "Bihar",
+  "lat": 24.8326,
+  "lng": 83.531,
+  "alt": 300,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "An 80 m waterfall off the Kaimur plateau, deep in Bihar's southern forest",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the flow fades to a thin ribbon, but cool, clear days suit the plateau drive and a stop at the Mundeshwari temple.",
+   "summer": "March leaves little water, and Apr-May the Kaimur rock bakes with the falls almost dry and no shade or shops; skip it.",
+   "monsoon": "Jul-Sep is the reason to come, as streams off the Adhaura plateau pour over the cliff; rocks are slippery and the water rises fast.",
+   "autumn": "October still carries good water under clearing skies; by November the fall thins, but the drive through the Kaimur hills is lovely."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "No shops or stalls anywhere near the kund, so carry food and water; base in Bhabua, which has simple hotels and dhabas.",
+  "hub": "Bhabua town about 30 km by road; Bhabua Road (Mohania) railhead about 46 km",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Adhaura",
+    "kind": "village",
+    "note": "Block headquarters on top of the Kaimur plateau, reached by a winding ghat road through forest.",
+    "km": 15
+   },
+   {
+    "name": "Mundeshwari Temple",
+    "kind": "temple",
+    "note": "Octagonal stone hilltop temple often called one of India's oldest working shrines.",
+    "km": 17
+   },
+   {
+    "name": "Shergarh Fort",
+    "kind": "fort",
+    "note": "Sher Shah's hill fort above the Durgavati valley, with long walls and underground chambers to explore.",
+    "km": 20
+   }
+  ]
+ },
+ {
+  "id": "karkatgarh-falls",
+  "name": "Karkatgarh Falls (Kaimur)",
+  "state": "Bihar",
+  "lat": 24.9297,
+  "lng": 83.3626,
+  "alt": 136,
+  "category": [
+   "waterfall",
+   "wildlife",
+   "offbeat"
+  ],
+  "tagline": "A 300 ft wide curtain of the Karmanasa where crocodiles bask below",
+  "peakMonths": [
+   7,
+   8,
+   9
+  ],
+  "shoulderMonths": [
+   6,
+   10,
+   11
+  ],
+  "avoidMonths": [
+   4,
+   5
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the curtain breaks into separate threads, but the river pools hold water and cool, clear days suit a quiet visit.",
+   "summer": "March is warm with little flow; Apr-May the Kaimur rock bakes and the fall is a dribble, so skip it until the monsoon.",
+   "monsoon": "Jul-Sep the river spreads into its full 100 ft high curtain, the falls at their widest; rocks are slick and levels rise fast after rain.",
+   "autumn": "October keeps decent water under clearing skies and November is calm and green; scan the pools below for basking crocodiles."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 2,
+  "vibe": "Inside Kaimur Wildlife Sanctuary, with an old British dak bungalow above the falls; weekend picnickers, few facilities, base in Bhabua.",
+  "hub": "About 1 h by road from Bhabua via Chainpur, last stretch on a forest track; Bhabua Road (Mohania) is the railhead",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Tomb of Bakhtiyar Khan",
+    "kind": "heritage",
+    "note": "Domed tomb at Chainpur built in the manner of Sher Shah's Sasaram mausoleum, near the old Chainpur fort.",
+    "km": 17
+   },
+   {
+    "name": "Rajdari Falls",
+    "kind": "waterfall",
+    "note": "Stepped falls in Chandraprabha sanctuary just across the Uttar Pradesh border, with Devdari close by.",
+    "km": 20
+   },
+   {
+    "name": "Mundeshwari Temple",
+    "kind": "temple",
+    "note": "Octagonal stone hilltop temple often called one of India's oldest working shrines.",
+    "km": 21
+   }
+  ]
+ },
+ {
   "id": "chandigarh",
   "name": "Chandigarh",
   "state": "Chandigarh",
@@ -7165,6 +7990,73 @@
    "road"
   ],
   "spots": []
+ },
+ {
+  "id": "ghatarani-falls",
+  "name": "Ghatarani Falls (Gariaband)",
+  "state": "Chhattisgarh",
+  "lat": 20.828,
+  "lng": 82.0598,
+  "alt": 333,
+  "category": [
+   "waterfall",
+   "spiritual",
+   "offbeat"
+  ],
+  "tagline": "A stepped forest waterfall beside a Devi temple, a day out from Raipur",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11,
+   12
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "Navratri (Mar-Apr and Sep-Oct)",
+  "why": {
+   "winter": "Dec-Feb the falls shrink to a thin veil over the rock steps, but cool air makes the forest walk and the temple visit pleasant.",
+   "summer": "March leaves only a trickle, and by Apr-May the rock is bare and the plains roast in the mid 40s C; skip it until the rains return.",
+   "monsoon": "July brings the water back; Aug-Sep it runs full over the wide rock tiers, but the wet rock is slippery, so bathe only at the edges.",
+   "autumn": "October is the time the district itself recommends, full water after the monsoon with Navratri crowds at the temple; November is calmer."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 2,
+  "vibe": "Weekend picnic families and temple pilgrims, with few places to eat; no stays here, so base in Raipur or Rajim and pack lunch.",
+  "hub": "Raipur airport about 78 km and Raipur Junction about 90 km; taxis from Raipur take around 2 h",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Jatmai Mata Mandir",
+    "kind": "temple",
+    "note": "Durga temple built between seasonal falls in the same hills, about 25 km round by road; fairs at both Navratris.",
+    "km": 4
+   },
+   {
+    "name": "Bhooteshwarnath Mahadev",
+    "kind": "temple",
+    "note": "Forest shrine at Marauda, 3 km from Gariaband town, famous for its huge natural Shivling.",
+    "km": 24
+   },
+   {
+    "name": "Rajivlochan Temple",
+    "kind": "temple",
+    "note": "Old Vishnu temple at Rajim on the Mahanadi, near the river confluence; a good stop on the way back to Raipur.",
+    "km": 24
+   }
+  ]
  },
  {
   "id": "daman",
@@ -17973,6 +18865,142 @@
   "spots": []
  },
  {
+  "id": "hirni-falls",
+  "name": "Hirni Falls (Bandgaon)",
+  "state": "Jharkhand",
+  "lat": 22.8077,
+  "lng": 85.3645,
+  "alt": 501,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "A 37 m forest falls on the Ramgarha, off the Ranchi to Chaibasa road",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11,
+   12
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the fall slims but stays pretty, and the cool sal forest makes the walk down pleasant; winter Sundays bring picnic crowds.",
+   "summer": "March still has some flow; Apr-May the plateau turns hot and the falls dwindle to a thread, so skip it and come back after the rains.",
+   "monsoon": "July fills the river; Aug-Sep it pours off the plateau edge in a broad torrent, though the rocks get slick and swimming is unwise.",
+   "autumn": "Oct-Nov is the best of it: strong water, clear skies and dry trails, an easy pairing with Panchghagh's five streams near Khunti."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 2,
+  "vibe": "Munda village country with a few stalls and picnic groups; no lodges at the falls, so base in Ranchi or Khunti.",
+  "hub": "Ranchi airport and railhead about 70 km, off the Ranchi to Chakradharpur road via Khunti and Bandgaon",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Panchghagh Falls",
+    "kind": "waterfall",
+    "note": "The Banai splits into five low streams 8 km from Khunti; the gentlest falls around, good for a safe paddle.",
+    "km": 19
+   },
+   {
+    "name": "Perwaghagh Falls",
+    "kind": "waterfall",
+    "note": "Forest falls on the Chata river in Torpa block, about 40 km from Khunti by road; quieter than Panchghagh.",
+    "km": 21
+   },
+   {
+    "name": "Ulihatu",
+    "kind": "village",
+    "note": "Birthplace of the tribal hero Birsa Munda, with a memorial in this small Munda village.",
+    "km": 23
+   },
+   {
+    "name": "Dassam Falls",
+    "kind": "waterfall",
+    "note": "The Kanchi river's big drop on the Ranchi to Tata road, a bigger and busier sight for a second day.",
+    "km": 39
+   }
+  ]
+ },
+ {
+  "id": "sadni-falls",
+  "name": "Sadni Falls (Gumla)",
+  "state": "Jharkhand",
+  "lat": 23.3013,
+  "lng": 84.202,
+  "alt": 900,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "A 60 m snake-like cascade of the Sankh off the edge of the Netarhat plateau",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11,
+   12
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the Sankh runs thin but clear, plateau days are crisp and nights cold, good for pairing the falls with Netarhat sunrises.",
+   "summer": "March is still mild up here, but by Apr-May the flow nearly stops and the scarp is bare rock; skip the falls and stay on the plateau.",
+   "monsoon": "Jul-Sep the river coils down the scarp in full flow; forest roads off the Netarhat plateau turn muddy, so go in a sturdy car.",
+   "autumn": "Oct-Nov is prime: strong water, dry roads and clear views over the forested plateau edge, before winter thins the fall."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Remote tribal hill country near Rajadera village with no facilities at the falls; stay in Netarhat's lodges and carry food.",
+  "hub": "Netarhat about 35 km by road; Ranchi airport and railhead about 170 km via Gumla, 4 h or more",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Rajadera",
+    "kind": "village",
+    "note": "The nearest village, about 3 km from the falls; ask here for the path down to the viewpoint.",
+    "km": 3
+   },
+   {
+    "name": "Netarhat",
+    "kind": "viewpoint",
+    "note": "The hill station on the plateau above, known for its sunrise and sunset points and its pine and sal forest.",
+    "km": 20
+   },
+   {
+    "name": "Lodh Falls",
+    "kind": "waterfall",
+    "note": "Jharkhand's highest waterfall, the Burha river's long drop near Mahuadanr, best in the same Aug to Oct window.",
+    "km": 27
+   }
+  ]
+ },
+ {
   "id": "agumbe",
   "name": "Agumbe",
   "state": "Karnataka",
@@ -27168,7 +28196,44 @@
    "train",
    "road"
   ],
-  "spots": []
+  "spots": [
+   {
+    "name": "Chachai Falls",
+    "kind": "waterfall",
+    "note": "The Bihad river drops about 130 m in a single plunge off the plateau edge, 46 km from Rewa.",
+    "km": 15
+   },
+   {
+    "name": "Purwa Falls",
+    "kind": "waterfall",
+    "note": "The Tamsa, or Tons, drops 70 m off the Rewa plateau near Semariya; strongest from August to October.",
+    "km": 19
+   },
+   {
+    "name": "Deur Kothar",
+    "kind": "heritage",
+    "note": "Mauryan era Buddhist stupas and painted rock shelters on a Vindhyan ridge off the Rewa to Prayagraj road.",
+    "km": 25
+   },
+   {
+    "name": "Rewa Fort",
+    "kind": "fort",
+    "note": "Old fort of the Baghel rulers in the heart of Rewa town, worth a look on the way to the railhead.",
+    "km": 35
+   },
+   {
+    "name": "White Tiger Safari Mukundpur",
+    "kind": "wildlife",
+    "note": "Zoo and safari park opened in 2016, honouring Mohan, the Rewa white tiger caught in 1951 by Maharaja Martand Singh.",
+    "km": 50
+   },
+   {
+    "name": "Govindgarh Palace",
+    "kind": "palace",
+    "note": "Lakeside palace of the Rewa rulers where Mohan the white tiger was once kept; see it from the lake bund.",
+    "km": 52
+   }
+  ]
  },
  {
   "id": "khajuraho",
@@ -28488,6 +29553,222 @@
     "kind": "heritage",
     "note": "Where Krishna and Sudama are said to have studied, with the tank and the old numeral tablet; ten minutes is enough",
     "km": 4
+   }
+  ]
+ },
+ {
+  "id": "bahuti-falls",
+  "name": "Bahuti Falls (Mauganj)",
+  "state": "Madhya Pradesh",
+  "lat": 24.7618,
+  "lng": 81.8296,
+  "alt": 305,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "Madhya Pradesh's highest waterfall, a 145 m leap off the Rewa plateau",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11,
+   12
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the Odda thins to a few white threads down the cliff; cool, clear days suit the walk to the rim, but expect little water.",
+   "summer": "March is the last month with any flow; by Apr-May the plateau bakes, the falls run dry and the bare rim has no shade, so skip it.",
+   "monsoon": "Aug-Sep is the show, the full river leaping the scarp in one long plume; July lanes turn to mud and the unfenced rim is slick with spray.",
+   "autumn": "October still carries strong water under clear skies; by November the flow drops, but the gorge stays green and the light is soft."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "No stays or food at the falls; sleep in Mauganj or Rewa and carry lunch. Weekdays are near empty, Sundays bring local picnickers.",
+  "hub": "Mauganj town 13 km by road; Rewa railhead about 75 km (2 h), then a taxi for the last stretch",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Naigarhi Fort",
+    "kind": "fort",
+    "note": "Old fort in Naigarhi town, 17 km from Mauganj; the Ashtbhuja Mata temple, a Durga shrine, is in the same town.",
+    "km": 6
+   },
+   {
+    "name": "Deotalab Shiv Mandir",
+    "kind": "temple",
+    "note": "Old Shiva temple at Deotalab, a tahsil town of Mauganj district, listed by the district among its main sights.",
+    "km": 14
+   },
+   {
+    "name": "Deur Kothar",
+    "kind": "heritage",
+    "note": "Mauryan era Buddhist stupas and painted rock shelters on a Vindhyan ridge off the Rewa to Prayagraj road.",
+    "km": 25
+   },
+   {
+    "name": "Keoti Falls",
+    "kind": "waterfall",
+    "note": "The Mahana's 98 m drop into a deep gorge, an easy add on the drive back towards Rewa.",
+    "km": 38
+   }
+  ]
+ },
+ {
+  "id": "bhimkund",
+  "name": "Bhimkund (Bajna)",
+  "state": "Madhya Pradesh",
+  "lat": 24.4383,
+  "lng": 79.3761,
+  "alt": 394,
+  "category": [
+   "lake",
+   "spiritual",
+   "offbeat"
+  ],
+  "tagline": "An indigo pool inside a red-walled cave, tied by legend to Bhima's mace",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   9
+  ],
+  "avoidMonths": [
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb is ideal: mild days for the forest drive to Bajna, and light through the hole in the cave roof turns the still pool a deep blue.",
+   "summer": "March and April work if you go early, since the cave stays cool though the roads bake; May is brutal Bundelkhand heat, so leave it.",
+   "monsoon": "June is fierce heat then storms; Jul-Aug the forest greens but village roads get muddy, and September is a fair start as the rains ease.",
+   "autumn": "Oct-Nov bring clear water, dry roads and green country around Bajna, the best season to pair the kund with a Khajuraho stay."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "No hotels or restaurants nearby, just a few snack stalls; stay in Khajuraho or Chhatarpur and carry food and water.",
+  "hub": "Khajuraho airport about 92 km; Chhatarpur railhead about 77 km by road; taxis from either",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Bajna",
+    "kind": "village",
+    "note": "Village in Buxwaha tahsil that gives the kund its address; the road to the cave runs through it.",
+    "km": 2
+   },
+   {
+    "name": "Jatashankar Dham",
+    "kind": "temple",
+    "note": "Shiva shrine about 15 km south-east of Bijawar where water flows from a stone Nandi, with one cold and one hot spring pond.",
+    "km": 22
+   },
+   {
+    "name": "Khajuraho Western Group of Temples",
+    "kind": "temple",
+    "note": "The Chandela temples of the 10th to 12th centuries, the natural base for this trip, with the airport next door.",
+    "km": 72
+   }
+  ]
+ },
+ {
+  "id": "patalpani-falls",
+  "name": "Patalpani Falls (Mhow)",
+  "state": "Madhya Pradesh",
+  "lat": 22.5039,
+  "lng": 75.7987,
+  "alt": 548,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "A 91 m monsoon plunge on the Choral, with a heritage hill train to Kalakund",
+  "peakMonths": [
+   7,
+   8,
+   9
+  ],
+  "shoulderMonths": [
+   10,
+   11
+  ],
+  "avoidMonths": [
+   3,
+   4,
+   5
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the falls shrink to a thin trickle down the dark basalt cliff; fine for a cool walk and the train ride, not for water.",
+   "summer": "Mar-May the Choral runs almost dry and the cliff is bare basalt in the heat, so skip the falls until the rains return.",
+   "monsoon": "Jul-Sep is the reason to come, as the river drops about 91 m into a misty gorge; weekends are packed, so go midweek and keep off the edge.",
+   "autumn": "October still has a good flow under clearing skies, and November is calm but thin; both are quieter for the Kalakund train ride."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 3,
+  "vibe": "A day trip from Indore with chai and bhutta stalls and weekend crowds; the Kalakund stop is known for its kalakand milk sweet.",
+  "hub": "Indore airport and junction about 32 km; Patalpani station sits by the falls, and Mhow is the main railhead nearby",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Bhim Janmabhoomi",
+    "kind": "heritage",
+    "note": "Memorial at Mhow marking the birthplace of Dr B R Ambedkar, busiest on his birth anniversary in April.",
+    "km": 7
+   },
+   {
+    "name": "Kalakund",
+    "kind": "village",
+    "note": "Ghat section stop on the heritage metre gauge line from Patalpani, famous for the kalakand milk sweet sold here.",
+    "km": 7
+   },
+   {
+    "name": "Choral Dam",
+    "kind": "dam",
+    "note": "Reservoir in wooded hills on the Choral river, a quieter picnic spot with sunset views.",
+    "km": 11
+   },
+   {
+    "name": "Janapav",
+    "kind": "temple",
+    "note": "Hilltop said to be the birthplace of Parashurama, with a temple on top and views over the Malwa plateau.",
+    "km": 15
+   },
+   {
+    "name": "Tincha Falls",
+    "kind": "waterfall",
+    "note": "Another tall monsoon fall dropping into a wooded gorge in the same hills, best seen Jul to Sep.",
+    "km": 20
    }
   ]
  },
@@ -33637,6 +34918,303 @@
   "spots": []
  },
  {
+  "id": "mawsynram",
+  "name": "Mawsynram",
+  "state": "Meghalaya",
+  "lat": 25.2989,
+  "lng": 91.5814,
+  "alt": 1439,
+  "category": [
+   "offbeat",
+   "waterfall",
+   "trek"
+  ],
+  "tagline": "Reputedly the wettest place on Earth: sandstone caves, fossils and rain-fed falls",
+  "peakMonths": [
+   10,
+   11,
+   12
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   3,
+   4,
+   9
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec is dry and clear for the caves and crevice walks; by Jan-Feb the falls thin to threads, but trails are firm and views reach Bangladesh.",
+   "summer": "Mar is warm and still fairly dry for Mawjymbuin and the fossil ravines; Apr brings heavy showers, and May storms make the hill roads slippery.",
+   "monsoon": "Jun-Aug is the record rain itself: cloud on the road, landslides and caves you cannot enter. Sep is still very wet, but the falls roar.",
+   "autumn": "Oct-Nov is the sweet spot: falls still full from the rains, trails drying out, and clear sunsets from the Khreng Khreng edge."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Khasi homestays and community lodges in a mist-soaked village; Shillong day-trippers at the cave, quiet once they leave.",
+  "hub": "About 61 km from Shillong, 2 to 2.5 h by road; Shillong (Umroi) airport about 85 km; no permits needed",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Mawjymbuin Cave",
+    "kind": "cave",
+    "note": "Sandstone cave with a stalagmite worshipped as a Shiva linga, fed by drips from an udder-shaped stalactite above.",
+    "km": 1
+   },
+   {
+    "name": "Khreng Khreng",
+    "kind": "viewpoint",
+    "note": "The 'cracked rock' sunset point over the Umngi river and Lumiawpaw hill, beside the Khreng Khreng falls.",
+    "km": 1
+   },
+   {
+    "name": "Krem Puri",
+    "kind": "cave",
+    "note": "Longest known sandstone cave in the world, entered at Laitsohum village by a short downhill trek; go with a local guide.",
+    "km": 10
+   },
+   {
+    "name": "Mawlyngbna",
+    "kind": "village",
+    "note": "Fossil-lined crevice walk, the Ar Phalat and Umdiengkain falls, and kayaking on Umkhakoi lake; hire a village guide.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "lum-sohpetbneng",
+  "name": "Lum Sohpetbneng (Umiam)",
+  "state": "Meghalaya",
+  "lat": 25.7086,
+  "lng": 91.9232,
+  "alt": 1327,
+  "category": [
+   "spiritual",
+   "trek",
+   "offbeat"
+  ],
+  "tagline": "Sacred Khasi peak, the 'navel of heaven', in pine forest above Umiam Lake",
+  "peakMonths": [
+   2,
+   3,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   4,
+   5,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Sohpetbneng Pilgrimage (Feb)",
+  "why": {
+   "winter": "Dry, cool Dec-Jan days for the climb; in Feb thousands of Seng Khasi faithful walk up on a Sunday for the annual pilgrimage and prayers.",
+   "summer": "Mar is clear and pine-scented for the gentle climb with views over Umiam; Apr-May turn hazy and stormy, so start early in the day.",
+   "monsoon": "Skip Jun-Sep: steady rain, slippery forest paths and cloud that hides the lake views the climb is for.",
+   "autumn": "Oct-Nov is dry and bright after the rains, the best light for summit views over Umiam Lake and the Ri Bhoi hills."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "A sacred forest, not a sight: a quiet day trip from Shillong or Umiam, shared with Khasi families and pilgrims.",
+  "hub": "About 25 km from Shillong off the Guwahati-Shillong road at Umiam; Shillong (Umroi) airport under 20 km; no permits",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Umiam Lake",
+    "kind": "lake",
+    "note": "Reservoir made by damming the Umiam river in the early 1960s; the big view from the summit, about 6 km up from Umiam.",
+    "km": 6
+   },
+   {
+    "name": "Umiam Water Sports Complex",
+    "kind": "activity",
+    "note": "Sailing, rowing and other rides on the lake beside the Orchid Lake Resort; open daily, roughly 9 am to 5 pm.",
+    "km": 6
+   },
+   {
+    "name": "Lum Nehru Park",
+    "kind": "park",
+    "note": "Lawns, flower beds, an orchidarium and an aviary on a spur above the lake, next to the Orchid Lake Resort.",
+    "km": 6
+   }
+  ]
+ },
+ {
+  "id": "umbyrlein-falls",
+  "name": "Umbyrlein Falls (Rangad)",
+  "state": "Meghalaya",
+  "lat": 25.3351,
+  "lng": 92.2196,
+  "alt": 1168,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "Hidden Jaintia falls valley: Umbyrlein, Moopun's stone bridge and Rynji",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   1
+  ],
+  "shoulderMonths": [
+   2,
+   3,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Jan is the pick: dry, sunny days and clear pools; by Feb the flow drops, but the meadow, menhirs and gazebos still make a fine picnic.",
+   "summer": "Mar-Apr is warm and quiet, good for a dip below the Moopun stone bridge; May storms start to swell and muddy the falls.",
+   "monsoon": "Skip Jun-Aug: the pools flood, the stone steps turn slick and swimming is unsafe; by Sep the falls run loud between the storms.",
+   "autumn": "Oct-Nov is peak: full falls, clear green water in the pools and dry paths between Umbyrlein, Moopun and Rynji."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Day trip with no stays at the falls, so base in Jowai or Khliehriat; gazebos, swings, stone paths and weekend picnickers.",
+  "hub": "36 km from Jowai off NH6 at Kongong junction, on the Mukhaialong to Cham Cham road; taxis from Jowai; no permit",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Moopun Falls",
+    "kind": "waterfall",
+    "note": "110 ft drop on the Umjhai at Mutong beside a natural stone bridge, with a swimming pool below and pitcher plants on the rock.",
+    "km": 4
+   },
+   {
+    "name": "Rynji Falls",
+    "kind": "waterfall",
+    "note": "Roaring falls at Cham Cham, south of Mutong, with stepping natural ponds above and forest footpaths and footbridges.",
+    "km": 4
+   },
+   {
+    "name": "Dem Khla",
+    "kind": "viewpoint",
+    "note": "Viewpoint 500 m from Moopun Falls towards the Myntdu river; the name is said to mean the tiger's resting place.",
+    "km": 4
+   },
+   {
+    "name": "Sahksaw Fish Sanctuary",
+    "kind": "river",
+    "note": "Wide, slow river at Cham Cham, 700 m off the road, flowing down to Rynji Falls; a calm spot for boating.",
+    "km": 4
+   },
+   {
+    "name": "Latang Falls (Lumchyrmit)",
+    "kind": "waterfall",
+    "note": "Tall falls where the Myntdu crosses a gorge into a valley, with rapids above; a newer, little-visited spot.",
+    "km": 5
+   }
+  ]
+ },
+ {
+  "id": "lumshnong-caves",
+  "name": "Lumshnong (Krem Kotsati caves)",
+  "state": "Meghalaya",
+  "lat": 25.184,
+  "lng": 92.3767,
+  "alt": 585,
+  "category": [
+   "offbeat",
+   "trek",
+   "waterfall"
+  ],
+  "tagline": "Jaintia limestone cave country: swim-in river caves, a hidden waterfall and a lake",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   4,
+   10
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb is caving season: low water makes it safest to swim into Krem Kotsati, and a 4x4 can get close to the Khaddum falls.",
+   "summer": "Mar is still dry enough for the caves and the Khaddum trail; Apr storms raise cave water fast, so go only with a guide, and skip caving by May.",
+   "monsoon": "Avoid Jun-Sep: cave entrances flood, the mouth of Krem Kotsati is underwater and the Khaddum trail turns to deep mud.",
+   "autumn": "Oct is muddy as the water drops; by Nov the caves reopen to swimmers, the Khaddum falls are full and the 4x4 track dries out."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Cement-belt village on NH6 with basic stays; you go with a local caving guide and meet few other travellers.",
+  "hub": "About 110 km from Shillong via Jowai on NH6; Badarpur Junction railhead about 80 km; no permits needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Krem Kotsati",
+    "kind": "cave",
+    "note": "River cave whose entrance sits in the middle of the village; you swim in through a pool, and the mouth floods in monsoon.",
+    "km": 1
+   },
+   {
+    "name": "Khaddum Falls (Pieltleng)",
+    "kind": "waterfall",
+    "note": "Fan-shaped falls over a green rock face into a deep pool, reached on foot from Brichyrnot; in dry weather a 4x4 cuts the walk to about 2 km.",
+    "km": 8
+   },
+   {
+    "name": "Krem Chympe",
+    "kind": "cave",
+    "note": "Long river cave by Khaddum village, a short hike from the falls; you swim, canoe or take a bamboo raft into the dark.",
+    "km": 8
+   },
+   {
+    "name": "Umhang Lake",
+    "kind": "lake",
+    "note": "Lake at Bataw village, reached south via Rymbai, that the district calls the largest natural lake in the Jaintia Hills.",
+    "km": 14
+   }
+  ]
+ },
+ {
   "id": "aizawl",
   "name": "Aizawl",
   "state": "Mizoram",
@@ -34892,6 +36470,75 @@
     "name": "Tseminyu",
     "kind": "village",
     "note": "Rengma district town further up the road north, with a roadside market and terraced fields; the only real stop that way.",
+    "km": 30
+   }
+  ]
+ },
+ {
+  "id": "mount-tiyi",
+  "name": "Mount Tiyi (Wokha)",
+  "state": "Nagaland",
+  "lat": 26.097,
+  "lng": 94.2835,
+  "alt": 1980,
+  "category": [
+   "trek",
+   "mountains",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Wokha's sacred peak, about 1970 m, a forest climb lit up by spring rhododendrons",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   2,
+   5
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Tokhu Emong (Nov)",
+  "why": {
+   "winter": "Cold, dry and mostly clear; Dec and Jan are fine for the climb, and rhododendron buds start opening by late Feb.",
+   "summer": "Mar and Apr are peak bloom, with the ridge flushed red by rhododendrons; May turns cloudy with early rain.",
+   "monsoon": "Avoid: steep forest trails turn to slick mud, leeches come out and cloud hides the summit views for weeks.",
+   "autumn": "Clear post-rain skies over the Doyang valley, and Lotha villages celebrate the Tokhu Emong harvest in Nov."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Lotha Naga hill-town life, church bells, smoked pork at small eateries and a few local hikers at weekends",
+  "hub": "Base at Wokha town, about 80 km (3 h) from Kohima; Dimapur airport and railhead are about 125 km. Nagaland ILP needed.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Wokha Village",
+    "kind": "village",
+    "note": "Old Lotha village beside the town and the usual base for the climb; ask about a local guide here.",
+    "km": 3
+   },
+   {
+    "name": "Doyang River",
+    "kind": "river",
+    "note": "The main river of the Lotha hills, winding through forested valleys west and north of Wokha town.",
+    "km": 14
+   },
+   {
+    "name": "Doyang HEP Dam",
+    "kind": "dam",
+    "note": "Hydro dam whose reservoir draws huge Amur falcon flocks in Oct and Nov; birders base at Pangti nearby.",
     "km": 30
    }
   ]
@@ -36550,6 +38197,229 @@
     "kind": "wildlife",
     "note": "Fenced spotted deer enclosure a short walk below the spring; ten minutes of your time, best in the late afternoon.",
     "km": 1
+   }
+  ]
+ },
+ {
+  "id": "sanaghagara-falls",
+  "name": "Sanaghagara & Badaghagara (Keonjhar)",
+  "state": "Odisha",
+  "lat": 21.6328,
+  "lng": 85.5569,
+  "alt": 533,
+  "category": [
+   "waterfall",
+   "offbeat"
+  ],
+  "tagline": "Twin falls of the Machha Kandana, a few minutes out of Keonjhar town",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11,
+   12,
+   1,
+   2
+  ],
+  "avoidMonths": [
+   4,
+   5
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb is picnic season: the falls run gentler, Keonjhar's hill air is cool and the drive to Gonasika is easy; Sundays get busy.",
+   "summer": "March still has some flow, but Apr-May are hot and both falls shrink to thin threads, so skip them until the rains return.",
+   "monsoon": "July fills the Machha Kandana; Aug-Sep Badaghagara roars through the forest below, though spray soaks the rocks and paths get slippery.",
+   "autumn": "Oct-Nov is ideal: full water, clear skies and green hills, with Sanaghagara's two cascades and its downstream twin in one morning."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Local picnickers on winter Sundays; the forest department's Sanaghagara Nature Camp has cottages, and Keonjhar town has simple hotels.",
+  "hub": "Keonjhar town about 5 km on NH 49 towards Sambalpur; Keonjhar railway station is 4 km from town",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Badaghagara Falls",
+    "kind": "waterfall",
+    "note": "The second fall, about 3 km downstream on the Machha Kandana below an old reservoir that still supplies Keonjhar town.",
+    "km": 3
+   },
+   {
+    "name": "Gonasika",
+    "kind": "temple",
+    "note": "Where the Baitarani rises from a rock shaped like a cow's nose, with the Guptaganga and Brahmeswar shrines.",
+    "km": 14
+   },
+   {
+    "name": "Maa Tarini Temple, Ghatgaon",
+    "kind": "temple",
+    "note": "One of Odisha's busiest goddess temples, where pilgrims offer coconuts by the thousand.",
+    "km": 43
+   }
+  ]
+ },
+ {
+  "id": "mahendragiri",
+  "name": "Mahendragiri (Gajapati)",
+  "state": "Odisha",
+  "lat": 18.9663,
+  "lng": 84.3648,
+  "alt": 1449,
+  "category": [
+   "mountains",
+   "trek",
+   "heritage",
+   "spiritual"
+  ],
+  "tagline": "A 1,501 m Eastern Ghats summit crowned with Pandava legend temples",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Maha Shivaratri (Feb or Mar)",
+  "why": {
+   "winter": "Dec-Feb is the best window: clear views over the Eastern Ghats, cool climbs to the Kunti, Yudhishthira and Bhima temples, dry trails.",
+   "summer": "Mar-Apr the summit stays cooler than the plains, though haze dulls the views; Shivaratri can fall in March and fills the path with pilgrims.",
+   "monsoon": "Jun-Aug bring heavy rain, leeches and slippery, rutted tracks to the top, so skip it; late September can clear but stays wet and misty.",
+   "autumn": "October is lush but can bring Bay of Bengal storms; November is the sweet spot, rinsed air, green forest and steady weather."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Pilgrims and a few trekkers; basic stays in Paralakhemundi and simple food at the base, plus jeeps that ferry people up from Burakhat.",
+  "hub": "Paralakhemundi, 115 km from Brahmapur railhead, then about 2 h of hill road to Burakhat at the foot of the peak",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Burakhat",
+    "kind": "village",
+    "note": "The pass at the foot of the peak where cars stop; walk up or hire one of the few jeeps that run to the top.",
+    "km": 1
+   },
+   {
+    "name": "Bhima Temple",
+    "kind": "temple",
+    "note": "Rough stone shrine near the summit, said to be built by the Pandavas, with some of the widest views on the hill.",
+    "km": 1
+   },
+   {
+    "name": "Yudhishthira Temple",
+    "kind": "temple",
+    "note": "Triratha style stone temple on the summit ridge; the hill also holds an 11th century Rajendra Chola inscription.",
+    "km": 1
+   },
+   {
+    "name": "Kunti Temple",
+    "kind": "temple",
+    "note": "Small shrine to Kunti, mother of the Pandavas, among the forest on the top, part of the Shivaratri circuit.",
+    "km": 1
+   },
+   {
+    "name": "Gandahati Waterfall",
+    "kind": "waterfall",
+    "note": "Stepped forest waterfall south-west of the hill, a popular picnic spot with locals after the rains.",
+    "km": 14
+   },
+   {
+    "name": "Gajapati Palace",
+    "kind": "palace",
+    "note": "Palace of the former Paralakhemundi rulers in the town centre; admire the facade from outside.",
+    "km": 36
+   }
+  ]
+ },
+ {
+  "id": "phurlijharan",
+  "name": "Phurlijharan (Kalahandi)",
+  "state": "Odisha",
+  "lat": 19.7815,
+  "lng": 83.1111,
+  "alt": 279,
+  "category": [
+   "waterfall",
+   "wildlife",
+   "offbeat"
+  ],
+  "tagline": "A forest waterfall on the edge of Karlapat sanctuary, near Bhawanipatna",
+  "peakMonths": [
+   8,
+   9,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   7,
+   12,
+   1
+  ],
+  "avoidMonths": [
+   4,
+   5
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Jan is picnic season: the perennial fall runs slimmer but steady, mornings are cool and the forest is at its most walkable.",
+   "summer": "March is hot but bearable; Apr-May Kalahandi bakes and the fall shrinks to a thread, so skip it until the rains return.",
+   "monsoon": "July wakes the stream; Aug-Sep the fall runs full through green sal forest, though forest roads can be muddy after heavy rain.",
+   "autumn": "Oct-Nov is the pick: steady water, dry tracks and sun on the spray throwing rainbows; pair it with the Rabandhara eco camp."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "A forest picnic spot with no facilities; the gate has shut after storm damage before, so ask in Bhawanipatna, which has simple hotels.",
+  "hub": "Bhawanipatna town and railway station 15 km on State Highway 44; taxis and autos from town",
+  "modes": [
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Karlapat Wildlife Sanctuary",
+    "kind": "wildlife",
+    "note": "Hilly sal and bamboo forest right beside the falls; check entry rules with the forest office in Bhawanipatna.",
+    "km": 10
+   },
+   {
+    "name": "Manikeswari Temple",
+    "kind": "temple",
+    "note": "Bhawanipatna's main temple to the goddess of the old Kalahandi rulers, centre of the town's Chhatar Jatra.",
+    "km": 15
+   },
+   {
+    "name": "Rabandhara",
+    "kind": "waterfall",
+    "note": "Eco tourism camp about 10 km from Bhawanipatna with cottages and a forest waterfall 4 km from the centre.",
+    "km": 17
+   },
+   {
+    "name": "Asurgarh Fort",
+    "kind": "fort",
+    "note": "Ruins of an early historic fort near Narla, set between a 200 acre oval tank and the Sandul river.",
+    "km": 42
    }
   ]
  },
@@ -48848,6 +50718,143 @@
   ]
  },
  {
+  "id": "lakhaniya-dari",
+  "name": "Lakhaniya Dari (Ahraura)",
+  "state": "Uttar Pradesh",
+  "lat": 24.9589,
+  "lng": 83.0086,
+  "alt": 120,
+  "category": [
+   "waterfall",
+   "trek",
+   "offbeat"
+  ],
+  "tagline": "A jungle walk to a Vindhyan waterfall past prehistoric painted rock shelters",
+  "peakMonths": [
+   8,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   7,
+   11
+  ],
+  "avoidMonths": [
+   4,
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb the stream runs low and clear; cool weather suits the rocky walk in, though the main drop is only a ribbon.",
+   "summer": "March leaves a trickle; Apr-May the rocks scorch and the falls go dry, so skip the walk until the rains are back.",
+   "monsoon": "Jul-Sep the falls are at full strength; the path crosses streams and the plunge pool is deep, so do not swim.",
+   "autumn": "October still has good flow under clear skies, and November is cooler and quieter for the walk past the painted rock shelters."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 2,
+  "crowd": 2,
+  "vibe": "No food at the falls, so pack lunch; weekend groups from Varanasi and Mirzapur, quiet weekdays.",
+  "hub": "Ahraura town about 9 km; Varanasi about 50 km by road and its airport about 2 h; Chunar railhead about 30 km",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Lekhania rock shelters",
+    "kind": "heritage",
+    "note": "Painted rock shelters along the Lakhaniya valley, recorded by archaeologists in the 1930s; look for red ochre figures.",
+    "km": 1
+   },
+   {
+    "name": "Bhandari Devi Temple",
+    "kind": "temple",
+    "note": "Hill temple at the north edge of Ahraura town; one of Ashoka's minor rock edicts is carved on the same hill.",
+    "km": 8
+   },
+   {
+    "name": "Rajdari Falls",
+    "kind": "waterfall",
+    "note": "Stepped falls in Chandraprabha Wildlife Sanctuary, with Devdari a short walk away.",
+    "km": 16
+   }
+  ]
+ },
+ {
+  "id": "chunar-fort",
+  "name": "Chunar Fort",
+  "state": "Uttar Pradesh",
+  "lat": 25.1233,
+  "lng": 82.8762,
+  "alt": 118,
+  "category": [
+   "heritage",
+   "offbeat"
+  ],
+  "tagline": "A sandstone fort on a rock above the Ganga, once held by Sher Shah and Akbar",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   10
+  ],
+  "avoidMonths": [
+   5,
+   6
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec-Feb is ideal: mild sun on the ramparts, morning mist over the Ganga bend and an easy pairing with Varanasi, about 30 km away.",
+   "summer": "March is still pleasant on the walls; April gets hot and May's loo winds make the bare rock brutal, so go at dawn or skip it.",
+   "monsoon": "June is fierce heat then storms; Jul-Sep the Ganga swells right under the walls, a fine sight between showers, though paths get muddy.",
+   "autumn": "Oct-Nov the river settles and skies clear; walk to the Sonwa Mandap and peer into the deep stepwell in comfort."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Clay craft town below the fort; much of the fort is a police training school, so only Sonwa Mandap and a few halls are open.",
+  "hub": "Chunar railway station in town; Varanasi about 30 km and its Babatpur airport about 1.5 h by road",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Sonwa Mandap",
+    "kind": "heritage",
+    "note": "Open pavilion of 28 pillars in the Hindu style, with Bhartri Nath's samadhi behind it and a stepwell nearly 200 ft deep.",
+    "km": 0
+   },
+   {
+    "name": "British Cemetery, Chunar",
+    "kind": "heritage",
+    "note": "ASI protected graves dating from 1782 to 1839, beside the road leading up to the fort.",
+    "km": 1
+   },
+   {
+    "name": "Ramnagar Fort",
+    "kind": "fort",
+    "note": "The Maharaja of Benares's 18th century riverside fort and museum, on the way back to Varanasi.",
+    "km": 22
+   },
+   {
+    "name": "Vindhyavasini Temple",
+    "kind": "temple",
+    "note": "The busy goddess temple at Vindhyachal on the Ganga, one of north India's major Shakti shrines.",
+    "km": 38
+   }
+  ]
+ },
+ {
   "id": "abbott-mount",
   "name": "Abbott Mount (Lohaghat)",
   "state": "Uttarakhand",
@@ -53899,5 +55906,3226 @@
    "road"
   ],
   "spots": []
+ },
+ {
+  "id": "kathmandu-durbar-square",
+  "name": "Kathmandu Durbar Square",
+  "state": "Nepal",
+  "lat": 27.7043,
+  "lng": 85.3066,
+  "alt": 1305,
+  "category": [
+   "heritage",
+   "culture",
+   "spiritual"
+  ],
+  "tagline": "Newar palace square, a living goddess and pagoda temples in the old city",
+  "peakMonths": [
+   10,
+   11,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Indra Jatra (Sep)",
+  "why": {
+   "winter": "Crisp sunny days for walking the squares; mornings are foggy and smoggy, so start your temple rounds after 10 am.",
+   "summer": "Mar is clear and warm for rooftop cafes over the pagodas; by Apr and May haze from forest fires hides the hills and afternoons get hot.",
+   "monsoon": "Daily downpours flood the lanes in Jul and Aug, but Sep brings Indra Jatra, when the Kumari is pulled through the square on a chariot.",
+   "autumn": "Best season: rain-washed blue skies, Dashain and Tihar lights in Oct and Nov, and mild days for long walks across the valley."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 5,
+  "crowd": 3,
+  "vibe": "Rooftop cafes over the pagodas, Newari khaja shops, pigeons and sadhus; Thamel backpackers and Indian tour groups mix here.",
+  "hub": "Kathmandu airport (TIA) is about 6 km; buses from the Raxaul/Birgunj border take 7 h. Indians need a passport or voter ID.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Swayambhunath",
+    "kind": "temple",
+    "note": "Hilltop stupa reached by a long stone stair, monkeys on every ledge; come at sunset for the view over the valley.",
+    "km": 2
+   },
+   {
+    "name": "Pashupatinath Temple",
+    "kind": "temple",
+    "note": "Shiva shrine on the Bagmati with cremation ghats; only Hindus enter the main courtyard, river aarti every evening.",
+    "km": 4
+   },
+   {
+    "name": "Boudhanath Stupa",
+    "kind": "shrine",
+    "note": "One of the largest stupas in the world, ringed by Tibetan monasteries and cafes; walk the kora clockwise at dusk.",
+    "km": 6
+   },
+   {
+    "name": "Patan Durbar Square",
+    "kind": "heritage",
+    "note": "The finest Newar square in the valley, with the Patan Museum in the old palace; 20 min by taxi across the Bagmati.",
+    "km": 4
+   },
+   {
+    "name": "Asan Tole",
+    "kind": "market",
+    "note": "Six-street bazaar of spices, brass and the Annapurna Ajima shrine, busiest early morning; walk up from Indra Chowk.",
+    "km": 1
+   },
+   {
+    "name": "Garden of Dreams",
+    "kind": "garden",
+    "note": "Restored 1920s neo-classical garden by Thamel with pavilions, ponds and lawns; a quiet hour away from the traffic.",
+    "km": 1
+   },
+   {
+    "name": "Kirtipur",
+    "kind": "heritage",
+    "note": "Hilltop Newar town with the Bagh Bhairab temple and cheap Newari feasts; 30 min by bus, sunset views of the valley.",
+    "km": 4
+   },
+   {
+    "name": "Chandragiri Hills",
+    "kind": "viewpoint",
+    "note": "Cable car from Thankot climbs to the ridge for a Himalayan panorama and the Bhaleshwor temple; clearest Oct to Feb.",
+    "km": 11
+   }
+  ]
+ },
+ {
+  "id": "bhaktapur",
+  "name": "Bhaktapur (Durbar Square)",
+  "state": "Nepal",
+  "lat": 27.6722,
+  "lng": 85.4279,
+  "alt": 1338,
+  "category": [
+   "heritage",
+   "culture"
+  ],
+  "tagline": "Car-free Newar old town of pagodas, potters' squares and curd in clay pots",
+  "peakMonths": [
+   10,
+   11,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Bisket Jatra (Apr)",
+  "why": {
+   "winter": "Sunny afternoons for the squares and cheap off-season rooms, but dawn fog sits low and nights drop close to freezing.",
+   "summer": "Bisket Jatra in Apr hauls giant chariots through the lanes at Nepali New Year; Mar is the clearest month before the May heat.",
+   "monsoon": "Rain soaks the brick lanes and hides the hills in Jul and Aug, though Gai Jatra processions in Aug are worth a wet day.",
+   "autumn": "Ideal: clear skies after the rains, Dashain kites and Tihar oil lamps in Oct and Nov, and an easy day trip up to Nagarkot."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 5,
+  "crowd": 3,
+  "vibe": "Guesthouses in old brick houses, juju dhau curd and bara at street stalls, potters at their wheels and day trippers by noon.",
+  "hub": "Kathmandu airport (TIA) is about 11 km, 40 min by taxi; the heritage entry fee is NPR 500 for SAARC visitors.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Nyatapola Temple",
+    "kind": "temple",
+    "note": "Five-tiered 1702 pagoda on Taumadhi Square, the tallest in Nepal, its stair guarded by stone wrestlers, elephants and lions.",
+    "km": 0
+   },
+   {
+    "name": "Pottery Square",
+    "kind": "market",
+    "note": "Potters spin clay on wheels and dry rows of pots in the sun; some will let you try the wheel for a small fee.",
+    "km": 0
+   },
+   {
+    "name": "Dattatreya Temple",
+    "kind": "temple",
+    "note": "Oldest square in town with the 15th century temple, and the carved Peacock Window in a lane right beside it.",
+    "km": 1
+   },
+   {
+    "name": "Siddha Pokhari",
+    "kind": "lake",
+    "note": "Large walled pond at the bus park end of town, good for an evening stroll before walking into the old city.",
+    "km": 1
+   },
+   {
+    "name": "Changu Narayan Temple",
+    "kind": "temple",
+    "note": "UNESCO-listed hilltop Vishnu temple with the oldest dated inscription in Nepal, 464 AD; 20 min by taxi or a 2 h hike.",
+    "km": 5
+   },
+   {
+    "name": "Nagarkot",
+    "kind": "viewpoint",
+    "note": "Ridge village above 2000 m for Himalayan sunrise from Langtang to Everest on clear mornings between Oct and Mar.",
+    "km": 10
+   }
+  ]
+ },
+ {
+  "id": "pokhara-phewa",
+  "name": "Pokhara (Phewa Lake)",
+  "state": "Nepal",
+  "lat": 28.2117,
+  "lng": 83.9488,
+  "alt": 795,
+  "category": [
+   "lake",
+   "mountains",
+   "backpacker"
+  ],
+  "tagline": "Lakeside town under the Annapurnas, with paragliding, rowing boats and cafes",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   3
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Pokhara Street Festival (Dec)",
+  "why": {
+   "winter": "Clear Machhapuchhre views most mornings and dry paragliding days; nights get cold, and the street festival fills Lakeside in late Dec.",
+   "summer": "Mar brings rhododendrons and good flying weather; by Apr and May haze often hides the peaks and the humidity builds.",
+   "monsoon": "Pokhara is one of the wettest places in Nepal: heavy daily rain, cloud on the peaks and paragliding mostly stops in Jul and Aug.",
+   "autumn": "Peak season: the sharp Annapurna skyline over the lake, prime paragliding from Sarangkot and treks setting off every morning."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 5,
+  "crowd": 3,
+  "vibe": "Lakeside strip of cafes, bakeries and live music bars; trekkers, paragliders and Indian families row boats at sunset.",
+  "hub": "Fly Kathmandu to Pokhara in about 25 min or take a 7 h tourist bus; from the Sunauli border it is about 8 h by road.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Tal Barahi Temple",
+    "kind": "temple",
+    "note": "Two-tiered pagoda on an island in Phewa, reached by a short rowing boat ride from Lakeside; busiest on Saturdays.",
+    "km": 1
+   },
+   {
+    "name": "Sarangkot",
+    "kind": "viewpoint",
+    "note": "Ridge village for sunrise over Annapurna and Machhapuchhre, and the launch site for tandem paragliding flights.",
+    "km": 4
+   },
+   {
+    "name": "World Peace Pagoda",
+    "kind": "shrine",
+    "note": "White Japanese-built stupa on the ridge across the lake; take a boat over and climb about 45 min through forest.",
+    "km": 1
+   },
+   {
+    "name": "Davis Falls",
+    "kind": "waterfall",
+    "note": "Patale Chhango, where the Pardi Khola plunges into an underground tunnel; loudest after the rains, small entry fee.",
+    "km": 3
+   },
+   {
+    "name": "Gupteshwar Mahadev Cave",
+    "kind": "cave",
+    "note": "Cave shrine across the road from Davis Falls, with a Shiva lingam and a passage that ends behind the falling water.",
+    "km": 3
+   },
+   {
+    "name": "International Mountain Museum",
+    "kind": "museum",
+    "note": "Big museum on Himalayan peaks, famous climbers and mountain peoples, in a hall facing the Annapurnas; 2 h is enough.",
+    "km": 4
+   },
+   {
+    "name": "Begnas Lake",
+    "kind": "lake",
+    "note": "Quieter second lake east of the city, with rowing boats, fish lunches and terraced paddy around the shore.",
+    "km": 14
+   },
+   {
+    "name": "Mahendra Cave",
+    "kind": "cave",
+    "note": "Limestone cave with stalactites and a lit walkway, next door to the Bat Cave in Batulechaur; 30 min by taxi.",
+    "km": 7
+   }
+  ]
+ },
+ {
+  "id": "ghandruk",
+  "name": "Ghandruk",
+  "state": "Nepal",
+  "lat": 28.3769,
+  "lng": 83.8078,
+  "alt": 2017,
+  "category": [
+   "trek",
+   "mountains",
+   "culture"
+  ],
+  "tagline": "Stone Gurung village facing Annapurna South and Machhapuchhre",
+  "peakMonths": [
+   10,
+   11,
+   3,
+   4
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   2,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Tamu Lhosar (Dec)",
+  "why": {
+   "winter": "Frosty nights but sharp Annapurna South views and empty lodges; Tamu Lhosar at the end of Dec brings Gurung dances to the village.",
+   "summer": "Mar and Apr turn the forests red with rhododendron on the trail to Tadapani; by May clouds build up after midday.",
+   "monsoon": "Leeches, slippery stone steps and landslides on the jeep road, and the mountains hide behind cloud for weeks at a time.",
+   "autumn": "Peak trekking: clear skies, harvest terraces and full teahouses on the Poon Hill and Annapurna Base Camp trails."
+  },
+  "days": 3,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Gurung teahouses serving dal bhat and millet bread, homes of retired Gurkha soldiers and trekkers from every country.",
+  "hub": "Pokhara to Ghandruk by jeep in about 3 h via Nayapul and Kimche; ACAP permit needed, SAARC rate NPR 1,000.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Gurung Museum",
+    "kind": "museum",
+    "note": "Small village museum of Gurung dress, tools and household life in an old stone house in the upper village.",
+    "km": 0
+   },
+   {
+    "name": "Tadapani",
+    "kind": "village",
+    "note": "Forest teahouse hamlet on the ridge, about 4 h up from Ghandruk, with close views of Machhapuchhre.",
+    "km": 5
+   },
+   {
+    "name": "Landruk",
+    "kind": "village",
+    "note": "Twin Gurung village across the Modi Khola gorge, on the walking route to Pothana and Australian Camp.",
+    "km": 2
+   },
+   {
+    "name": "Chhomrong",
+    "kind": "village",
+    "note": "Last big village before the Annapurna Sanctuary, stacked on a slope facing Annapurna South; a long day's walk.",
+    "km": 5
+   },
+   {
+    "name": "Poon Hill",
+    "kind": "viewpoint",
+    "note": "3210 m sunrise hill above Ghorepani with a Dhaulagiri to Annapurna panorama; 2 days on foot via Tadapani.",
+    "km": 12
+   },
+   {
+    "name": "Annapurna Base Camp",
+    "kind": "trek",
+    "note": "4130 m amphitheatre of peaks at the head of the sanctuary, about 4 days on foot from Ghandruk via Chhomrong.",
+    "km": 18
+   }
+  ]
+ },
+ {
+  "id": "marpha",
+  "name": "Marpha",
+  "state": "Nepal",
+  "lat": 28.7519,
+  "lng": 83.6862,
+  "alt": 2697,
+  "category": [
+   "offbeat",
+   "mountains",
+   "culture"
+  ],
+  "tagline": "Whitewashed Thakali apple village in the windswept Kali Gandaki valley",
+  "peakMonths": [
+   3,
+   4,
+   5,
+   9,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   2,
+   6,
+   7,
+   8
+  ],
+  "avoidMonths": [],
+  "festival": "",
+  "why": {
+   "winter": "Bitter afternoon wind and nights below freezing; Jomsom flights run on clear mornings and the village is almost empty.",
+   "summer": "Apple trees blossom in Mar and Apr, skies are clear and the Dhaulagiri and Nilgiri views are at their best.",
+   "monsoon": "The rain shadow keeps Marpha fairly dry, but landslides on the Beni road and cancelled flights make getting here hard.",
+   "autumn": "Apple harvest under clear skies: fresh juice, dried apples and apple brandy, then a walk to Jomsom along the river."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Flagstone lanes, Thakali dal bhat sets and apple pie in family lodges; jeep travellers to Muktinath pass through.",
+  "hub": "Fly Pokhara to Jomsom (20 min), then 6 km by jeep, or 8 to 10 h by jeep from Pokhara via Beni. ACAP permit.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Marpha Monastery",
+    "kind": "monastery",
+    "note": "Village gompa above the flat roofs, up a stone stair, with prayer wheels and views down the valley.",
+    "km": 0
+   },
+   {
+    "name": "Jomsom",
+    "kind": "village",
+    "note": "Mustang's district hub and airstrip on the Kali Gandaki, with gear shops and the Mustang Eco Museum.",
+    "km": 6
+   },
+   {
+    "name": "Tukuche",
+    "kind": "village",
+    "note": "Old Thakali salt trading village with grand courtyard houses and gompas, under the east face of Dhaulagiri.",
+    "km": 6
+   },
+   {
+    "name": "Dhumba Lake",
+    "kind": "lake",
+    "note": "Small sacred green lake near Thini village, a short walk from Jomsom, with Nilgiri reflected on still mornings.",
+    "km": 3
+   },
+   {
+    "name": "Kagbeni",
+    "kind": "village",
+    "note": "Mud-brick village at the gate of Upper Mustang, with a red 15th century gompa above the Kali Gandaki.",
+    "km": 14
+   }
+  ]
+ },
+ {
+  "id": "muktinath",
+  "name": "Muktinath",
+  "state": "Nepal",
+  "lat": 28.8167,
+  "lng": 83.8713,
+  "alt": 3735,
+  "category": [
+   "spiritual",
+   "mountains",
+   "heritage"
+  ],
+  "tagline": "High Himalayan shrine sacred to Hindus and Buddhists, with 108 water spouts",
+  "peakMonths": [
+   4,
+   5,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   3,
+   6,
+   7,
+   8,
+   11,
+   12
+  ],
+  "avoidMonths": [
+   1,
+   2
+  ],
+  "festival": "Yartung Festival (Aug or Sep)",
+  "why": {
+   "winter": "Snow and temperatures well below freezing; jeeps still run when the road is clear, but Jan and Feb are hard going for elderly pilgrims.",
+   "summer": "Apr and May are the main pilgrim months: clear skies, an open road and icy 108-spout baths in thin mountain air.",
+   "monsoon": "Little rain falls in the rain shadow, but slides on the road below Jomsom and cancelled flights slow travel; Yartung comes in Aug or Sep.",
+   "autumn": "Crisp, clear days in Oct with Dhaulagiri views on the drive up; by late Nov the nights turn bitterly cold."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 3,
+  "vibe": "Ranipauwa lodges full of Indian pilgrims, Thakali dal bhat and Tibetan stalls selling shaligram fossils and shawls.",
+  "hub": "About 1.5 h by jeep from the Jomsom airstrip, a 20 min flight from Pokhara; ACAP permit at the SAARC rate.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Ranipauwa",
+    "kind": "village",
+    "note": "Pilgrim village below the temple with lodges, food and the jeep stand; the walk up to the shrine is short and steep.",
+    "km": 1
+   },
+   {
+    "name": "Jwala Mai Temple",
+    "kind": "temple",
+    "note": "Small shrine inside the complex where a natural gas flame burns beside a spring, sacred to both faiths.",
+    "km": 0
+   },
+   {
+    "name": "Jharkot",
+    "kind": "village",
+    "note": "Fortified mud village on a ridge with a ruined fort, a gompa and a Tibetan herbal clinic; about an hour's walk down.",
+    "km": 2
+   },
+   {
+    "name": "Kagbeni",
+    "kind": "village",
+    "note": "Gateway village to Upper Mustang on the Kali Gandaki, with the red Kag Chode gompa and apple orchards.",
+    "km": 9
+   },
+   {
+    "name": "Thorong La",
+    "kind": "trek",
+    "note": "5416 m pass of the Annapurna Circuit, a steep climb east from Muktinath for fit and acclimatised trekkers only.",
+    "km": 7
+   },
+   {
+    "name": "Jomsom",
+    "kind": "village",
+    "note": "Airstrip town of Mustang and the start of the jeep ride up to Muktinath or the walk down to Marpha.",
+    "km": 14
+   }
+  ]
+ },
+ {
+  "id": "lo-manthang",
+  "name": "Lo Manthang (Upper Mustang)",
+  "state": "Nepal",
+  "lat": 29.1828,
+  "lng": 83.9563,
+  "alt": 3818,
+  "category": [
+   "heritage",
+   "desert",
+   "offbeat",
+   "culture"
+  ],
+  "tagline": "Walled medieval capital of the old Kingdom of Lo, deep in Upper Mustang",
+  "peakMonths": [
+   5,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   6,
+   7,
+   8,
+   11
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2
+  ],
+  "festival": "Tiji Festival (May)",
+  "why": {
+   "winter": "Avoid: snow and bitter wind, many families move south for the season, most lodges close and the road can be blocked.",
+   "summer": "Tiji Festival fills the walled city with masked dances in May; Mar and Apr are cold but clear and very quiet.",
+   "monsoon": "The rain shadow keeps trails dry and open while the rest of Nepal is wet, but landslides below Jomsom still disrupt travel.",
+   "autumn": "Oct is crisp and golden with clear skies over the canyons; by late Nov villagers start leaving for the winter."
+  },
+  "days": 4,
+  "budget": 3,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Mud-brick lodges run by Loba families, butter tea and tsampa, and a handful of guided trekking groups and jeep tours.",
+  "hub": "6 to 7 h by jeep from Jomsom. Upper Mustang RAP (USD 50 a day) through a registered agency, plus ACAP.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Jampa Lhakhang",
+    "kind": "monastery",
+    "note": "15th century temple inside the walls with mandala murals, carefully restored by an international team.",
+    "km": 0
+   },
+   {
+    "name": "Thubchen Gompa",
+    "kind": "monastery",
+    "note": "Huge red assembly hall from the 15th century with restored wall paintings; ask at the gate if it is locked.",
+    "km": 0
+   },
+   {
+    "name": "Lo Manthang Royal Palace",
+    "kind": "palace",
+    "note": "Four-storey palace of the former Raja of Mustang, standing at the heart of the walled town.",
+    "km": 0
+   },
+   {
+    "name": "Namgyal Gompa",
+    "kind": "monastery",
+    "note": "Active hilltop monastery on a ridge just outside the walls, with views back over the walled city and its fields.",
+    "km": 1
+   },
+   {
+    "name": "Jhong Cave (Chhoser)",
+    "kind": "cave",
+    "note": "Multi-storey cave complex carved high into the cliff at Chhoser, a short jeep or horse ride north of town.",
+    "km": 6
+   },
+   {
+    "name": "Ghar Gompa",
+    "kind": "monastery",
+    "note": "Lo Gekar, one of the oldest gompas in the region, linked to Guru Rinpoche, on the trail south of town.",
+    "km": 9
+   },
+   {
+    "name": "Charang (Tsarang)",
+    "kind": "village",
+    "note": "Charang village with an old five-storey palace and a big red gompa above a deep canyon, on the way up.",
+    "km": 10
+   }
+  ]
+ },
+ {
+  "id": "manang",
+  "name": "Manang",
+  "state": "Nepal",
+  "lat": 28.6665,
+  "lng": 84.0175,
+  "alt": 3537,
+  "category": [
+   "trek",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "High Annapurna Circuit village with glacier lakes and the Tilicho trail",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   1,
+   2,
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Deep cold and snow; Thorong La is often blocked and many lodges shut, so Jan and Feb suit only well-prepared trekkers.",
+   "summer": "Apr and May bring clear mornings, open passes and the side trip to Tilicho Lake; Mar can still be snowy higher up.",
+   "monsoon": "The rain shadow keeps Manang drier than the south, but the jeep road up the Marsyangdi slides and washes out often from Jun to Aug.",
+   "autumn": "Peak circuit season: acclimatisation hikes to Ice Lake, clear Gangapurna views and full lodges before the pass."
+  },
+  "days": 4,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Stone lodges with bakeries and a small cinema, yak steaks, acclimatising trekkers and Manangi families.",
+  "hub": "Jeep from Besisahar in about 6 to 10 h; Besisahar is about 6 h by bus from Kathmandu. ACAP permit needed.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Gangapurna Lake",
+    "kind": "lake",
+    "note": "Glacial lake right below the village, fed by the Gangapurna glacier; a few minutes' walk for the classic view.",
+    "km": 0
+   },
+   {
+    "name": "Braga Monastery",
+    "kind": "monastery",
+    "note": "Centuries-old gompa stacked on a cliff in Braga village with old statues, an easy walk from Manang.",
+    "km": 3
+   },
+   {
+    "name": "Ice Lake (Kicho Tal)",
+    "kind": "lake",
+    "note": "High lake at about 4600 m, a tough acclimatisation hike of some 1000 m up from Braga with Annapurna views.",
+    "km": 5
+   },
+   {
+    "name": "Khangsar",
+    "kind": "village",
+    "note": "Old stone village on the Tilicho trail with a gompa and a few lodges, much quieter than Manang.",
+    "km": 4
+   },
+   {
+    "name": "Tilicho Lake",
+    "kind": "lake",
+    "note": "One of the highest big lakes in the world at about 4900 m, 2 days on foot west via Tilicho Base Camp.",
+    "km": 16
+   },
+   {
+    "name": "Upper Pisang",
+    "kind": "village",
+    "note": "Tibetan-style hillside village with a gompa and Annapurna II views, a day's walk east down the valley.",
+    "km": 14
+   }
+  ]
+ },
+ {
+  "id": "namche-bazaar",
+  "name": "Namche Bazaar",
+  "state": "Nepal",
+  "lat": 27.8046,
+  "lng": 86.712,
+  "alt": 3450,
+  "category": [
+   "trek",
+   "mountains",
+   "culture"
+  ],
+  "tagline": "Horseshoe Sherpa town on the Everest trail, with your first views of Everest",
+  "peakMonths": [
+   3,
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   12,
+   2,
+   9
+  ],
+  "avoidMonths": [
+   1,
+   6,
+   7,
+   8
+  ],
+  "festival": "Mani Rimdu at Tengboche (Oct or Nov)",
+  "why": {
+   "winter": "Clear skies but freezing nights and fewer open lodges; Jan is bitterly cold, while Dec still suits fit trekkers.",
+   "summer": "Second best season: rhododendrons on the trail in Apr, Everest expedition teams passing through and warmer days.",
+   "monsoon": "Cloud hides the peaks, lower trails are muddy with leeches and Lukla flights are often grounded for days.",
+   "autumn": "Prime season: crystal views of Ama Dablam and Everest, Mani Rimdu at Tengboche and the busy Saturday market."
+  },
+  "days": 4,
+  "budget": 3,
+  "solo": 4,
+  "crowd": 3,
+  "vibe": "Lodges with hot showers and bakeries, gear shops, Sherpa families and trekkers taking an acclimatisation day.",
+  "hub": "Fly to Lukla from Kathmandu or Ramechhap, then 2 days on foot; Sagarmatha park fee and Khumbu local permit.",
+  "modes": [
+   "flight"
+  ],
+  "spots": [
+   {
+    "name": "Sherpa Culture Museum",
+    "kind": "museum",
+    "note": "Small museum of Sherpa home life and Everest climbers' portraits, on the ridge above town with Everest views.",
+    "km": 0
+   },
+   {
+    "name": "Hotel Everest View",
+    "kind": "viewpoint",
+    "note": "Hilltop hotel at about 3880 m on the acclimatisation hike, with a terrace view of Everest and Ama Dablam.",
+    "km": 2
+   },
+   {
+    "name": "Khumjung",
+    "kind": "village",
+    "note": "Sherpa village with the Hillary school and a gompa said to keep a yeti scalp, on the acclimatisation loop.",
+    "km": 2
+   },
+   {
+    "name": "Tengboche Monastery",
+    "kind": "monastery",
+    "note": "Biggest gompa in the Khumbu, at about 3870 m facing Ama Dablam; monks chant at dawn and dusk.",
+    "km": 6
+   },
+   {
+    "name": "Thame",
+    "kind": "village",
+    "note": "Quiet valley village west of Namche with an old gompa on the cliff, home of many famous summiteers.",
+    "km": 7
+   },
+   {
+    "name": "Gokyo",
+    "kind": "lake",
+    "note": "Turquoise lake chain below Cho Oyu at about 4790 m, 3 days on foot from Namche, with Gokyo Ri above.",
+    "km": 17
+   },
+   {
+    "name": "Lukla",
+    "kind": "village",
+    "note": "Airstrip town where the trail starts, a long day's walk down valley; flights run in the morning, weather permitting.",
+    "km": 13
+   }
+  ]
+ },
+ {
+  "id": "kyanjin-gompa",
+  "name": "Kyanjin Gompa (Langtang)",
+  "state": "Nepal",
+  "lat": 28.2124,
+  "lng": 85.5666,
+  "alt": 3852,
+  "category": [
+   "trek",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Last village of the Langtang valley, with a gompa, cheese factory and glaciers",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   12,
+   2,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   1,
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Snow on the trail and nights far below freezing; Dec still has clear views, but in Jan few lodges stay open.",
+   "summer": "Rhododendron forests bloom in Mar and Apr, and mornings are clear for Kyanjin Ri; May brings afternoon cloud.",
+   "monsoon": "Landslide risk is real in this valley, trails are muddy and the peaks stay hidden; most trekkers skip Jun to Aug.",
+   "autumn": "Best time: clear Langtang Lirung views, yak pastures turning gold and fresh yak cheese at the factory."
+  },
+  "days": 6,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Tamang lodges rebuilt after the 2015 quake, yak cheese and apple pie, and small trekking groups with guides.",
+  "hub": "Kathmandu to Syabrubesi by jeep or bus in 7 to 8 h, then 3 days on foot. Langtang National Park permit needed.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Kyanjin Ri",
+    "kind": "viewpoint",
+    "note": "4773 m hill above the village, a 3 to 4 h return climb at dawn for a full view of Langtang Lirung.",
+    "km": 2
+   },
+   {
+    "name": "Tserko Ri",
+    "kind": "trek",
+    "note": "Harder 4984 m summit east of Kyanjin, a long day hike with the widest glacier panorama in the valley.",
+    "km": 3
+   },
+   {
+    "name": "Kyanjin Cheese Factory",
+    "kind": "food",
+    "note": "Yak cheese factory set up in the 1950s with Swiss help; buy a slab of hard cheese to carry back down.",
+    "km": 0
+   },
+   {
+    "name": "Langtang",
+    "kind": "village",
+    "note": "Village rebuilt above the site buried by the 2015 avalanche, with a memorial chorten beside the trail.",
+    "km": 6
+   },
+   {
+    "name": "Lama Hotel",
+    "kind": "village",
+    "note": "Forest teahouse stop by the Langtang Khola, where red pandas are sometimes seen, a day above Syabrubesi.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "gosaikunda",
+  "name": "Gosaikunda Lake",
+  "state": "Nepal",
+  "lat": 28.0825,
+  "lng": 85.4138,
+  "alt": 4395,
+  "category": [
+   "spiritual",
+   "lake",
+   "trek"
+  ],
+  "tagline": "Sacred alpine lake at about 4380 m, the Shiva pilgrimage of Janai Purnima",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   8,
+   9
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2,
+   6,
+   7
+  ],
+  "festival": "Janai Purnima (Aug)",
+  "why": {
+   "winter": "Avoid: the lake freezes, snow buries the trail above Laurebina and most lodges shut; only experienced groups go.",
+   "summer": "Apr and May are clear with snow patches around the lake; Mar can still bring heavy snow on the upper trail.",
+   "monsoon": "Thousands of pilgrims climb for Janai Purnima in Aug despite rain, cloud and leeches; Jun and Jul are best skipped.",
+   "autumn": "Best views: blue lakes under clear skies and the Langtang and Ganesh Himal ranges from the Laurebina ridge."
+  },
+  "days": 4,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Simple stone lodges by the lake, dal bhat and noodle soup, Tamang porters and Hindu pilgrims in the festival month.",
+  "hub": "Bus or jeep 6 to 7 h from Kathmandu to Dhunche, then 2 days up via Sing Gompa. Langtang park permit needed.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Saraswati Kunda",
+    "kind": "lake",
+    "note": "One of the chain of smaller sacred lakes passed on the trail just before you reach Gosaikunda itself.",
+    "km": 1
+   },
+   {
+    "name": "Laurebina",
+    "kind": "viewpoint",
+    "note": "Lodge hamlet on the ridge with the widest Himalayan view on the route; most trekkers stop here to acclimatise.",
+    "km": 4
+   },
+   {
+    "name": "Sing Gompa (Chandanbari)",
+    "kind": "monastery",
+    "note": "Small monastery and a yak cheese factory in the forest, the usual first night out of Dhunche.",
+    "km": 8
+   },
+   {
+    "name": "Dhunche",
+    "kind": "village",
+    "note": "Rasuwa district bazaar and park entry point where buses from Kathmandu end; stock up on supplies here.",
+    "km": 12
+   },
+   {
+    "name": "Laurebina La",
+    "kind": "trek",
+    "note": "Pass of about 4600 m beyond the lakes that leads down into Helambu, a long day for acclimatised trekkers.",
+    "km": 2
+   }
+  ]
+ },
+ {
+  "id": "chitwan-sauraha",
+  "name": "Chitwan National Park (Sauraha)",
+  "state": "Nepal",
+  "lat": 27.5802,
+  "lng": 84.5023,
+  "alt": 186,
+  "category": [
+   "wildlife"
+  ],
+  "tagline": "Rhino and tiger jungle along the Rapti River, with canoe trips and jeep safaris",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   1,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Cool foggy mornings that clear to sunny days; in Jan and Feb the grass is cut, views open up and rhino sightings rise.",
+   "summer": "Mar is still good; Apr and May climb past 35°C, but the grass is short and animals gather near the water.",
+   "monsoon": "Heavy rain floods the Rapti, jungle walks and many jeep routes close, and leeches are out from Jun to Aug.",
+   "autumn": "Fresh after the rains, with green jungle and clear skies; the elephant grass is tall, so canoe rides work best."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 3,
+  "vibe": "Riverside resorts, Tharu villages, sunset tea on the Rapti bank and Indian families on 2 night safari packages.",
+  "hub": "Bharatpur airport is about 15 km; from the Birgunj/Raxaul border about 4 h by road, Kathmandu 5 to 6 h by bus.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Rapti River",
+    "kind": "river",
+    "note": "Dugout canoe trips drift past mugger crocodiles and kingfishers at dawn; sunset tea on the Sauraha bank.",
+    "km": 1
+   },
+   {
+    "name": "Tharu Cultural Museum",
+    "kind": "museum",
+    "note": "Small museum of Tharu masks, murals and farm tools; evening Tharu stick dances run in Sauraha nearby.",
+    "km": 1
+   },
+   {
+    "name": "Elephant Breeding Center",
+    "kind": "wildlife",
+    "note": "Government centre at Khorsor where elephant calves are raised, a short ride from Sauraha; go in the morning.",
+    "km": 4
+   },
+   {
+    "name": "Bis Hajari Tal",
+    "kind": "lake",
+    "note": "Twenty Thousand Lakes, a wetland of ponds and sal forest in the buffer zone, very good for birding.",
+    "km": 10
+   },
+   {
+    "name": "Kasara",
+    "kind": "wildlife",
+    "note": "Park headquarters on the western side with the gharial crocodile breeding centre and a small museum.",
+    "km": 17
+   },
+   {
+    "name": "Devghat",
+    "kind": "temple",
+    "note": "Sacred confluence of the Kali Gandaki and Trishuli with ashrams and temples, and a big Makar Sankranti fair.",
+    "km": 19
+   }
+  ]
+ },
+ {
+  "id": "bardia",
+  "name": "Bardia National Park (Thakurdwara)",
+  "state": "Nepal",
+  "lat": 28.4499,
+  "lng": 81.2433,
+  "alt": 159,
+  "category": [
+   "wildlife",
+   "offbeat"
+  ],
+  "tagline": "Nepal's wildest tiger country, along the Karnali River and its Tharu villages",
+  "peakMonths": [
+   10,
+   11,
+   2,
+   3,
+   4
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   5
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Maghi, Tharu new year (Jan)",
+  "why": {
+   "winter": "Foggy cold mornings but quiet trails; Maghi, the Tharu new year in Jan, brings dancing and feasts to the villages.",
+   "summer": "Best tiger odds: the grass is cut short and animals come to the rivers in Mar and Apr, but May gets very hot.",
+   "monsoon": "Avoid: rivers flood, park roads close and most lodges shut or run only short walks until the rains end.",
+   "autumn": "Green and lush after the monsoon with pleasant days; tall grass hides animals, so river trips and walks work best."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Family-run jungle lodges, Tharu homestays and food, walking safaris with local guides and very few tourists.",
+  "hub": "Nepalgunj airport is about 90 km, 2 to 3 h by road; Nepalgunj sits on the border at Rupaidiha in Uttar Pradesh.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Thakurdwara Temple",
+    "kind": "temple",
+    "note": "Old temple that gave the village its name, near the park gate and the cluster of jungle lodges.",
+    "km": 0
+   },
+   {
+    "name": "Crocodile Breeding Centre",
+    "kind": "wildlife",
+    "note": "Park headquarters centre for gharial and mugger crocodiles and turtles, beside the small visitor centre.",
+    "km": 1
+   },
+   {
+    "name": "Karnali Bridge",
+    "kind": "river",
+    "note": "Where the Karnali leaves the hills at Chisapani, with rafting take-outs and a chance of river dolphins.",
+    "km": 22
+   }
+  ]
+ },
+ {
+  "id": "koshi-tappu",
+  "name": "Koshi Tappu Wildlife Reserve",
+  "state": "Nepal",
+  "lat": 26.6477,
+  "lng": 86.9981,
+  "alt": 86,
+  "category": [
+   "wildlife",
+   "offbeat"
+  ],
+  "tagline": "Sapta Koshi wetland reserve with wild water buffalo and huge winter bird flocks",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   10,
+   4
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Peak birding: huge flocks of migratory ducks and waders on the river and ponds, under cool sunny skies.",
+   "summer": "Mar still has late migrants and wild buffalo on the grassland; Apr turns hot and May is very hot and humid.",
+   "monsoon": "Avoid: the Koshi floods the reserve, tracks turn to mud and most camps close until the water drops.",
+   "autumn": "Oct is green and hot with the first returning birds; by Nov the winter migrants arrive in big numbers."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "A few tented camps on the buffer zone, birders with scopes, dawn boat rides and Tharu villages all around.",
+  "hub": "Fly Kathmandu to Biratnagar, then 57 km by road to the Kusaha headquarters; Jogbani border is next to Biratnagar.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Sapta Koshi River",
+    "kind": "river",
+    "note": "Braided river channels and sandbanks where boat trips go out for ducks, storks and the odd river dolphin.",
+    "km": 0
+   },
+   {
+    "name": "Koshi Tappu Wildlife Reserve Office",
+    "kind": "wildlife",
+    "note": "Reserve headquarters at Kusaha where you pay the fee; the nearby embankment is good for buffalo sightings.",
+    "km": 4
+   },
+   {
+    "name": "Koshi Barrage",
+    "kind": "dam",
+    "note": "Long barrage across the Koshi at the southern end of the reserve, a classic winter spot for gulls and terns.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "lumbini",
+  "name": "Lumbini",
+  "state": "Nepal",
+  "lat": 27.4696,
+  "lng": 83.2758,
+  "alt": 95,
+  "category": [
+   "spiritual",
+   "heritage"
+  ],
+  "tagline": "Birthplace of the Buddha, with the Maya Devi Temple and Ashoka's pillar",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   9,
+   10
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8
+  ],
+  "festival": "Buddha Jayanti (Apr or May)",
+  "why": {
+   "winter": "Best season: mild sunny days for cycling the monastic zone, though thick fog can sit until noon in Dec and Jan.",
+   "summer": "Mar is pleasant; by Apr and May it can pass 40°C, though Buddha Jayanti draws monks and pilgrims from across Asia.",
+   "monsoon": "Hot, humid and wet, with waterlogged paths from Jun to Aug; Sep starts to dry out but stays sticky.",
+   "autumn": "Clear skies return and the monastic zone is green; Nov is ideal for slow walks and cycle rides between temples."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Monastery guesthouses and simple hotels, monks from many countries, cycle rickshaws and quiet gardens at dawn.",
+  "hub": "Bhairahawa airport is about 20 km and the Sunauli border about 27 km; Nautanwa station on the Indian side is near Sunauli.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Mayadevi Temple",
+    "kind": "temple",
+    "note": "Brick shrine over the excavated birth spot of the Buddha, with the marker stone; shoes off and no photos inside.",
+    "km": 0
+   },
+   {
+    "name": "Ashoka Pillar",
+    "kind": "heritage",
+    "note": "Pillar raised by Emperor Ashoka in 249 BC, its Brahmi inscription naming Lumbini as the Buddha's birthplace.",
+    "km": 0
+   },
+   {
+    "name": "Puskarini Pond",
+    "kind": "lake",
+    "note": "Sacred pond where Maya Devi is said to have bathed before the birth, with prayer flags and a Bodhi tree.",
+    "km": 0
+   },
+   {
+    "name": "World Peace Pagoda",
+    "kind": "shrine",
+    "note": "White Japanese peace pagoda with a golden Buddha at the north end of the sacred garden; lovely at sunset.",
+    "km": 3
+   },
+   {
+    "name": "Lumbini Museum",
+    "kind": "museum",
+    "note": "Museum of finds from the region, Mauryan and Kushan coins and Buddhist art, in the Kenzo Tange master plan area.",
+    "km": 2
+   },
+   {
+    "name": "Tilaurakot",
+    "kind": "heritage",
+    "note": "Ruins of the Kapilavastu palace city where Siddhartha grew up, with moats and gateways, west of Lumbini.",
+    "km": 25
+   },
+   {
+    "name": "Ramagrama Stupa",
+    "kind": "shrine",
+    "note": "Unopened brick stupa said to hold a share of the Buddha's relics, by the Jharahi river in Nawalparasi.",
+    "km": 40
+   }
+  ]
+ },
+ {
+  "id": "janakpur",
+  "name": "Janakpur (Janaki Mandir)",
+  "state": "Nepal",
+  "lat": 26.7304,
+  "lng": 85.9257,
+  "alt": 81,
+  "category": [
+   "spiritual",
+   "heritage",
+   "culture"
+  ],
+  "tagline": "Sita's birthplace, with the white marble Janaki Mandir and sacred ponds",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   10
+  ],
+  "avoidMonths": [
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "Vivah Panchami (Nov or Dec)",
+  "why": {
+   "winter": "Best season: Vivah Panchami re-enacts the wedding of Ram and Sita, often in Dec, and days are mild though misty.",
+   "summer": "Ram Navami brings a big fair in Mar or Apr; May turns scorching, often above 40°C on the plains.",
+   "monsoon": "Skip: heavy heat, humidity and waterlogged lanes on the plains; the temples are open but the town is hard work.",
+   "autumn": "Chhath on the sacred ponds after Diwali is a spectacle, and Nov days are warm and clear for temple rounds."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 3,
+  "vibe": "Maithili temple town of pilgrims, sweet shops and Mithila painted walls; mostly Indian and Nepali devotees.",
+  "hub": "Janakpur airport has flights from Kathmandu; a cross-border train runs from Jaynagar in Bihar, about 30 km away.",
+  "modes": [
+   "flight",
+   "train",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Ram Mandir",
+    "kind": "temple",
+    "note": "Pagoda-style Ram temple a short walk from the Janaki Mandir, the focus of the Ram Navami celebrations.",
+    "km": 0
+   },
+   {
+    "name": "Ganga Sagar",
+    "kind": "lake",
+    "note": "Large sacred pond where pilgrims bathe and an evening aarti is held, a few minutes from the main temple.",
+    "km": 1
+   },
+   {
+    "name": "Dhanush Sagar",
+    "kind": "lake",
+    "note": "Another of the town's holy ponds, next to Ganga Sagar, linked in legend to the bow Ram broke to win Sita.",
+    "km": 0
+   },
+   {
+    "name": "Vivah Mandap",
+    "kind": "temple",
+    "note": "Pavilion beside the Janaki Mandir marking the wedding of Ram and Sita, with painted dioramas inside.",
+    "km": 0
+   },
+   {
+    "name": "Janakpur Women's Development Center",
+    "kind": "heritage",
+    "note": "Cooperative where Maithil women paint Mithila art on paper, pottery and cloth; buy direct from the artists.",
+    "km": 3
+   },
+   {
+    "name": "Jaleshwar",
+    "kind": "temple",
+    "note": "Border town with the Jaleshwar Mahadev temple, its Shiva lingam set in a water-filled pit below floor level.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "bandipur-tanahun",
+  "name": "Bandipur (Tanahun)",
+  "state": "Nepal",
+  "lat": 27.938,
+  "lng": 84.4067,
+  "alt": 989,
+  "category": [
+   "heritage",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Car-free Newar hill bazaar with Himalayan views above the Marsyangdi valley",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   1,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Clear mornings with the Annapurna and Manaslu ranges on show, mild days and cold nights as fog fills the valley below.",
+   "summer": "Mar is clear and green for walks to Ramkot and Siddha Cave; Apr and May get hazy and hot down at Dumre.",
+   "monsoon": "Rain and leeches on the trails and clouds over the mountains in Jul and Aug, though the bazaar itself stays lovely.",
+   "autumn": "Best time: festival season, crisp air and a long Himalayan skyline from Tundikhel at sunrise in Oct and Nov."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Restored old Newar houses turned into guesthouses and cafes, with tables out on the stone street at night.",
+  "hub": "8 km uphill from Dumre on the Kathmandu to Pokhara highway; about 4 to 5 h from Kathmandu and 2 h from Pokhara.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Tundikhel",
+    "kind": "viewpoint",
+    "note": "Old parade ground on the ridge just north of the bazaar, the sunrise spot for the Himalayan skyline.",
+    "km": 1
+   },
+   {
+    "name": "Thani Mai Temple",
+    "kind": "temple",
+    "note": "Hilltop shrine about 30 min up stone steps, with the best sunrise view over Bandipur and the peaks.",
+    "km": 1
+   },
+   {
+    "name": "Siddha Cave",
+    "kind": "cave",
+    "note": "One of the largest caves in Nepal, with big stalactite chambers; about 1 h walk down with a local guide.",
+    "km": 2
+   },
+   {
+    "name": "Khadga Devi Temple",
+    "kind": "temple",
+    "note": "Shrine holding a sacred sword said to come from a Palpa king, brought out only once a year at Dashain.",
+    "km": 0
+   },
+   {
+    "name": "Ramkot",
+    "kind": "village",
+    "note": "Magar village of round thatched houses, a half-day walk west along the ridge from Bandipur.",
+    "km": 4
+   },
+   {
+    "name": "Manakamana Temple",
+    "kind": "temple",
+    "note": "Wish-fulfilling goddess temple on a ridge, reached by a short cable car ride up from Kurintar on the highway.",
+    "km": 16
+   }
+  ]
+ },
+ {
+  "id": "tansen",
+  "name": "Tansen (Palpa)",
+  "state": "Nepal",
+  "lat": 27.8664,
+  "lng": 83.5469,
+  "alt": 1300,
+  "category": [
+   "heritage",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Old Newar hill town of Palpa, known for Dhaka cloth and a riverside palace",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   1,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Fog often fills the valleys at dawn while Srinagar hill sits above it in the sun, with the Himalaya on clear days.",
+   "summer": "Mar is clear and warm for the walk down to Rani Mahal; Apr and May bring haze and hot afternoons.",
+   "monsoon": "Steep lanes get slippery and cloud covers the peaks in Jul and Aug, and the Siddhartha Highway can see slides.",
+   "autumn": "Best season: clear views of Dhaulagiri and Annapurna from Srinagar Danda and cool evenings in the bazaar."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Steep cobbled lanes, Newari sweets and Dhaka topi shops, a few old guesthouses and hardly any tourists.",
+  "hub": "Bhairahawa airport and the Sunauli border are about 3 h by road via Butwal on the Siddhartha Highway.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Rani Mahal",
+    "kind": "palace",
+    "note": "1890s palace on the Kali Gandaki built by Khadga Shumsher in memory of his wife; a long walk down or a jeep road.",
+    "km": 7
+   },
+   {
+    "name": "Srinagar Danda",
+    "kind": "viewpoint",
+    "note": "Pine forest hill about 30 min above the bazaar, with a Himalayan panorama on clear mornings.",
+    "km": 1
+   },
+   {
+    "name": "Amar Narayan Temple",
+    "kind": "temple",
+    "note": "Three-tiered pagoda from the early 1800s with carved roof struts, set in a walled garden with stone spouts.",
+    "km": 0
+   },
+   {
+    "name": "Tansen Durbar",
+    "kind": "palace",
+    "note": "Palpa's old governor's palace on the main square, rebuilt after it burned in 2006, with the old town gate nearby.",
+    "km": 0
+   },
+   {
+    "name": "Ridi Bazaar",
+    "kind": "village",
+    "note": "Pilgrim town where the Ridi Khola meets the Kali Gandaki, with the Rishikesh temple and a Makar Sankranti fair.",
+    "km": 13
+   }
+  ]
+ },
+ {
+  "id": "daman-rajpath",
+  "name": "Daman (Makwanpur)",
+  "state": "Nepal",
+  "lat": 27.6105,
+  "lng": 85.0938,
+  "alt": 2299,
+  "category": [
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Ridge village on the old Rajpath with one of the widest Himalayan views in Nepal",
+  "peakMonths": [
+   10,
+   11,
+   12
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Clearest views in Dec, with frost and the odd snowfall in Jan and Feb; pack warm layers for sunrise at the tower.",
+   "summer": "Rhododendron forests bloom in Mar and Apr along the Rajpath, but haze often hides the peaks by afternoon.",
+   "monsoon": "Cloud and rain sit on the pass, the winding Rajpath sees landslides and the mountain view is mostly gone.",
+   "autumn": "Best time: Dhaulagiri to Everest across the horizon on clear mornings, crisp air and quiet resorts."
+  },
+  "days": 1,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "A few resorts and lodges on the ridge, quiet pine forest, Kathmandu weekenders and bikers riding the Rajpath.",
+  "hub": "About 80 km from Kathmandu on the winding Tribhuvan Rajpath, 3 to 4 h by road; Hetauda is about 2 h south.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Daman View Tower",
+    "kind": "viewpoint",
+    "note": "Old tower with telescopes for the full Himalayan panorama; come at sunrise before the cloud builds.",
+    "km": 0
+   },
+   {
+    "name": "Simbhanjyang",
+    "kind": "viewpoint",
+    "note": "Highest point on the Rajpath, a short drive south, with tea stalls and walks into the rhododendron forest.",
+    "km": 2
+   },
+   {
+    "name": "Chitlang",
+    "kind": "village",
+    "note": "Newar valley village on the old trade route to Kathmandu, known for goat cheese and homestays.",
+    "km": 9
+   },
+   {
+    "name": "Indra Sarobar (Kulekhani)",
+    "kind": "lake",
+    "note": "Reservoir of the Kulekhani dam below Daman, with boating and fish lunches on the shore.",
+    "km": 8
+   }
+  ]
+ },
+ {
+  "id": "gorkha-durbar",
+  "name": "Gorkha Durbar",
+  "state": "Nepal",
+  "lat": 28.0041,
+  "lng": 84.6293,
+  "alt": 1373,
+  "category": [
+   "heritage",
+   "spiritual",
+   "mountains"
+  ],
+  "tagline": "Hilltop palace fort where Prithvi Narayan Shah set out to unify Nepal",
+  "peakMonths": [
+   10,
+   11,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Dashain (Sep or Oct)",
+  "why": {
+   "winter": "Clear and cool for the stone stair climb from the bazaar, with Manaslu and Himalchuli to the north; dawn can be foggy.",
+   "summer": "Mar is pleasant; Apr and May turn hot and hazy, so climb early and rest in the shade of the palace courtyards.",
+   "monsoon": "Rain makes the stone steps slippery and clouds hide the peaks in Jul and Aug; Sep is greener and drier.",
+   "autumn": "Dashain rituals at the Kalika temple draw big crowds, usually in Oct, and the post-monsoon air gives the best views."
+  },
+  "days": 1,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Simple hotels in Gorkha bazaar, dal bhat and tea by the steps, Nepali families and school groups at the palace.",
+  "hub": "24 km up from Abukhaireni on the Kathmandu to Pokhara highway; about 5 h from Kathmandu, 3 h from Pokhara.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Kalika Temple",
+    "kind": "temple",
+    "note": "Goddess shrine inside the palace complex, closed to visitors inside, with big rituals at Dashain.",
+    "km": 0
+   },
+   {
+    "name": "Gorakhnath Cave",
+    "kind": "cave",
+    "note": "Cave shrine of the saint who gave Gorkha its name, just below the palace terrace.",
+    "km": 0
+   },
+   {
+    "name": "Gorkha Museum (Tallo Durbar)",
+    "kind": "museum",
+    "note": "Lower palace in the bazaar, now a museum of Shah dynasty history, weapons and old documents.",
+    "km": 1
+   },
+   {
+    "name": "Manakamana Temple",
+    "kind": "temple",
+    "note": "Wish goddess temple on the next ridge south, with old links to Gorkha's royal family; cable car from Kurintar.",
+    "km": 12
+   },
+   {
+    "name": "Barpak",
+    "kind": "village",
+    "note": "Big Gurung village rebuilt after the 2015 earthquake struck right here, with homestays and Manaslu views.",
+    "km": 25
+   }
+  ]
+ },
+ {
+  "id": "ilam",
+  "name": "Ilam (tea gardens)",
+  "state": "Nepal",
+  "lat": 26.9103,
+  "lng": 87.9211,
+  "alt": 1131,
+  "category": [
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Rolling tea hills next to Darjeeling, with Kanchenjunga sunrise at Antu Danda",
+  "peakMonths": [
+   10,
+   11,
+   3,
+   4
+  ],
+  "shoulderMonths": [
+   12,
+   1,
+   2,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Clear skies for Kanchenjunga at the Antu Danda sunrise, cold mornings and misty tea slopes; little picking happens.",
+   "summer": "First flush picking begins in Mar and Apr, the gardens are bright green and views are still fairly clear.",
+   "monsoon": "Heavy rain, leeches and slips on hill roads; the tea grows fast but the views disappear behind cloud.",
+   "autumn": "Best time: clear Himalayan views, autumn flush tea and comfortable walks through the Kanyam and Ilam gardens."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Homestays among the tea bushes, milk tea and churpi cheese, Nepali couples and Siliguri weekenders.",
+  "hub": "Bhadrapur airport is 77 km, about 3 h up the Mechi Highway; from the Kakarbhitta border allow 3 to 4 h.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Ilam Tea Estate",
+    "kind": "tea",
+    "note": "The oldest tea garden in Nepal, planted in the 1860s, with walking paths right above the bazaar.",
+    "km": 0
+   },
+   {
+    "name": "Kanyam",
+    "kind": "tea",
+    "note": "Sweeping tea slopes on the highway where everyone stops for photos and momos; busy at weekends.",
+    "km": 17
+   },
+   {
+    "name": "Antu Danda",
+    "kind": "viewpoint",
+    "note": "Ridge near the border above 2000 m, famous for sunrise over Kanchenjunga and a sea of clouds.",
+    "km": 22
+   },
+   {
+    "name": "Mai Pokhari",
+    "kind": "lake",
+    "note": "Sacred wetland lake in forest, a Ramsar site with nine bays, about 1 h by road north of Ilam.",
+    "km": 11
+   },
+   {
+    "name": "Fikkal",
+    "kind": "market",
+    "note": "Highway bazaar between Ilam and Kanyam with tea factories, where the road branches off to Pashupatinagar.",
+    "km": 14
+   }
+  ]
+ },
+ {
+  "id": "rara-lake",
+  "name": "Rara Lake",
+  "state": "Nepal",
+  "lat": 29.5293,
+  "lng": 82.0871,
+  "alt": 2966,
+  "category": [
+   "lake",
+   "offbeat",
+   "trek"
+  ],
+  "tagline": "Nepal's biggest lake, a deep blue bowl ringed by pine in far-west Mugu",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   6,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   1,
+   2,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec is cold and clear; by Jan and Feb snow can block the trail and flights, and the few lodges by the lake close.",
+   "summer": "Apr and May bring wildflowers and rhododendron, warm days for the shore walk and the clearest water.",
+   "monsoon": "Jul and Aug rain cancels Talcha flights and turns roads to mud, though Sep greens the meadows beautifully.",
+   "autumn": "Best season: deep blue water under clear skies, golden meadows and the climb to Murma Top for the whole lake."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "A few simple lodges and camping inside the park, Thakuri villages nearby and very few outsiders this far west.",
+  "hub": "Fly Nepalgunj to Talcha in Mugu, about 35 min, then 2 to 4 h on foot; Rara National Park fee at the gate.",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Murma Top",
+    "kind": "viewpoint",
+    "note": "Ridge viewpoint west of the lake at about 3700 m, the classic spot to fit the whole lake in one frame.",
+    "km": 5
+   },
+   {
+    "name": "Rara Lake circuit",
+    "kind": "walk",
+    "note": "Shoreline trail of about 13 km through pine and juniper forest around the lake, a 4 to 5 h walk.",
+    "km": 0
+   },
+   {
+    "name": "Thakur Baba Temple",
+    "kind": "temple",
+    "note": "Shrine of the local deity Thakur at the lake's south-east corner, tied to a legend about taming the lake's floods.",
+    "km": 2
+   },
+   {
+    "name": "Gamgadhi",
+    "kind": "village",
+    "note": "Mugu district headquarters east of the lake, with simple hotels, shops and jeeps toward Talcha.",
+    "km": 7
+   }
+  ]
+ },
+ {
+  "id": "phoksundo-lake",
+  "name": "Phoksundo Lake (Dolpo)",
+  "state": "Nepal",
+  "lat": 29.1959,
+  "lng": 82.9522,
+  "alt": 3614,
+  "category": [
+   "lake",
+   "trek",
+   "offbeat"
+  ],
+  "tagline": "Turquoise high lake of Dolpo, with a Bon village and a tall waterfall below",
+  "peakMonths": [
+   5,
+   9,
+   10
+  ],
+  "shoulderMonths": [
+   4,
+   6,
+   7,
+   8,
+   11
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2,
+   3
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Avoid: snow and deep cold, many Ringmo families move down the valley and Juphal flights are unreliable.",
+   "summer": "Mar is still snowbound; Apr and May open the trail with clear skies and the lake at its most vivid turquoise.",
+   "monsoon": "Dolpo sits partly in the rain shadow, so treks run, but Juphal flights cancel often; Sep is greener and calmer.",
+   "autumn": "Prime season: crystal water, golden birch forest and clear trails before the cold sets in by late Nov."
+  },
+  "days": 7,
+  "budget": 3,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Basic lodges and camping at Ringmo, Bon chortens and gompas, and a handful of guided trekking groups.",
+  "hub": "Fly Nepalgunj to Juphal, then 2 to 3 days on foot. Shey Phoksundo park permit; Lower Dolpo RAP via an agency.",
+  "modes": [
+   "flight"
+  ],
+  "spots": [
+   {
+    "name": "Ringmo",
+    "kind": "village",
+    "note": "Bon village of stone houses at the south end of the lake, where most trekkers stay the night.",
+    "km": 3
+   },
+   {
+    "name": "Tshowa Gompa",
+    "kind": "monastery",
+    "note": "Old Bon monastery on the lakeshore a short walk from Ringmo, with the turquoise water right below.",
+    "km": 1
+   },
+   {
+    "name": "Phoksundo Waterfall",
+    "kind": "waterfall",
+    "note": "Tall falls below the lake outlet, about 167 m, seen from the trail as you climb up from Chhepka.",
+    "km": 4
+   },
+   {
+    "name": "Chhepka",
+    "kind": "village",
+    "note": "Riverside hamlet in forest on the way up, the usual first or second night out of Juphal.",
+    "km": 16
+   },
+   {
+    "name": "Juphal",
+    "kind": "village",
+    "note": "Airstrip village above the Thuli Bheri where flights from Nepalgunj land and the treks begin.",
+    "km": 27
+   }
+  ]
+ },
+ {
+  "id": "kalinchowk",
+  "name": "Kalinchowk Bhagwati",
+  "state": "Nepal",
+  "lat": 27.7578,
+  "lng": 86.0337,
+  "alt": 3709,
+  "category": [
+   "spiritual",
+   "snow",
+   "mountains"
+  ],
+  "tagline": "Ridge-top goddess shrine in Dolakha, a favourite winter snow trip from Kathmandu",
+  "peakMonths": [
+   12,
+   1,
+   2,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Snow season: Nepalis flock up for snowfall from Dec, and the cable car from Kuri saves the icy climb; very cold.",
+   "summer": "Mar and Apr bring rhododendron forests and clear mornings; by May cloud rolls in after noon.",
+   "monsoon": "Skip: cloud and rain cover the ridge, roads past Charikot see landslides and there are no views at all.",
+   "autumn": "Clear post-monsoon skies with the Gaurishankar, Rolwaling and Langtang ranges in view; cold but mostly snow-free."
+  },
+  "days": 2,
+  "budget": 1,
+  "solo": 3,
+  "crowd": 2,
+  "vibe": "Basic hotels in Kuri village, dal bhat and noodle soup, and crowds of Nepali snow seekers at weekends.",
+  "hub": "About 150 km from Kathmandu, 6 to 7 h by road via Charikot to Kuri, then a 1 km cable car or a 1.5 h walk.",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Kuri",
+    "kind": "village",
+    "note": "Lodge village below the summit where vehicles stop and both the cable car and the walking trail begin.",
+    "km": 1
+   },
+   {
+    "name": "Kalinchowk Cable Car",
+    "kind": "activity",
+    "note": "Ropeway of about 1 km from Kuri up to the temple in some 5 min, saving a steep walk of about 1.5 h.",
+    "km": 1
+   },
+   {
+    "name": "Charikot",
+    "kind": "viewpoint",
+    "note": "Dolakha district hub on a ridge with views of Gaurishankar, the last big bazaar on the way up.",
+    "km": 11
+   },
+   {
+    "name": "Bhimeshwor Temple",
+    "kind": "temple",
+    "note": "Old Bhimsen shrine in Dolakha bazaar, famous for an idol said to sweat before big national events.",
+    "km": 10
+   }
+  ]
+ },
+ {
+  "id": "paro-valley",
+  "name": "Paro Valley (Tiger's Nest)",
+  "state": "Bhutan",
+  "lat": 27.4267,
+  "lng": 89.4229,
+  "alt": 2281,
+  "category": [
+   "heritage",
+   "spiritual",
+   "trek"
+  ],
+  "tagline": "Bhutan's gateway valley, crowned by the cliffside Tiger's Nest",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   5,
+   6,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   7,
+   8
+  ],
+  "festival": "Paro Tshechu (Mar or Apr)",
+  "why": {
+   "winter": "Dec to Feb is cold but clear, with crisp Jomolhari views from Chele La and a quiet, frosty climb to the Tiger's Nest.",
+   "summer": "Mar to May is prime: the Paro Tshechu dawn thongdrel, rhododendrons on Chele La and dry trails up to Taktsang.",
+   "monsoon": "Jun and Sep are workable with green paddies; Jul and Aug bring daily rain, cloud over Taktsang and the odd delayed flight.",
+   "autumn": "Oct and Nov are the best of the year: harvest-gold paddies, sharp blue skies and the clearest views from the Taktsang trail."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Farmhouse stays and dzong-view hotels, ema datshi lunches, and early starts with fellow hikers bound for Taktsang.",
+  "hub": "Paro airport is in the valley: flights from Delhi, Kolkata, Bagdogra, Guwahati. Or 165 km from Phuentsholing",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Taktsang Palphug Monastery",
+    "kind": "monastery",
+    "note": "The Tiger's Nest clings to a cliff about 900 m above the valley floor; the hike up takes 2 to 3 h, so start early.",
+    "km": 9
+   },
+   {
+    "name": "Kyichu Lhakhang",
+    "kind": "temple",
+    "note": "One of Bhutan's oldest temples, traditionally dated to the 7th century, with prayer wheels ringing its courtyard.",
+    "km": 5
+   },
+   {
+    "name": "National Museum of Bhutan",
+    "kind": "museum",
+    "note": "Housed in the round Ta Dzong watchtower above Rinpung Dzong, with masks, thangkas and natural history galleries.",
+    "km": 1
+   },
+   {
+    "name": "Dungtse Lhakhang",
+    "kind": "temple",
+    "note": "Chorten-shaped temple built in 1433 by Thangtong Gyalpo, the iron bridge maker, its floors mapping Buddhist cosmology.",
+    "km": 1
+   },
+   {
+    "name": "Tamchog Lhakhang",
+    "kind": "temple",
+    "note": "Temple reached by an iron-chain footbridge over the Paro Chhu, linked to Thangtong Gyalpo; a stop on the Thimphu road.",
+    "km": 13
+   },
+   {
+    "name": "Chele La",
+    "kind": "viewpoint",
+    "note": "Road pass to Haa at 3,988 m, thick with prayer flags; on clear mornings Jomolhari and Jichu Drake show to the north.",
+    "km": 10
+   }
+  ]
+ },
+ {
+  "id": "thimphu",
+  "name": "Thimphu (Tashichho Dzong)",
+  "state": "Bhutan",
+  "lat": 27.4894,
+  "lng": 89.635,
+  "alt": 2337,
+  "category": [
+   "heritage",
+   "culture",
+   "spiritual"
+  ],
+  "tagline": "A capital without traffic lights, built around a white-walled dzong",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   5,
+   6,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   7,
+   8
+  ],
+  "festival": "Thimphu Tshechu (Sep or Oct)",
+  "why": {
+   "winter": "Dec to Feb is cold and dry with clear skies; Dochu La often shows a white Himalayan skyline and hotel rates soften.",
+   "summer": "Mar to May is mild and bright, rhododendrons flower on the passes and the weekend market fills with spring produce.",
+   "monsoon": "Jun and Sep are fine between showers, and the Tshechu falls in Sep in some years; Jul and Aug are the wettest, cloudiest weeks.",
+   "autumn": "Oct and Nov bring clear skies and crisp air, ideal for the dzong, the Buddha Dordenma and the walk up to Cheri."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Cafes, craft shops and archery matches; monks, office workers and students share momo joints along Norzin Lam.",
+  "hub": "Paro airport is 50 km, about 1 h 15 min; Phuentsholing is 175 km, 5 to 6 h. Entry permit covers Thimphu",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Buddha Dordenma",
+    "kind": "shrine",
+    "note": "A 51.5 m gilded bronze Buddha on Kuensel Phodrang hill, filled with thousands of small Buddhas, with wide views over the city.",
+    "km": 5
+   },
+   {
+    "name": "National Memorial Chorten",
+    "kind": "shrine",
+    "note": "White stupa built in 1974 in memory of the third king; elderly residents circle it all day spinning prayer wheels.",
+    "km": 3
+   },
+   {
+    "name": "Centenary Farmers' Market",
+    "kind": "market",
+    "note": "Riverside market of chillies, datshi cheese and red rice; cross the cantilever footbridge to the craft stalls.",
+    "km": 2
+   },
+   {
+    "name": "Changangkha Lhakhang",
+    "kind": "temple",
+    "note": "12th-century hilltop temple where parents bring newborns to be named, with a wide view over the valley.",
+    "km": 1
+   },
+   {
+    "name": "Motithang Takin Preserve",
+    "kind": "wildlife",
+    "note": "Small reserve on the edge of town to see the takin, Bhutan's odd-looking national animal, at close range.",
+    "km": 2
+   },
+   {
+    "name": "Cheri Monastery",
+    "kind": "monastery",
+    "note": "Founded in 1620 by Zhabdrung Ngawang Namgyal; a steep forest climb of about 1 h from the road head at Dodena.",
+    "km": 12
+   },
+   {
+    "name": "Dochu La",
+    "kind": "viewpoint",
+    "note": "Pass at about 3,100 m on the Punakha road with 108 memorial chortens; on clear winter days the high Himalaya lines up.",
+    "km": 11
+   }
+  ]
+ },
+ {
+  "id": "punakha",
+  "name": "Punakha",
+  "state": "Bhutan",
+  "lat": 27.5823,
+  "lng": 89.8632,
+  "alt": 1229,
+  "category": [
+   "heritage",
+   "spiritual",
+   "culture"
+  ],
+  "tagline": "Jacaranda-framed dzong where the Pho Chhu and Mo Chhu rivers meet",
+  "peakMonths": [
+   2,
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   5,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Punakha Drubchen and Tshechu (Feb or Mar)",
+  "why": {
+   "winter": "Mild valley winters, warmer than Thimphu, with the central monk body in residence; the Drubchen battle pageant often falls in Feb.",
+   "summer": "Mar and Apr are glorious, with lilac jacaranda around the dzong; by May the valley turns hot and humid at about 1,200 m.",
+   "monsoon": "Jun to Aug are hot, humid and wet, and rafting pauses on swollen rivers; Sep greens the rice terraces before harvest.",
+   "autumn": "Oct and Nov are perfect: golden paddies around Chimi Lhakhang, calm rivers for rafting and clear skies on Dochu La."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 2,
+  "vibe": "Riverside resorts and farm homestays, red rice and ema datshi, rafting crews on the Mo Chhu and pilgrims at Chimi Lhakhang.",
+  "hub": "71 km from Thimphu over Dochu La, about 3 h; Paro airport is 130 km, 4 to 5 h. Route permit needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Punakha Suspension Bridge",
+    "kind": "walk",
+    "note": "Long prayer-flag footbridge over the Pho Chhu just upstream of the dzong, swaying gently above the water.",
+    "km": 1
+   },
+   {
+    "name": "Chimi Lhakhang",
+    "kind": "temple",
+    "note": "Fertility temple of the Divine Madman, Drukpa Kunley, built in 1499; a short walk through rice fields from Sopsokha.",
+    "km": 6
+   },
+   {
+    "name": "Khamsum Yulley Namgyal Chorten",
+    "kind": "temple",
+    "note": "Temple-chorten built by Queen Mother Ashi Tshering Yangdon, reached by a 45 min climb through paddies with views up the Mo Chhu.",
+    "km": 8
+   },
+   {
+    "name": "Mo Chhu",
+    "kind": "river",
+    "note": "Gentle rafting stretch that finishes beside the dzong; trips run in the dry months when the river is calm.",
+    "km": 1
+   },
+   {
+    "name": "Wangdue Phodrang Dzong",
+    "kind": "fort",
+    "note": "Ridge-top dzong of 1638, rebuilt after the 2012 fire and reconsecrated in 2022, above the Punatsang Chhu.",
+    "km": 12
+   },
+   {
+    "name": "Dochu La",
+    "kind": "viewpoint",
+    "note": "The 108 chortens at about 3,100 m on the way in from Thimphu; stop for tea and the northern skyline.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "haa-valley",
+  "name": "Haa Valley",
+  "state": "Bhutan",
+  "lat": 27.387,
+  "lng": 89.2805,
+  "alt": 2722,
+  "category": [
+   "mountains",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Quiet western valley over Chele La, with sacred white and black temples",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   6,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   1,
+   2,
+   7,
+   8
+  ],
+  "festival": "Haa Tshechu (Oct or Nov)",
+  "why": {
+   "winter": "Dec can be crisp and clear, but Jan and Feb bring sub-zero nights and snow that can shut the Chele La road from Paro.",
+   "summer": "Apr and May are lovely: rhododendrons on Chele La, yaks moving up and green barley fields along the Haa Chhu.",
+   "monsoon": "Jul and Aug are wet, with cloud on the passes and slips on the Chele La road; Jun and Sep are greener and calmer.",
+   "autumn": "Oct and Nov bring the clearest Jomolhari views from Chele La and the Haa Tshechu in the Lhakhang Karpo courtyard."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Farmhouse homestays with hot stone baths, buckwheat hoentay dumplings and very few other visitors.",
+  "hub": "About 61 km from Paro over Chele La, around 2.5 h; Paro airport is the nearest. Route permit needed",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Lhakhang Karpo",
+    "kind": "temple",
+    "note": "The White Temple, said to date from the 7th century, whose courtyard hosts the Haa Tshechu masked dances.",
+    "km": 3
+   },
+   {
+    "name": "Lhakhang Nagpo",
+    "kind": "temple",
+    "note": "The Black Temple, twin shrine to Lhakhang Karpo a short walk away, tied to the same founding legend.",
+    "km": 3
+   },
+   {
+    "name": "Chele La",
+    "kind": "viewpoint",
+    "note": "Road pass at 3,988 m between Paro and Haa; dense prayer flags and Jomolhari views at sunrise on clear days.",
+    "km": 7
+   },
+   {
+    "name": "Kila Gompa",
+    "kind": "monastery",
+    "note": "Cliffside nunnery below Chele La on the Paro side, reached by a forest walk from the pass road.",
+    "km": 6
+   }
+  ]
+ },
+ {
+  "id": "phobjikha-valley",
+  "name": "Phobjikha Valley (Gangtey)",
+  "state": "Bhutan",
+  "lat": 27.4848,
+  "lng": 90.1649,
+  "alt": 3028,
+  "category": [
+   "wildlife",
+   "mountains",
+   "spiritual",
+   "offbeat"
+  ],
+  "tagline": "Glacial bowl valley where black-necked cranes winter below Gangtey",
+  "peakMonths": [
+   10,
+   11,
+   12,
+   1,
+   2
+  ],
+  "shoulderMonths": [
+   3,
+   4,
+   5,
+   9
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Black-Necked Crane Festival (Nov)",
+  "why": {
+   "winter": "Dec and Jan are peak crane months, with hundreds of black-necked cranes on the marsh, frosty mornings and snow some nights.",
+   "summer": "Most cranes have flown back to Tibet by Mar; Apr and May bring rhododendron bloom, green meadows and easy trail walking.",
+   "monsoon": "Jun to Aug are wet and misty, with muddy trails and leeches in the forest; Sep dries out as the potato harvest begins.",
+   "autumn": "Cranes arrive from late Oct and Gangtey Goemba celebrates them in Nov with the crane festival; days are clear and cold."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Farmhouse homestays and wood stoves, potato fields, monks from Gangtey Goemba, and birders with scopes at dawn.",
+  "hub": "65 km from Wangdue, about 2.5 h, over Lawa La; Thimphu is about 130 km, 4 to 5 h. Route permit needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Gangtey Goemba",
+    "kind": "monastery",
+    "note": "Nyingma monastery founded in 1613 on a knoll over the valley, seat of the Gangteng Tulku, restored in local timber.",
+    "km": 0
+   },
+   {
+    "name": "Black-Necked Crane Information Centre",
+    "kind": "wildlife",
+    "note": "RSPN centre with spotting scopes over the marsh where the cranes roost; check winter opening hours locally.",
+    "km": 2
+   },
+   {
+    "name": "Gangtey Nature Trail",
+    "kind": "walk",
+    "note": "Gentle 4 km trail from Gangtey down through pine forest and meadows to Khewang Lhakhang, about 1.5 h one way.",
+    "km": 0
+   },
+   {
+    "name": "Khewang Lhakhang",
+    "kind": "temple",
+    "note": "Old village temple at the far end of the nature trail, on the valley floor below the eastern slopes.",
+    "km": 3
+   },
+   {
+    "name": "Lawa La",
+    "kind": "viewpoint",
+    "note": "Prayer-flag pass on the road in from the highway, the first wide look down over the Phobjikha bowl.",
+    "km": 5
+   },
+   {
+    "name": "Chendebji Chorten",
+    "kind": "shrine",
+    "note": "Large white 18th-century chorten in the style of Swayambhunath, beside the highway towards Trongsa.",
+    "km": 18
+   }
+  ]
+ },
+ {
+  "id": "bumthang",
+  "name": "Bumthang (Jakar)",
+  "state": "Bhutan",
+  "lat": 27.5492,
+  "lng": 90.744,
+  "alt": 2689,
+  "category": [
+   "heritage",
+   "spiritual",
+   "culture"
+  ],
+  "tagline": "Bhutan's spiritual heartland of ancient temples and wide valleys",
+  "peakMonths": [
+   3,
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Jambay Lhakhang Drup (Oct or Nov)",
+  "why": {
+   "winter": "Dec to Feb is cold with frosty nights and snow on the passes, but skies are clear and the temples have few visitors.",
+   "summer": "Mar to May is pleasant and dry, with apple blossom, green buckwheat and easy walks between Jambay, Kurjey and Tamshing.",
+   "monsoon": "Jun to Aug bring heavy rain, slides on the Trongsa road and mud on village tracks; Sep is greener and calmer.",
+   "autumn": "Oct and Nov are the best: crisp clear days and the Jambay Lhakhang Drup with its midnight fire blessing."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 4,
+  "crowd": 1,
+  "vibe": "Wooden guesthouses with bukhari stoves, local cheese, Red Panda beer and buckwheat noodles among farmers and pilgrims.",
+  "hub": "Bathpalathang airport has domestic flights from Paro; by road 68 km from Trongsa, 2 to 3 h. Route permit needed",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Jambay Lhakhang",
+    "kind": "temple",
+    "note": "One of the temples the Tibetan king Songtsen Gampo is said to have built in 659; home of the Jambay Lhakhang Drup.",
+    "km": 4
+   },
+   {
+    "name": "Kurjey Lhakhang",
+    "kind": "temple",
+    "note": "Three temples around a rock bearing the body imprint of Guru Rinpoche, enclosed by a wall of 108 chortens.",
+    "km": 4
+   },
+   {
+    "name": "Tamshing Lhakhang",
+    "kind": "temple",
+    "note": "Founded in 1501 by Pema Lingpa, with some of Bhutan's oldest wall paintings and a chain-mail coat to carry round the shrine.",
+    "km": 4
+   },
+   {
+    "name": "Wangdicholing Palace",
+    "kind": "palace",
+    "note": "Palace of 1857 where the first king held court, a short walk from Chamkhar town.",
+    "km": 1
+   },
+   {
+    "name": "Mebar Tsho",
+    "kind": "lake",
+    "note": "The Burning Lake, a deep pool in the Tang Chhu gorge where Pema Lingpa is said to have found treasure holding a lit lamp.",
+    "km": 9
+   },
+   {
+    "name": "Ogyen Choling",
+    "kind": "museum",
+    "note": "Hilltop manor in the Tang valley turned into a family-run museum of rural and religious life, with a guesthouse.",
+    "km": 16
+   },
+   {
+    "name": "Bumthang Brewery",
+    "kind": "food",
+    "note": "Small Jakar brewery behind Red Panda, an unfiltered wheat beer; the Swiss farm nearby also sells local cheese.",
+    "km": 1
+   }
+  ]
+ },
+ {
+  "id": "ura-valley",
+  "name": "Ura (Bumthang)",
+  "state": "Bhutan",
+  "lat": 27.4789,
+  "lng": 90.9057,
+  "alt": 3129,
+  "category": [
+   "culture",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Cobbled hill village of whitewashed houses on the Bumthang to Mongar road",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   1,
+   2,
+   6,
+   7,
+   8
+  ],
+  "festival": "Ura Yakchoe (Apr or May)",
+  "why": {
+   "winter": "Dec is cold but clear; Jan and Feb bring hard frost, snow at Thrumshing La and a hushed village with bare fields.",
+   "summer": "Apr and May are the best: the Ura Yakchoe dances, rhododendron forests in bloom and fresh green pastures on the hills.",
+   "monsoon": "Jun to Aug are wet, with mud and slides around Thrumshing La; Sep is clearer and the barley turns gold.",
+   "autumn": "Oct and Nov bring crisp air, harvest in the fields and wide views back over the valley from the road pass."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Homestays in old stone farmhouses, buckwheat pancakes and butter tea, with villagers who rarely see visitors.",
+  "hub": "48 km east of Jakar, about 2 h; Bathpalathang airport in Bumthang has domestic flights from Paro. Route permit",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Ura Lhakhang",
+    "kind": "temple",
+    "note": "Village temple where the Ura Yakchoe is held, when a sacred relic is shown and masked dancers fill the yard.",
+    "km": 0
+   },
+   {
+    "name": "Shertang La",
+    "kind": "viewpoint",
+    "note": "Highest point on the drive in from Jakar; on clear mornings it looks north towards Gangkhar Puensum.",
+    "km": 6
+   },
+   {
+    "name": "Thrumshing La",
+    "kind": "viewpoint",
+    "note": "High road pass at about 3,780 m towards Mongar, in the fir and rhododendron forest of Thrumshing La National Park.",
+    "km": 12
+   },
+   {
+    "name": "Sengor",
+    "kind": "village",
+    "note": "Small herder settlement in the cloud forest below Thrumshing La, a noted stop for birders on the Mongar road.",
+    "km": 18
+   },
+   {
+    "name": "Jakar Dzong",
+    "kind": "fort",
+    "note": "Ridge-top Castle of the White Bird, rebuilt in 1667, watching over the Chamkhar valley about 2 h back by road.",
+    "km": 18
+   }
+  ]
+ },
+ {
+  "id": "trongsa",
+  "name": "Trongsa",
+  "state": "Bhutan",
+  "lat": 27.4996,
+  "lng": 90.505,
+  "alt": 2077,
+  "category": [
+   "heritage",
+   "culture",
+   "mountains"
+  ],
+  "tagline": "Bhutan's largest dzong spills down a ridge above the Mangde Chhu gorge",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   5,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Trongsa Tshechu (Dec or Jan)",
+  "why": {
+   "winter": "Dec and Jan are cold but clear, and the Trongsa Tshechu often falls in this window; Yotong La and Pele La may see snow.",
+   "summer": "Mar to May is bright and mild, with rhododendron and magnolia on the passes and clear views across the gorge.",
+   "monsoon": "Jun to Aug bring heavy rain and slides on the highway over Pele La; Sep is greener and roads usually reopen fast.",
+   "autumn": "Oct and Nov are ideal: blue skies, a sharp view of the dzong from across the gorge and easy days at the Ta Dzong museum."
+  },
+  "days": 1,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "A one-street hill town of family hotels facing the dzong; drivers and travellers break the cross-country trip here.",
+  "hub": "68 km from Bumthang, 2 to 3 h; 129 km from Wangdue, about 5 h; Thimphu 199 km. Route permit needed",
+  "modes": [
+   "flight",
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Ta Dzong",
+    "kind": "museum",
+    "note": "Old watchtower above the dzong, now the Royal Heritage Museum on the Wangchuck dynasty and its Trongsa roots.",
+    "km": 0
+   },
+   {
+    "name": "Trongsa Dzong Viewpoint",
+    "kind": "viewpoint",
+    "note": "Roadside lookout across the gorge on the approach from the west, the classic view of the dzong on its ridge.",
+    "km": 2
+   },
+   {
+    "name": "Kuenga Rabten Palace",
+    "kind": "palace",
+    "note": "Winter palace of the second king, built in 1929 on a terrace above the Mangde Chhu, about 23 km south by road.",
+    "km": 10
+   },
+   {
+    "name": "Yotong La",
+    "kind": "viewpoint",
+    "note": "Pass at about 3,400 m on the road to Bumthang, through fir and rhododendron forest with long views east.",
+    "km": 12
+   },
+   {
+    "name": "Chendebji Chorten",
+    "kind": "shrine",
+    "note": "Large white 18th-century chorten in the style of Swayambhunath, a tea stop on the road west to Pele La.",
+    "km": 16
+   }
+  ]
+ },
+ {
+  "id": "trashigang",
+  "name": "Trashigang",
+  "state": "Bhutan",
+  "lat": 27.3366,
+  "lng": 91.5515,
+  "alt": 990,
+  "category": [
+   "heritage",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Cliff-edge dzong above two rivers in Bhutan's far east",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   5,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Trashigang Tshechu (Nov or Dec)",
+  "why": {
+   "winter": "Dec to Feb is mild at about 1,000 m with clear skies; the Tshechu can fall in Dec, with Brokpa herders in full dress.",
+   "summer": "Mar and Apr are pleasant and the Gom Kora spring festival draws pilgrims; by May the valley turns hot and humid.",
+   "monsoon": "Jun to Aug bring heavy rain and frequent slides on the Mongar and Samdrup Jongkhar roads; Sep is more settled.",
+   "autumn": "Oct and Nov are the best: dry roads, golden rice at Radhi and clear views from the dzong over the Drangme Chhu."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Small family hotels and a busy square where Brokpa herders, students from Kanglung and traders mix over momos.",
+  "hub": "180 km from Samdrup Jongkhar border, 6 to 8 h; Guwahati airport to the border about 3 h. Route permit needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Gom Kora",
+    "kind": "temple",
+    "note": "Temple by a black rock where Guru Rinpoche is said to have meditated; its spring festival draws pilgrims from far around.",
+    "km": 10
+   },
+   {
+    "name": "Rangjung Woesel Chholing Monastery",
+    "kind": "monastery",
+    "note": "Large Nyingma monastery founded in 1990 above Rangjung, with a lively community of young monks.",
+    "km": 12
+   },
+   {
+    "name": "Radhi",
+    "kind": "village",
+    "note": "The rice bowl of the east, where women weave bura raw silk; terraced paddies turn gold before the harvest.",
+    "km": 15
+   },
+   {
+    "name": "Drametse Lhakhang",
+    "kind": "monastery",
+    "note": "Monastery founded in 1511 by Ani Choeten Zangmo, granddaughter of Pema Lingpa; home of the Drametse Ngacham drum dance on UNESCO's list.",
+    "km": 12
+   }
+  ]
+ },
+ {
+  "id": "trashiyangtse",
+  "name": "Trashiyangtse (Chorten Kora)",
+  "state": "Bhutan",
+  "lat": 27.606,
+  "lng": 91.4949,
+  "alt": 1739,
+  "category": [
+   "spiritual",
+   "wildlife",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Whitewashed stupa, woodturners and winter cranes in the far northeast",
+  "peakMonths": [
+   2,
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   5,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Chorten Kora Festival (Feb or Mar)",
+  "why": {
+   "winter": "Dec to Feb is cool and clear, black-necked cranes winter at Bumdeling, and the Chorten Kora festival can begin in Feb.",
+   "summer": "Mar often brings the Chorten Kora kora, with pilgrims from Arunachal joining in; Apr and May are warm and green.",
+   "monsoon": "Jun to Aug bring heavy rain, leeches and slips on the road up from Trashigang; Sep is calmer but still damp.",
+   "autumn": "Oct and Nov are clear and comfortable; the first cranes reach Bumdeling by Nov and the roads are at their best."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Simple guesthouses, dapa bowl workshops and village kora walks; you meet woodturners, monks and very few tourists.",
+  "hub": "About 53 km from Trashigang, around 2 h; the Samdrup Jongkhar border is 180 km beyond. Route permit needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Chorten Kora",
+    "kind": "shrine",
+    "note": "Large white stupa of 1740 modelled on Boudhanath in Kathmandu, circled by pilgrims at the spring festival.",
+    "km": 0
+   },
+   {
+    "name": "College of Zorig Chusum",
+    "kind": "heritage",
+    "note": "School for the 13 traditional arts, known here for turned wooden dapa bowls and lacquerware.",
+    "km": 1
+   },
+   {
+    "name": "Bumdeling Wildlife Sanctuary",
+    "kind": "wildlife",
+    "note": "Black-necked cranes roost in the Bumdeling paddies from about Nov to Feb, a short drive north of town.",
+    "km": 9
+   },
+   {
+    "name": "Rigsum Goenpa",
+    "kind": "monastery",
+    "note": "Hillside monastery above the Bumdeling valley reached by a steep forest hike, with views over the crane fields.",
+    "km": 10
+   },
+   {
+    "name": "Gom Kora",
+    "kind": "temple",
+    "note": "Guru Rinpoche meditation rock and temple on the road down to Trashigang, by the Drangme Chhu.",
+    "km": 21
+   }
+  ]
+ },
+ {
+  "id": "merak-sakteng",
+  "name": "Merak and Sakteng",
+  "state": "Bhutan",
+  "lat": 27.3017,
+  "lng": 91.858,
+  "alt": 3541,
+  "category": [
+   "culture",
+   "trek",
+   "offbeat",
+   "mountains"
+  ],
+  "tagline": "Brokpa yak herder villages in the high pastures of eastern Bhutan",
+  "peakMonths": [
+   4,
+   5,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   3,
+   9
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2,
+   6,
+   7,
+   8
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Avoid Dec to Feb: freezing nights at about 3,500 m, snow on Nachung La and a rough gravel road that can ice over.",
+   "summer": "Apr and May are the best: rhododendron forests in bloom on Nachung La and Brokpa herders moving yaks to high pasture.",
+   "monsoon": "Skip Jun to Aug: rain, leeches and slides on the gravel road via Phongmey; Sep is drier but trails stay muddy.",
+   "autumn": "Oct and Nov bring crisp clear days, the best pass views and herders back near the villages before winter."
+  },
+  "days": 4,
+  "budget": 3,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Village homestays with butter tea, yak cheese and ara; Brokpa families in red yak-wool tunics and felt hats.",
+  "hub": "About 68 km from Trashigang, 2 to 3 h on a rough road; Sakteng is 1 to 2 days on foot. Route permit and guide needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Sakteng",
+    "kind": "village",
+    "note": "Sister Brokpa village at about 2,950 m, one long or two easier trekking days from Merak over Nachung La.",
+    "km": 13
+   },
+   {
+    "name": "Nachung La",
+    "kind": "trek",
+    "note": "Pass at about 4,150 m on the Merak to Sakteng trek, the hardest climb of the route, above rhododendron forest.",
+    "km": 7
+   },
+   {
+    "name": "Sakteng Wildlife Sanctuary",
+    "kind": "wildlife",
+    "note": "Protected forest of about 1,500 to 4,500 m set up in 2003, famed in local lore as home of the migoi, or yeti.",
+    "km": 9
+   },
+   {
+    "name": "Chaling",
+    "kind": "village",
+    "note": "Road head village on the climb from Trashigang where many Merak trek itineraries start.",
+    "km": 15
+   },
+   {
+    "name": "Phongmey",
+    "kind": "village",
+    "note": "Village with an old lhakhang on the Merak road; slips here can force long detours in the rains.",
+    "km": 15
+   }
+  ]
+ },
+ {
+  "id": "lhuentse",
+  "name": "Lhuentse (Kurtoe)",
+  "state": "Bhutan",
+  "lat": 27.6656,
+  "lng": 91.1867,
+  "alt": 1467,
+  "category": [
+   "heritage",
+   "culture",
+   "offbeat"
+  ],
+  "tagline": "Ridge-top dzong, kishuthara silk weavers and the royal family's ancestral home",
+  "peakMonths": [
+   3,
+   4,
+   10,
+   11
+  ],
+  "shoulderMonths": [
+   1,
+   2,
+   5,
+   9,
+   12
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8
+  ],
+  "festival": "Lhuentse Tshechu (Dec or Jan)",
+  "why": {
+   "winter": "Dec to Feb is cool and clear in the deep Kuri Chhu valley, and the Lhuentse Tshechu can fall in this window.",
+   "summer": "Mar and Apr are pleasant for village walks out to Khoma; May turns warm and humid in the lower valley.",
+   "monsoon": "Jun to Aug bring heavy rain and frequent slides on the narrow road from Mongar; Sep is calmer but still damp.",
+   "autumn": "Oct and Nov are the best: clear skies over the dzong, dry roads and Khoma weavers working on their porches."
+  },
+  "days": 2,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Few hotels, mostly simple guesthouses and Khoma homestays with hot stone baths; backstrap looms clack on the porches.",
+  "hub": "75 km from Mongar, about 3 h; Mongar is 91 km from Trashigang. Route permit needed beyond Thimphu",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Takila Guru Statue",
+    "kind": "shrine",
+    "note": "Bhutan's largest Guru Rinpoche statue, 154 ft tall and consecrated in 2015, ringed by eight large and 108 small chortens.",
+    "km": 7
+   },
+   {
+    "name": "Khoma",
+    "kind": "village",
+    "note": "Weaving village of kishuthara silk kiras on backstrap looms, a short walk from the road; a fine piece takes months.",
+    "km": 5
+   },
+   {
+    "name": "Dungkar Naktshang",
+    "kind": "heritage",
+    "note": "Ancestral house in Kurtoe where Jigme Namgyel, father of the first king, was born; reached on a rough road.",
+    "km": 18
+   },
+   {
+    "name": "Gangzur",
+    "kind": "village",
+    "note": "Village near the dzong long known for hand-shaped clay pottery.",
+    "km": 3
+   },
+   {
+    "name": "Kuri Chhu",
+    "kind": "river",
+    "note": "The big river below the dzong ridge, whose gorge the whole road up from Mongar follows.",
+    "km": 1
+   }
+  ]
+ },
+ {
+  "id": "royal-manas",
+  "name": "Royal Manas National Park (Panbang)",
+  "state": "Bhutan",
+  "lat": 26.8504,
+  "lng": 90.9617,
+  "alt": 164,
+  "category": [
+   "wildlife",
+   "offbeat"
+  ],
+  "tagline": "Bhutan's oldest national park, explored by raft from a riverside village",
+  "peakMonths": [
+   11,
+   12,
+   1,
+   2,
+   3
+  ],
+  "shoulderMonths": [
+   4,
+   5,
+   10
+  ],
+  "avoidMonths": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "festival": "",
+  "why": {
+   "winter": "Dec to Feb is the best: mild sunny days, low clear rivers for rafting and good odds of hornbills and golden langurs.",
+   "summer": "Mar is still good; Apr and May turn hot and humid, though the rivers stay raftable before the rains arrive.",
+   "monsoon": "Skip Jun to Sep: swollen rivers stop rafting, the long road from Gelephu suffers slides and the forest crawls with leeches.",
+   "autumn": "Oct is warm and green as the rivers drop; by Nov rafting, mahseer fishing and guided walks in the park are back in full swing."
+  },
+  "days": 3,
+  "budget": 2,
+  "solo": 3,
+  "crowd": 1,
+  "vibe": "Bamboo cottages on the Mangde Chhu, community river guides, mahseer fly fishing and almost no other travellers.",
+  "hub": "Gelephu, with Drukair flights from Paro and Kolkata, is 6 to 7 h by road. Enter at Gelephu; route permit needed",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Drangme Chhu",
+    "kind": "river",
+    "note": "Gentle 11 km rafting run from below the Nishioka Bridge at Panbang to the boat crossing into the park, fine for first timers.",
+    "km": 0
+   },
+   {
+    "name": "Mangde Chhu",
+    "kind": "river",
+    "note": "The stronger river, meeting the Drangme Chhu just below Panbang; bigger rapids for skilled rafters and bamboo cottages on its banks.",
+    "km": 2
+   },
+   {
+    "name": "Marang Jungle Camp",
+    "kind": "activity",
+    "note": "Tented camp of the River Guides of Panbang by a Drangme Chhu tributary, base for rafting trips and catch and release mahseer fishing.",
+    "km": 2
+   }
+  ]
+ },
+ {
+  "id": "laya",
+  "name": "Laya",
+  "state": "Bhutan",
+  "lat": 28.0617,
+  "lng": 89.6833,
+  "alt": 3820,
+  "category": [
+   "trek",
+   "culture",
+   "mountains",
+   "offbeat"
+  ],
+  "tagline": "Layap highland village of conical bamboo hats, high above the Mo Chhu",
+  "peakMonths": [
+   4,
+   5,
+   10
+  ],
+  "shoulderMonths": [
+   3,
+   6,
+   9,
+   11
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2,
+   7,
+   8
+  ],
+  "festival": "Royal Highland Festival (Oct)",
+  "why": {
+   "winter": "Avoid Dec to Feb: deep cold at about 3,800 m, snow on the climb from the road end and few services in the village.",
+   "summer": "Apr and May are the best: warming days, rhododendrons along the trail and yaks on fresh pasture around the village.",
+   "monsoon": "Jul and Aug are wet, with leeches and slips on the Mo Chhu trail; Jun and Sep are greener and manageable with a guide.",
+   "autumn": "Oct is the highlight, with the Royal Highland Festival and clear peaks; by late Nov the nights are bitterly cold."
+  },
+  "days": 4,
+  "budget": 3,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Camping or simple farmhouse stays, yak butter tea by the hearth, and Layap women in conical bamboo hats.",
+  "hub": "Punakha to Gasa is about 80 km, 3 h; a rough road runs on to Taktsimakha, then a 2 to 3 h climb. Route permit and guide",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Koina",
+    "kind": "village",
+    "note": "Old trek camp in the Mo Chhu gorge below Laya on the Gasa route, set in thick conifer forest beside the river.",
+    "km": 11
+   },
+   {
+    "name": "Gasa Tsachu",
+    "kind": "hotspring",
+    "note": "Hot spring pools beside the Mo Chhu below Gasa town; a soak here is the reward on the way back down.",
+    "km": 20
+   },
+   {
+    "name": "Gasa Dzong",
+    "kind": "fort",
+    "note": "Tashi Thongmon Dzong on a spur above Gasa with snow peaks behind, restored after a fire in 2008.",
+    "km": 18
+   },
+   {
+    "name": "Mo Chhu",
+    "kind": "river",
+    "note": "The glacial river the route follows up from Gasa, roaring through a deep forested gorge below the village.",
+    "km": 2
+   }
+  ]
+ },
+ {
+  "id": "jomolhari-base-camp",
+  "name": "Jomolhari Base Camp (Jangothang)",
+  "state": "Bhutan",
+  "lat": 27.7813,
+  "lng": 89.3417,
+  "alt": 4088,
+  "category": [
+   "trek",
+   "mountains",
+   "snow"
+  ],
+  "tagline": "Meadow camp at the foot of 7,326 m Jomolhari, days up the Paro Chhu",
+  "peakMonths": [
+   4,
+   5,
+   10
+  ],
+  "shoulderMonths": [
+   3,
+   6,
+   9,
+   11
+  ],
+  "avoidMonths": [
+   12,
+   1,
+   2,
+   7,
+   8
+  ],
+  "festival": "Jomolhari Mountain Festival (Oct)",
+  "why": {
+   "winter": "Avoid Dec to Feb: snow on the trail and passes, nights far below freezing at 4,000 m, and few operators run the trek.",
+   "summer": "Apr and May are prime: rhododendron forest lower down, yaks grazing at Jangothang and mostly clear mornings.",
+   "monsoon": "Jul and Aug bring rain, leeches and cloud hiding the peak; Jun and Sep can work, but expect mud below Soe.",
+   "autumn": "Oct is the best month for clear Jomolhari views and the mountain festival at Dangochang; Nov is colder but still crisp and clear."
+  },
+  "days": 6,
+  "budget": 3,
+  "solo": 2,
+  "crowd": 1,
+  "vibe": "Tented camps with a cook and pony crew, yak herders' stone huts and a few small trekking groups at the campsite.",
+  "hub": "Drive from Paro past Drukgyel Dzong to the Shana trailhead, then 2 to 3 days on foot. Licensed guide, route permit",
+  "modes": [
+   "road"
+  ],
+  "spots": [
+   {
+    "name": "Jomolhari",
+    "kind": "viewpoint",
+    "note": "The 7,326 m sacred peak on the Tibet border rising straight above the camp, lit gold at sunrise.",
+    "km": 9
+   },
+   {
+    "name": "Tsophu Lakes",
+    "kind": "lake",
+    "note": "High twin lakes above Jangothang on the climb towards Nyile La, a popular acclimatisation hike.",
+    "km": 3
+   },
+   {
+    "name": "Jichu Drake",
+    "kind": "viewpoint",
+    "note": "Sharp sacred peak north of camp, seen best from the moraine walk above Jangothang.",
+    "km": 7
+   },
+   {
+    "name": "Lingshi Dzong",
+    "kind": "fort",
+    "note": "Remote hilltop dzong over Lingshi village, reached across the high Nyile La on the longer Jomolhari loop.",
+    "km": 12
+   },
+   {
+    "name": "Shana",
+    "kind": "village",
+    "note": "Road head on the Paro Chhu where most Jomolhari treks start.",
+    "km": 21
+   }
+  ]
  }
 ]

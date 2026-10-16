@@ -10,8 +10,8 @@ backend, no planning spiral.
 ## How it works
 
 1. **📍 One tap**: browser GPS (or type your city; your location never leaves the page).
-2. **The engine ranks 745 curated Indian destinations**, every state and union
-   territory covered, by:
+2. **The engine ranks 811 curated destinations**, every Indian state and union
+   territory covered, plus visa-free Nepal and Bhutan, by:
    - **Season honesty**: every place has peak / shoulder / avoid months. Places in
      `avoidMonths` (landslide season, 45 °C plains, closed parks, rough seas) are *never*
      suggested. No "Top 10 places to visit in July" listicle lies.
@@ -49,8 +49,8 @@ Zero-framework static frontend: the same pattern as
 - `index.html` + `css/style.css` + vanilla ES modules in `js/`
 - `js/engine.js`: pure ranking logic (season scoring, haversine, road estimates,
   long-weekend detection). No DOM, unit-testable.
-- `data/destinations.json`: 745 curated destinations across all 36 states and union
-  territories: coordinates, peak/shoulder/avoid months, four season-specific "why now"
+- `data/destinations.json`: 811 curated destinations across all 36 states and union
+  territories, plus Nepal and Bhutan (their country sits in `state`): coordinates, peak/shoulder/avoid months, four season-specific "why now"
   lines, solo score, budget, transport hub, altitude, signature festival. Beauty first:
   hill stations, valleys, waterfalls, beaches, gorges and one-bus-a-day villages. A
   city earns an entry only when the trip IS its heritage (Jaipur, Varanasi, Amritsar);
@@ -63,8 +63,8 @@ Zero-framework static frontend: the same pattern as
   16 category glyphs + transport modes), all `currentColor` SVG. No emoji, no icon fonts.
 - Leaflet + Esri canvas basemap tiles (theme-aware light/dark, no API key), with India's
   official boundary drawn as a corrective overlay (see DATA-LICENSE.md).
-- `tools/build-seo.mjs`: generates the readable half of the site, 813 static pages
-  (745 destination guides, 36 state guides, 12 month guides, 16 theme guides, four
+- `tools/build-seo.mjs`: generates the readable half of the site, 881 static pages
+  (811 destination guides, 36 state guides, Nepal and Bhutan guides, 12 month guides, 16 theme guides, four
   browse indexes) plus the sitemaps, straight out of `data/destinations.json`. Output
   is committed, so deploy is still "upload the folder". See **Search & indexing**.
 - `css/pages.css` + `js/page.js`: the guide pages' thin layer on top of the app's
@@ -95,8 +95,9 @@ can read:
 
 | URL | What it is | Count |
 | --- | --- | --- |
-| `/places/<id>` | One destination: season strip, the four season-specific "why now" lines, vibe, how to get there, trip facts, nearby places | 745 |
+| `/places/<id>` | One destination: season strip, the four season-specific "why now" lines, vibe, how to get there, trip facts, nearby places | 811 |
 | `/india/<state>` | Best places in a state, with the months it is actually strong | 36 |
+| `/nepal` `/bhutan` | The same for the two visa-free neighbours, kept off the pages titled "in India" | 2 |
 | `/best-time-to-visit/<month>` | Best places in India that month, **and where not to go** | 12 |
 | `/themes/<category>` | Best beaches / treks / heritage / offbeat, and so on | 16 |
 | `/places` `/india` `/best-time-to-visit` `/themes` | Browse indexes | 4 |
@@ -110,7 +111,7 @@ Each page carries a unique title and description, a canonical, `BreadcrumbList` 
 either `TouristAttraction` (with real coordinates) or `ItemList`, plus a `FAQPage`
 whose answers are visible on the page. Every destination links to its state, its
 themes, its peak months and its eight nearest neighbours, so the catalogue is one
-connected graph rather than 745 orphans, and `/` links into it so the front door is
+connected graph rather than 811 orphans, and `/` links into it so the front door is
 not a dead end. A guide page's call to action opens `/?to=<id>`, which drops you on
 the live map with that place selected.
 

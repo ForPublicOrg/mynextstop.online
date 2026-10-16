@@ -5,6 +5,7 @@
 //   node tools/verify-destinations.mjs --offline  # schema only, no network
 //   node tools/verify-destinations.mjs --only=leh,kaza
 //   node tools/verify-destinations.mjs --no-spots # skip geocoding local places
+//   node tools/verify-destinations.mjs batch.json --cache=batch-cache.json
 //
 // Offline it checks the schema and the season logic. Online it also asks
 // two public APIs whether the data is telling the truth about the map:
@@ -27,16 +28,22 @@ import { fileURLToPath } from 'node:url';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
-const CACHE_FILE = path.join(HERE, '.geo-cache.json');
 const UA = 'mynextstop.online-data-check (https://mynextstop.online)';
 
 const argv = process.argv.slice(2);
+// a separate cache per run keeps parallel checkers from overwriting each other
+const CACHE_FILE = (argv.find(a => a.startsWith('--cache=')) || '').replace('--cache=', '') || path.join(HERE, '.geo-cache.json');
 const FILE = argv.find(a => !a.startsWith('--')) || path.join(ROOT, 'data', 'destinations.json');
 const OFFLINE = argv.includes('--offline');
 const NO_SPOTS = argv.includes('--no-spots');
 const ONLY = (argv.find(a => a.startsWith('--only=')) || '').replace('--only=', '').split(',').filter(Boolean);
 
 const STATES = ['Andaman & Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra & Nagar Haveli and Daman & Diu', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'];
+// the two visa-free neighbours: their records use the country as the "state"
+const COUNTRIES = ['Nepal', 'Bhutan'];
+const COUNTRY_CODE = { Nepal: 'NP', Bhutan: 'BT' };
+const countryOf = d => (COUNTRIES.includes(d.state) ? d.state : 'India');
+const codeOf = d => COUNTRY_CODE[d.state] || 'IN';
 const CATS = ['mountains', 'beach', 'heritage', 'spiritual', 'wildlife', 'trek', 'backpacker', 'desert', 'island', 'lake', 'waterfall', 'city', 'offbeat', 'party', 'culture', 'snow'];
 const MODES = ['flight', 'train', 'road'];
 const KEYS = ['id', 'name', 'state', 'lat', 'lng', 'alt', 'category', 'tagline', 'peakMonths', 'shoulderMonths', 'avoidMonths', 'festival', 'why', 'days', 'budget', 'solo', 'crowd', 'vibe', 'hub', 'modes', 'spots'];
@@ -107,10 +114,10 @@ function offlineChecks(data) {
 
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(String(d.id))) add(id, 'HIGH', 'bad-id', 'id is not kebab-case ascii');
     if (seen.has(d.id)) add(id, 'HIGH', 'dup-id', 'duplicate id'); else seen.add(d.id);
-    if (!STATES.includes(d.state)) add(id, 'HIGH', 'bad-state', `state "${d.state}" is not one of the 36`);
+    if (!STATES.includes(d.state) && !COUNTRIES.includes(d.state)) add(id, 'HIGH', 'bad-state', `state "${d.state}" is not one of the 36 or ${COUNTRIES.join('/')}`);
 
     if (typeof d.lat !== 'number' || typeof d.lng !== 'number') add(id, 'HIGH', 'bad-coord', 'lat/lng not numbers');
-    else if (d.lat < 6 || d.lat > 37.2 || d.lng < 68 || d.lng > 97.5) add(id, 'HIGH', 'coord-out-of-india', `${d.lat},${d.lng}`);
+    else if (d.lat < 6 || d.lat > 37.2 || d.lng < 68 || d.lng > 97.5) add(id, 'HIGH', 'coord-out-of-range', `${d.lat},${d.lng}`);
     if (!Number.isInteger(d.alt) || d.alt < 0 || d.alt > 5500) add(id, 'MED', 'bad-alt', `alt ${d.alt}`);
 
     if (!Array.isArray(d.category) || !d.category.length || d.category.length > 4) add(id, 'HIGH', 'bad-category', `category length ${d.category?.length}`);
@@ -215,7 +222,8 @@ function offlineChecks(data) {
 }
 
 function geocodeQuery(d) {
-  return `${String(d.name).split('(')[0].split(/ [&+] | and /)[0].trim()}, ${d.state}, India`;
+  const where = COUNTRIES.includes(d.state) ? d.state : `${d.state}, India`;
+  return `${String(d.name).split('(')[0].split(/ [&+] | and /)[0].trim()}, ${where}`;
 }
 
 async function onlineChecks(data) {
@@ -253,6 +261,7 @@ async function onlineChecks(data) {
       j = pr ? {
         principalSubdivision: pr.state || '',
         countryName: pr.country || '',
+        countryCode: pr.countrycode || '',
         locality: pr.city || pr.county || pr.name || '',
       } : null;
     }
@@ -261,7 +270,9 @@ async function onlineChecks(data) {
     if (!j) continue;
     const where = STATE_ALIAS[j.principalSubdivision] || j.principalSubdivision || '';
     geo[d.id] = { ...geo[d.id], state: where, locality: j.locality || j.city || '' };
-    if (j.countryName && j.countryName !== 'India') add(d.id, 'HIGH', 'wrong-country', `the coordinate is in ${j.countryName}`);
+    const wrongCountry = j.countryCode ? j.countryCode !== codeOf(d) : (j.countryName && j.countryName !== countryOf(d));
+    if (wrongCountry) add(d.id, 'HIGH', 'wrong-country', `the coordinate is in ${j.countryName || j.countryCode}, record says ${countryOf(d)}`);
+    else if (COUNTRIES.includes(d.state)) continue;   // provinces and dzongkhags are not tracked
     else if (where && where !== d.state && !OK_NEIGHBOUR.has(`${d.state}|${where}`)) {
       add(d.id, 'HIGH', 'state-mismatch', `claims ${d.state}, coordinate sits in ${where} (${geo[d.id].locality})`);
     }
@@ -275,14 +286,15 @@ async function onlineChecks(data) {
     const j = await getJSON(`https://photon.komoot.io/api/?limit=8&q=${encodeURIComponent(q)}`, 350);
     process.stderr.write(`place check ${++n}/${data.length}\r`);
     if (n % 25 === 0) saveCache();
-    const feats = (j?.features || []).filter(f => f.properties?.countrycode === 'IN');
+    const feats = (j?.features || []).filter(f => f.properties?.countrycode === codeOf(d));
     if (!feats.length) { add(d.id, 'LOW', 'no-geocode', `OpenStreetMap has no match for "${q}"`); continue; }
     let best = null, inState = null;
     for (const f of feats) {
       const [lng, lat] = f.geometry.coordinates, p = f.properties;
       const c = { dkm: km(d.lat, d.lng, lat, lng), name: p.name, state: p.state || '' };
       if (!best || c.dkm < best.dkm) best = c;
-      if ((STATE_ALIAS[c.state] || c.state) === d.state && (!inState || c.dkm < inState.dkm)) inState = c;
+      const sameRegion = COUNTRIES.includes(d.state) || (STATE_ALIAS[c.state] || c.state) === d.state;
+      if (sameRegion && (!inState || c.dkm < inState.dkm)) inState = c;
     }
     const use = inState || best;
     // the coordinate already passed the state check, so a distant name match is
@@ -303,12 +315,12 @@ async function onlineChecks(data) {
     if (typeof d.lat !== 'number') continue;
     for (const s of d.spots || []) {
       if (!s || typeof s.name !== 'string') continue;
-      const q = `${s.name.split('(')[0].trim()}, ${d.state}, India`;
+      const q = `${s.name.split('(')[0].trim()}, ${COUNTRIES.includes(d.state) ? d.state : `${d.state}, India`}`;
       const j = await getJSON(`https://photon.komoot.io/api/?limit=8&q=${encodeURIComponent(q)}`, 350);
       process.stderr.write(`spot check ${++n}/${total}\r`);
       if (n % 25 === 0) saveCache();
       if (!j) continue;
-      const feats = (j.features || []).filter(f => f.properties?.countrycode === 'IN');
+      const feats = (j.features || []).filter(f => f.properties?.countrycode === codeOf(d));
       if (!feats.length) { add(d.id, 'LOW', 'spot-no-geocode', `OpenStreetMap has no match for spot "${s.name}"`); continue; }
       let best = Infinity, bestName = '';
       for (const f of feats) {

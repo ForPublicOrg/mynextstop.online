@@ -12,6 +12,7 @@
 //
 //   /places/<id>              one destination guide per catalogue entry
 //   /india/<state>             36 state guides
+//   /nepal /bhutan             the two visa-free neighbours, one guide each
 //   /best-time-to-visit/<mon>  12 month guides
 //   /themes/<category>         16 theme guides
 //   /places /india /themes /best-time-to-visit   four browse indexes
@@ -83,6 +84,14 @@ const slug = s => String(s).toLowerCase()
   .replace(/&/g, ' and ')
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '');
+
+// Nepal and Bhutan ride along as neighbours: Indians cross into both on an ID,
+// no visa. Their records carry the country in `state`; their guides live at
+// /nepal and /bhutan, and the pages titled "in India" leave them out.
+const NEIGHBOURS = ['Nepal', 'Bhutan'];
+const COUNTRY_CODE = { Nepal: 'NP', Bhutan: 'BT' };
+const isNeighbour = s => NEIGHBOURS.includes(s);
+const regionUrl = s => (isNeighbour(s) ? `/${slug(s)}` : `/india/${slug(s)}`);
 
 // Meta descriptions get cut by Google around 160 chars; cut on a word so the
 // sentence never ends mid-word.
@@ -473,7 +482,7 @@ function destPage(d, all) {
   const crumbs = [
     ['Home', '/'],
     ['Destinations', '/places'],
-    [d.state, `/india/${slug(d.state)}`],
+    [d.state, regionUrl(d.state)],
     [name, null],
   ];
 
@@ -520,7 +529,7 @@ function destPage(d, all) {
     ['How busy', `${CROWD_LABEL[d.crowd] || '—'} at its peak`],
     ['Solo travel', SOLO_LABEL[d.solo] || '—'],
     ['Altitude', `${d.alt} m`],
-    ['State', `<a href="/india/${slug(d.state)}">${txt(d.state)}</a>`],
+    [isNeighbour(d.state) ? 'Country' : 'State', `<a href="${regionUrl(d.state)}">${txt(d.state)}</a>`],
     ['Coordinates', `${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}`],
   ];
 
@@ -540,10 +549,10 @@ function destPage(d, all) {
       geo: { '@type': 'GeoCoordinates', latitude: d.lat, longitude: d.lng, elevation: `${d.alt} m` },
       address: {
         '@type': 'PostalAddress',
-        addressRegion: jtxt(d.state),
-        addressCountry: 'IN',
+        ...(isNeighbour(d.state) ? {} : { addressRegion: jtxt(d.state) }),
+        addressCountry: COUNTRY_CODE[d.state] || 'IN',
       },
-      containedInPlace: { '@type': 'AdministrativeArea', name: jtxt(d.state) },
+      containedInPlace: { '@type': isNeighbour(d.state) ? 'Country' : 'AdministrativeArea', name: jtxt(d.state) },
       touristType: cats.map(catLabel),
       isAccessibleForFree: true,
       publicAccess: true,
@@ -563,7 +572,7 @@ function destPage(d, all) {
     <article class="doc-article">
 
       <header class="lede">
-        <p class="eyebrow"><a href="/india/${slug(d.state)}">${txt(d.state)}</a></p>
+        <p class="eyebrow"><a href="${regionUrl(d.state)}">${txt(d.state)}</a></p>
         <h1>${txt(d.name)}</h1>
         <p class="lede-sub">${txt(d.tagline)}</p>
         <p class="lede-tags">${catLinks(cats)}</p>
@@ -629,7 +638,7 @@ function destPage(d, all) {
       ${sameState.length ? `<section class="sec">
         <h2>More places to visit in ${txt(d.state)}</h2>
         ${destLinkList(sameState.slice(0, 40))}
-        <p class="alsosee"><a class="more" href="/india/${slug(d.state)}">All ${sameState.length + 1} destinations in ${txt(d.state)} ${ic('arrow')}</a></p>
+        <p class="alsosee"><a class="more" href="${regionUrl(d.state)}">All ${sameState.length + 1} destinations in ${txt(d.state)} ${ic('arrow')}</a></p>
       </section>` : ''}
 
     </article>`;
@@ -648,9 +657,12 @@ function destPage(d, all) {
 // ---------- state page ----------
 
 function statePage(state, ds, all) {
-  const url = `/india/${slug(state)}`;
+  const abroad = isNeighbour(state);
+  const url = regionUrl(state);
   const list = ds.slice().sort(byName);
-  const crumbs = [['Home', '/'], ['States', '/india'], [state, null]];
+  const crumbs = abroad
+    ? [['Home', '/'], ['Destinations', '/places'], [state, null]]
+    : [['Home', '/'], ['States', '/india'], [state, null]];
 
   // which months the state is actually good in, straight out of the data
   const peakByMonth = Array.from({ length: 12 }, (_, i) =>
@@ -668,9 +680,11 @@ function statePage(state, ds, all) {
         ${peakByMonth.map((n, i) => `<li${n === Math.max(...peakByMonth) ? ' class="is-best"' : ''}>
           <a href="/best-time-to-visit/${monthSlug(i + 1)}"><span class="mc-mo">${MONTHS[i]}</span><span class="mc-n">${n}</span></a></li>`).join('')}
       </ol>
-      <p class="mstrip-key"><span>Curated places in ${esc(state)} that are in peak season, by month. Tap a month for the whole country.</span></p>`;
+      <p class="mstrip-key"><span>Curated places in ${esc(state)} that are in peak season, by month. Tap a month for ${abroad ? 'the picks across India' : 'the whole country'}.</span></p>`;
 
-  const others = [...new Set(all.map(d => d.state))].filter(s => s !== state).sort();
+  const regions = [...new Set(all.map(d => d.state))].filter(s => s !== state).sort();
+  const others = regions.filter(s => !isNeighbour(s));
+  const neighbours = regions.filter(isNeighbour);
 
   const qas = [
     [`When is the best time to visit ${state}?`,
@@ -684,7 +698,7 @@ function statePage(state, ds, all) {
   const main = `
     <article class="doc-article">
       <header class="lede">
-        <p class="eyebrow"><a href="/india">India</a></p>
+        <p class="eyebrow">${abroad ? '<a href="/india#neighbours">Across the border</a>' : '<a href="/india">India</a>'}</p>
         <h1>Best places to visit in ${txt(state)}</h1>
         <p class="lede-sub">${ds.length} curated ${ds.length === 1 ? 'destination' : 'destinations'} in ${txt(state)}, each with its honest season window: when to go, when it is merely fine, and when to stay away.</p>
       </header>
@@ -708,9 +722,14 @@ function statePage(state, ds, all) {
       ${faqHtml(qas)}
 
       <section class="sec">
-        <h2>Other states and union territories</h2>
-        <p class="statelinks">${others.map(s => `<a href="/india/${slug(s)}">${esc(s)}</a>`).join('')}</p>
+        <h2>${abroad ? 'States and union territories of India' : 'Other states and union territories'}</h2>
+        <p class="statelinks">${others.map(s => `<a href="${regionUrl(s)}">${esc(s)}</a>`).join('')}</p>
       </section>
+
+      ${neighbours.length ? `<section class="sec">
+        <h2>Across the border</h2>
+        <p class="statelinks">${neighbours.map(s => `<a href="${regionUrl(s)}">${esc(s)}</a>`).join('')}</p>
+      </section>` : ''}
     </article>`;
 
   return {
@@ -729,7 +748,7 @@ function statePage(state, ds, all) {
 
 // ---------- month page ----------
 
-function monthPage(m, all) {
+function monthPage(m, all, abroad = []) {
   const mf = MONTH_FULL[m - 1];
   const url = `/best-time-to-visit/${monthSlug(m)}`;
   const season = seasonOf(m);
@@ -748,6 +767,7 @@ function monthPage(m, all) {
 
   // festivals whose month string names this month
   const fests = all.filter(d => d.festival && festivalMonth(d) === m).sort(byName).slice(0, 24);
+  const abroadPeak = abroad.filter(d => seasonStatus(d, m) === 'peak').sort(byName);
 
   const stateCount = {};
   for (const d of peak) stateCount[d.state] = (stateCount[d.state] || 0) + 1;
@@ -806,6 +826,12 @@ function monthPage(m, all) {
         <h2>Festivals in ${mf}</h2>
         <ul class="festlist">${fests.map(d =>
           `<li><a href="/places/${d.id}">${txt(d.name)}</a>, ${txt(d.state)}: ${txt(d.festival)}</li>`).join('')}</ul>
+      </section>` : ''}
+
+      ${abroadPeak.length ? `<section class="sec">
+        <h2>Across the border in ${mf}</h2>
+        <p class="prose">No visa needed for Indians: ${abroadPeak.length} ${abroadPeak.length === 1 ? 'place' : 'places'} in ${joinWords(NEIGHBOURS.filter(c => abroadPeak.some(d => d.state === c)))} ${abroadPeak.length === 1 ? 'is' : 'are'} in peak season this month.</p>
+        ${destLinkList(abroadPeak)}
       </section>` : ''}
 
       ${topStates.length ? `<section class="sec">
@@ -921,6 +947,12 @@ function themePage(cat, ds, all) {
 
 // ---------- index pages ----------
 
+// ", Nepal and Bhutan" once the catalogue carries them, nothing before
+function neighbourTail(all, lead = ', ') {
+  const have = NEIGHBOURS.filter(c => all.some(d => d.state === c));
+  return have.length ? lead + joinWords(have) : '';
+}
+
 function placesIndex(all) {
   const url = '/places';
   const crumbs = [['Home', '/'], ['Destinations', null]];
@@ -949,8 +981,8 @@ function placesIndex(all) {
     url,
     html: page({
       url, ogType: 'website',
-      title: fitTitle(`All ${all.length} places to visit in India, A to Z`, [` | ${BRAND}`]),
-      description: `The full catalogue: ${all.length} curated Indian destinations across all 36 states and union territories, each with its own honest season window.`,
+      title: fitTitle(`All ${all.length} places to visit in India${neighbourTail(all)}, A to Z`, [` | ${BRAND}`]),
+      description: `The full catalogue: ${all.length} curated destinations across all 36 Indian states and union territories${neighbourTail(all, ', plus ')}, each with its own honest season window.`,
       crumbs, ld: [itemListLd(sorted, 'All destinations')], main,
     }),
   };
@@ -961,36 +993,46 @@ function statesIndex(all) {
   const crumbs = [['Home', '/'], ['States', null]];
   const states = {};
   for (const d of all) (states[d.state] = states[d.state] || []).push(d);
-  const names = Object.keys(states).sort();
-  const main = `
-    <article class="doc-article">
-      <header class="lede">
-        <h1>Places to visit in India, state by state</h1>
-        <p class="lede-sub">All 36 states and union territories, ${all.length} curated destinations between them. Pick a state and every entry comes with the months it is worth going.</p>
-      </header>
-      <section class="sec">
-        <ul class="dgrid dgrid-tight">
-          ${names.map(s => {
-            const ds = states[s];
-            const peakByMonth = Array.from({ length: 12 }, (_, i) => ds.filter(d => (d.peakMonths || []).includes(i + 1)).length);
-            const best = peakByMonth.map((n, i) => [n, i + 1]).sort((a, b) => b[0] - a[0]).slice(0, 3).map(([, m]) => MONTHS[m - 1]);
-            return `<li class="dcard">
-              <a class="dcard-link" href="/india/${slug(s)}">
+  const names = Object.keys(states).filter(s => !isNeighbour(s)).sort();
+  const abroad = NEIGHBOURS.filter(s => states[s]);
+  const inIndia = names.reduce((n, s) => n + states[s].length, 0);
+  const card = s => {
+    const ds = states[s];
+    const peakByMonth = Array.from({ length: 12 }, (_, i) => ds.filter(d => (d.peakMonths || []).includes(i + 1)).length);
+    const best = peakByMonth.map((n, i) => [n, i + 1]).sort((a, b) => b[0] - a[0]).slice(0, 3).map(([, m]) => MONTHS[m - 1]);
+    return `<li class="dcard">
+              <a class="dcard-link" href="${regionUrl(s)}">
                 <span class="dcard-name">${esc(s)}</span>
                 <span class="dcard-state">${ds.length} ${ds.length === 1 ? 'place' : 'places'}</span>
               </a>
               <p class="dcard-note">Strongest in ${esc(joinWords(best))}</p>
             </li>`;
-          }).join('')}
+  };
+  const main = `
+    <article class="doc-article">
+      <header class="lede">
+        <h1>Places to visit in India, state by state</h1>
+        <p class="lede-sub">All 36 states and union territories, ${inIndia} curated destinations between them. Pick a state and every entry comes with the months it is worth going.</p>
+      </header>
+      <section class="sec">
+        <ul class="dgrid dgrid-tight">
+          ${names.map(card).join('')}
         </ul>
       </section>
+      ${abroad.length ? `<section class="sec" id="neighbours">
+        <h2>Across the border</h2>
+        <p class="prose">Indians need no visa for ${joinWords(abroad)}, so the catalogue covers them too, with the same honest season windows.</p>
+        <ul class="dgrid dgrid-tight">
+          ${abroad.map(card).join('')}
+        </ul>
+      </section>` : ''}
     </article>`;
   return {
     url,
     html: page({
       url, ogType: 'website',
       title: fitTitle('Places to visit in India, state by state', [` | ${BRAND}`]),
-      description: `Best places to visit in every Indian state and union territory, ${all.length} curated destinations with honest peak, shoulder and avoid months.`,
+      description: `Best places to visit in every Indian state and union territory, ${inIndia} curated destinations with honest peak, shoulder and avoid months.`,
       crumbs,
       ld: [{
         '@context': 'https://schema.org',
@@ -1158,20 +1200,22 @@ function build() {
   for (const s of Object.keys(states).sort()) {
     hubs.push({ ...statePage(s, states[s], all), priority: '0.8', changefreq: 'monthly' });
   }
+  const india = all.filter(d => !isNeighbour(d.state));
+  const abroad = all.filter(d => isNeighbour(d.state));
   for (let m = 1; m <= 12; m++) {
-    hubs.push({ ...monthPage(m, all), priority: '0.9', changefreq: 'weekly' });
+    hubs.push({ ...monthPage(m, india, abroad), priority: '0.9', changefreq: 'weekly' });
   }
   for (const c of Object.keys(CATEGORY_LABEL)) {
-    const ds = all.filter(d => (d.category || []).includes(c));
-    if (ds.length) hubs.push({ ...themePage(c, ds, all), priority: '0.8', changefreq: 'monthly' });
+    const ds = india.filter(d => (d.category || []).includes(c));
+    if (ds.length) hubs.push({ ...themePage(c, ds, india), priority: '0.8', changefreq: 'monthly' });
   }
 
   const core = [
     { url: '/', lastmod, changefreq: 'weekly', priority: '1.0' },
     { ...placesIndex(all), priority: '0.9', changefreq: 'weekly' },
     { ...statesIndex(all), priority: '0.9', changefreq: 'weekly' },
-    { ...monthsIndex(all), priority: '0.9', changefreq: 'weekly' },
-    { ...themesIndex(all), priority: '0.9', changefreq: 'weekly' },
+    { ...monthsIndex(india), priority: '0.9', changefreq: 'weekly' },
+    { ...themesIndex(india), priority: '0.9', changefreq: 'weekly' },
     // /reel is a hand-built page (reel/index.html), listed here so sitemap
     // regeneration keeps it; no html property, so nothing is emitted for it
     { url: '/reel', lastmod, changefreq: 'weekly', priority: '0.9' },
@@ -1209,7 +1253,7 @@ function flush() {
 // destination that has since been renamed or dropped is stale, and a stale
 // page is a 200 that Google will happily keep in the index.
 function sweep() {
-  const owned = ['places', 'india', 'themes', 'best-time-to-visit', 'sitemaps'];
+  const owned = ['places', 'india', 'nepal', 'bhutan', 'themes', 'best-time-to-visit', 'sitemaps'];
   const stale = [];
   for (const dir of owned) {
     const abs = path.join(ROOT, dir);
@@ -1247,7 +1291,7 @@ function sweep() {
 // ---------- run ----------
 
 if (CLEAN && !CHECK) {
-  for (const dir of ['places', 'india', 'themes', 'best-time-to-visit', 'sitemaps']) {
+  for (const dir of ['places', 'india', 'nepal', 'bhutan', 'themes', 'best-time-to-visit', 'sitemaps']) {
     fs.rmSync(path.join(ROOT, dir), { recursive: true, force: true });
   }
 }

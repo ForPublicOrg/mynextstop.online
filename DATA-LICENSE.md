@@ -11,7 +11,7 @@ CSS and JavaScript. It does not cover the destination catalogue.**
 
 ## The destination catalogue
 
-`data/destinations.json` (curated Indian destinations with coordinates, season
+`data/destinations.json` (curated destinations in India, Nepal and Bhutan with coordinates, season
 windows, solo-traveller notes and the local places worth a visit at each) and
 `data/holidays.json` (Indian holiday dates)
 are original curated datasets published under the
