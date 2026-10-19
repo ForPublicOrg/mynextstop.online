@@ -8,17 +8,17 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, MAPS, NATIVE_MAP, composeTheme, paintSwatch } from './themes.js?v=e4';
-import { DESIGNS, DEFAULT_DESIGNS, normalizeDesigns, paintDesign } from './models.js?v=e4';
-import { MODE_META, normalizeMode } from './vehicles.js?v=e4';
-import { TileCache } from './tiles.js?v=e4';
-import { haversineKm } from './geo.js?v=e4';
+import { THEMES, DEFAULT_THEME, MAPS, NATIVE_MAP, composeTheme, paintSwatch } from './themes.js?v=e5';
+import { DESIGNS, DEFAULT_DESIGNS, normalizeDesigns, paintDesign } from './models.js?v=e5';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e5';
+import { TileCache } from './tiles.js?v=e5';
+import { haversineKm } from './geo.js?v=e5';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js?v=e4';
-import { exportVideo, detectExportSupport } from './exporter.js?v=e4';
-import { createSearch } from './search.js?v=e4';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e4';
+} from './scene.js?v=e5';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e5';
+import { createSearch } from './search.js?v=e5';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e5';
 
 /* ------------------------------------------------------------------ *
  * constants
@@ -1164,6 +1164,7 @@ function commit(opts) {
   else refreshLegs();
   rebuildTimeline();
   syncExportButtons();
+  syncFoldSummaries();
   saveDraft();
 }
 
@@ -2125,7 +2126,70 @@ function buildLookControls() {
       commit();
     });
   });
-  viewField.parentNode.insertBefore(fieldOf('Vehicles', 'designsLbl', rows), viewField.nextSibling);
+  const vehicles = buildFold('Vehicles', 'designFold', rows);
+  dom.designSummary = vehicles.summary;
+  viewField.parentNode.insertBefore(vehicles.field, viewField.nextSibling);
+
+  // Speed and Route shape are set once if ever: fold them under More options.
+  const speedField = dom.speedSeg.closest('.field');
+  const routeField = dom.routeSeg ? dom.routeSeg.closest('.field') : null;
+  if (speedField && speedField.parentNode) {
+    const panel = make('div', 'fold-fields');
+    const more = buildFold('More options', 'moreFold', panel);
+    dom.moreSummary = more.summary;
+    speedField.parentNode.insertBefore(more.field, speedField);
+    panel.appendChild(speedField);
+    if (routeField) panel.appendChild(routeField);
+  }
+  syncFoldSummaries();
+}
+
+/**
+ * A labelled row that opens a panel when clicked, with a one line summary of
+ * what is inside while it is closed.
+ * @param {string} text Row label.
+ * @param {string} id Id for the panel.
+ * @param {HTMLElement} panel Content, hidden until opened.
+ * @returns {{field: HTMLElement, summary: HTMLElement}} The field and its summary slot.
+ */
+function buildFold(text, id, panel) {
+  const field = make('div', 'field fold');
+  const btn = make('button', 'fold-btn');
+  btn.type = 'button';
+  btn.setAttribute('aria-expanded', 'false');
+  btn.setAttribute('aria-controls', id);
+  btn.appendChild(make('span', 'lbl', text));
+  const summary = make('span', 'fold-sum');
+  btn.appendChild(summary);
+  btn.appendChild(make('span', 'fold-chev'));
+  panel.id = id;
+  panel.hidden = true;
+  btn.addEventListener('click', function () {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    panel.hidden = !open;
+  });
+  field.appendChild(btn);
+  field.appendChild(panel);
+  return { field: field, summary: summary };
+}
+
+/** The closed folds say what is chosen inside them. */
+function syncFoldSummaries() {
+  const labelOf = function (group, value) {
+    const btn = group ? group.querySelector('[data-value="' + value + '"]') : null;
+    return btn ? (btn.getAttribute('aria-label') || btn.textContent).replace(/^[^,]*, /, '').trim() : '';
+  };
+  if (dom.designSummary && dom.designSegs) {
+    dom.designSummary.textContent = ['car', 'moto', 'cycle'].map(function (k) {
+      return labelOf(dom.designSegs[k], state.designs[k]);
+    }).join(', ');
+  }
+  if (dom.moreSummary) {
+    const parts = [labelOf(dom.speedSeg, state.speed) + ' speed'];
+    if (dom.routeSeg) parts.push(labelOf(dom.routeSeg, state.routeStyle));
+    dom.moreSummary.textContent = parts.join(', ');
+  }
 }
 
 /** Bring the map, view and vehicle pickers in line with state. */
@@ -2135,6 +2199,7 @@ function syncLookControls() {
   if (dom.designSegs) {
     Object.keys(dom.designSegs).forEach(function (k) { syncRadio(dom.designSegs[k], state.designs[k]); });
   }
+  syncFoldSummaries();
 }
 
 /** Paint the theme picker cards. */

@@ -20,13 +20,13 @@
  * Canvas 2D only, no OffscreenCanvas, no WebGL, no build step.
  */
 
-import { Muxer, ArrayBufferTarget } from './vendor/mp4-muxer.min.mjs?v=e4';
-import { renderFrame, planTiles, FPS } from './scene.js?v=e4';
+import { Muxer, ArrayBufferTarget } from './vendor/mp4-muxer.min.mjs?v=e5';
+import { renderFrame, planTiles, FPS } from './scene.js?v=e5';
 // Namespace import on purpose: the per-frame tile query is optional, and a named
 // import of an export the scene does not have would fail the whole module at
 // link time. Read through the namespace it is simply undefined, and the frame
 // gate turns itself off.
-import * as scene from './scene.js?v=e4';
+import * as scene from './scene.js?v=e5';
 
 /**
  * Codec strings tried in order: High, Main, Baseline at level 4.0, then the

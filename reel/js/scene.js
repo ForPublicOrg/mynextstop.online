@@ -21,11 +21,11 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js?v=e4';
-import { roadKey } from './routes.js?v=e4';
-import { composeTheme, roundRectPath } from './themes.js?v=e4';
-import { MODE_META, drawVehicle } from './vehicles.js?v=e4';
-import { modelFor, normalizeDesigns, drawModel, project, PX_PER_M } from './models.js?v=e4';
+} from './geo.js?v=e5';
+import { roadKey } from './routes.js?v=e5';
+import { composeTheme, roundRectPath } from './themes.js?v=e5';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e5';
+import { modelFor, normalizeDesigns, drawModel, project, PX_PER_M } from './models.js?v=e5';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;
@@ -682,7 +682,7 @@ export function buildTimeline(project) {
   let outroHoldDur = D_OUTRO_HOLD * speed;
 
   const introDur = D_INTRO * speed;
-  const outroMoveDur = D_OUTRO_MOVE * speed;
+  const outroMoveDur = (is3d ? OUTRO_MOVE_3D : D_OUTRO_MOVE) * speed;
   const freezeDur = D_FREEZE * speed;
 
   // The opening and closing beats are fixed. Everything per leg, the pull
@@ -725,16 +725,17 @@ export function buildTimeline(project) {
         cy: h.cy,
         zoom: h.zoom,
         pitch: PITCH_HOLD,
-        bearing: s === 0 ? followBearing(legs[0], 0) : followBearing(legs[s - 1], 1)
+        bearing: legBearing(legs[Math.max(0, s - 1)])
       };
     });
-    wide3 = { cx: fitAll.cx, cy: fitAll.cy, zoom: fitAll.zoom - WIDE_PULLBACK, pitch: PITCH_WIDE, bearing: 0 };
+    // The closing shot is the flat overview itself: straight down, north up.
+    wide3 = { cx: fitAll.cx, cy: fitAll.cy, zoom: fitAll.zoom, pitch: 0, bearing: 0 };
   }
   const follow3 = function (i, f) {
     if (!is3d) return null;
     // The same centre camera3At rides during travel, so the hand-over is seamless.
-    const pt = chaseCentre(legs[i], f, legs[i].follow, u);
-    return { cx: pt.x, cy: pt.y, zoom: legs[i].follow, pitch: PITCH_FOLLOW, bearing: followBearing(legs[i], f) };
+    const pt = glideCentre(legs[i], f);
+    return { cx: pt.x, cy: pt.y, zoom: legs[i].follow, pitch: PITCH_FOLLOW, bearing: legBearing(legs[i]) };
   };
 
   segments.push({ kind: 'static', t0: 0, t1: introDur, cam: holds[0], a3: is3d ? holds3[0] : null, spin: [-ORBIT_INTRO, 0] });
@@ -776,11 +777,11 @@ export function buildTimeline(project) {
   const outroMove1 = outroMove0 + outroMoveDur;
   const duration = outroMove1 + outroHoldDur + freezeDur;
   segments.push({ kind: 'move', t0: outroMove0, t1: outroMove1, from: holds[legCount], to: fitAll, a3: is3d ? holds3[legCount] : null, b3: wide3 });
-  // The closing hold drifts in a touch and, tilted, orbits the trip; the
-  // freeze at the very end holds that last frame still.
+  // The closing hold drifts in a touch, the same in both views; the freeze
+  // at the very end holds that last frame still.
   const outroHold1 = outroMove1 + outroHoldDur;
-  segments.push({ kind: 'static', t0: outroMove1, t1: outroHold1, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT, spin: [0, ORBIT_OUTRO] });
-  segments.push({ kind: 'static', t0: outroHold1, t1: duration, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT, spin: [ORBIT_OUTRO, ORBIT_OUTRO], settled: true });
+  segments.push({ kind: 'static', t0: outroMove1, t1: outroHold1, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT });
+  segments.push({ kind: 'static', t0: outroHold1, t1: duration, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT, settled: true });
 
   return {
     project: p,
@@ -850,28 +851,31 @@ const TIER_TILE_DROP = [1, 1, 2];
 /** How much closer than the leg fit the camera rides while following. */
 const FOLLOW_LIFT = 0.75;
 const FOLLOW_BREATH = 0.28;
-/** The closing overview pulls back a little, since tilt crowds the far side. */
-const WIDE_PULLBACK = 0.3;
-/** Half window, as a fraction of the leg, the follow bearing is taken across. */
-const BEARING_WINDOW = 0.18;
-/** The chase camera sits a little off the road's line, so the vehicle shows its side. */
+/** The chase camera sits a little off the leg's line, so the vehicle shows its side. */
 const FOLLOW_SIDE = 0.32;
 /** Models read larger on the tilted view, where they are the hero of the shot. */
 const MODEL_BOOST_3D = 1.3;
 const ORBIT_INTRO = 0.4;
-const ORBIT_OUTRO = 0.42;
+/**
+ * Below this pitch the tilted camera is looking straight down, so the frame is
+ * drawn by the flat renderer: the 3D reel ends exactly like the 2D one.
+ */
+const FLAT_PITCH = 0.2 * DEG;
+/** Under this pitch the ground is barely foreshortened: tier 0 keeps full tile density. */
+const FULL_TILE_PITCH = 25 * DEG;
+/** The tilt up into the closing overview takes a little longer than a flat pull out. */
+const OUTRO_MOVE_3D = 1.6;
 /** Pin head height above the ground, in drawing units at unit scale. */
 const PIN_HEIGHT = 38;
 /** The 2D view draws models from a fixed three quarter camera. */
 const SPRITE_PITCH = 50 * DEG;
 const SPRITE_SCALE = 0.7;
 
-/** Ground pixels of road the chase camera averages over, so hairpins never shake it. */
-const CAM_SMOOTH_PX = 260;
-/** Never average over more than this much of a leg. */
-const CAM_SMOOTH_MAX = 0.15;
-/** Fraction of a leg each end of the bearing chord is averaged over. */
-const BEARING_SMOOTH = 0.12;
+/**
+ * The chase camera glides along the leg blurred by a Gaussian this wide, as a
+ * fraction of the leg, so only the leg's broad sweep moves it, never a bend.
+ */
+const GLIDE_SIGMA = 0.1;
 /** Vehicle position is averaged over this much road: corners round off. */
 const POSE_POS_PX = 14;
 /** Vehicle heading runs between points this far behind and ahead: about one car length. */
@@ -893,19 +897,16 @@ const LEAN_SPAN = 2;
 
 /**
  * A point on a path averaged over a window either side of f, with a triangle
- * kernel, so a zigzag road reads as one easy line. By default the window
- * shrinks to nothing at the ends, so f = 0 and f = 1 land exactly on the
- * stops; `full` keeps it whole and lets the samples pile up on the ends
- * instead, for a camera that should be just as calm leaving a stop.
+ * kernel, so a zigzag road reads as one easy line. The window shrinks to
+ * nothing at the ends, so f = 0 and f = 1 land exactly on the stops.
  * Pure in f.
  * @param {object} path A leg path.
  * @param {number} f Fraction along the leg.
  * @param {number} w Half window, as a fraction of the leg.
- * @param {boolean} [full] Keep the whole window at the ends.
  * @returns {{x: number, y: number}} World point.
  */
-function smoothPointAt(path, f, w, full) {
-  const half = full ? w : Math.min(w, f, 1 - f);
+function smoothPointAt(path, f, w) {
+  const half = Math.min(w, f, 1 - f);
   if (!(half > 1e-6)) return pathPointAt(path, clamp01(f));
   let sx = 0;
   let sy = 0;
@@ -961,17 +962,27 @@ function vehiclePose(leg, f, view, u, step) {
 }
 
 /**
- * Where the chase camera looks along a leg: an averaged line through the
- * road, so the vehicle weaves through the hairpins and the frame does not.
+ * Where the chase camera looks along a leg: the road blurred by a wide
+ * Gaussian, so the vehicle weaves through the bends while the frame glides.
+ * Samples past either end pile up on the stop, which keeps the line calm
+ * leaving and reaching it. Pure in f.
  * @param {object} leg A timeline leg.
  * @param {number} f Fraction along the leg.
- * @param {number} zoom Camera zoom, which sets how much road is averaged.
- * @param {number} u Unit scale.
  * @returns {{x: number, y: number}} World point.
  */
-function chaseCentre(leg, f, zoom, u) {
-  const w = Math.min(CAM_SMOOTH_MAX, legFrac(leg.path, CAM_SMOOTH_PX * u, 256 * Math.pow(2, zoom)));
-  return smoothPointAt(leg.path, f, w, true);
+function glideCentre(leg, f) {
+  let sx = 0;
+  let sy = 0;
+  let sw = 0;
+  for (let i = -8; i <= 8; i++) {
+    const o = i / 8 * 2.2;
+    const wt = Math.exp(-0.5 * o * o);
+    const pt = pathPointAt(leg.path, clamp01(f + o * GLIDE_SIGMA));
+    sx += pt.x * wt;
+    sy += pt.y * wt;
+    sw += wt;
+  }
+  return { x: sx / sw, y: sy / sw };
 }
 
 function wrapAngle(a) {
@@ -985,22 +996,20 @@ function lerpAngle(a, b, p) {
 }
 
 /**
- * Compass bearing of the road around a point on a leg, from the chord across
- * a wide window, so the camera turns with the route but never twitches.
+ * The one compass bearing the camera holds for a whole leg: start to end, or
+ * start to the middle of a leg that comes back on itself. The map only ever
+ * turns between legs, eased, never while the vehicle is moving.
  * @param {object} leg A timeline leg.
- * @param {number} f Fraction along the leg.
  * @returns {number} Radians clockwise from north.
  */
-function followBearing(leg, f) {
-  const a = smoothPointAt(leg.path, clamp01(f - BEARING_WINDOW), BEARING_SMOOTH, true);
-  const b = smoothPointAt(leg.path, clamp01(f + BEARING_WINDOW), BEARING_SMOOTH, true);
-  let dx = b.x - a.x;
-  let dy = b.y - a.y;
-  if (dx === 0 && dy === 0) {
-    const pts = leg.path.pts;
-    dx = pts[pts.length - 1].x - pts[0].x;
-    dy = pts[pts.length - 1].y - pts[0].y;
-  }
+function legBearing(leg) {
+  const pts = leg.path.pts;
+  const a = pts[0];
+  let b = pts[pts.length - 1];
+  const chord = Math.hypot(b.x - a.x, b.y - a.y);
+  if (!(chord > (leg.path.len || 0) * 0.15)) b = glideCentre(leg, 0.5);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
   return (dx === 0 && dy === 0 ? 0 : Math.atan2(dx, -dy)) + FOLLOW_SIDE;
 }
 
@@ -1026,13 +1035,13 @@ function camera3At(tl, t) {
     const f = legProgress(tl, seg.leg, t);
     const rise = Math.sin(Math.PI * p);
     const zoom = leg.follow - FOLLOW_BREATH * rise;
-    const pt = chaseCentre(leg, f, zoom, tl.u);
+    const pt = glideCentre(leg, f);
     return {
       cx: pt.x,
       cy: pt.y,
       zoom: zoom,
       pitch: PITCH_FOLLOW - 4 * DEG * rise,
-      bearing: followBearing(leg, f)
+      bearing: legBearing(leg)
     };
   }
   if (seg.kind === 'move') {
@@ -1132,7 +1141,8 @@ function groundLayout(tl, cam) {
  */
 function forEachTierTile(tl, cam, lay, tier, visit) {
   const spec = tl.theme.tiles;
-  const zt = clamp(Math.round(cam.zoom) + spec.zoomBias - TIER_TILE_DROP[tier.k], spec.minZoom, spec.maxZoom);
+  const drop = tier.k === 0 && cam.pitch < FULL_TILE_PITCH ? 0 : TIER_TILE_DROP[tier.k];
+  const zt = clamp(Math.round(cam.zoom) + spec.zoomBias - drop, spec.minZoom, spec.maxZoom);
   const n = Math.pow(2, zt);
   const sc = lay.scale;
   const cb = lay.cb;
@@ -1300,9 +1310,8 @@ function drawSky(ctx, tl, lay) {
  * The whole tilted ground for one frame. Returns the view the upright layers
  * project through.
  */
-function drawGround3d(ctx, tl, t, tiles) {
+function drawGround3d(ctx, tl, t, tiles, cam) {
   const dims = tl.dims;
-  const cam = camera3At(tl, t);
   const lay = groundLayout(tl, cam);
   const view = {
     scale: lay.scale,
@@ -1317,7 +1326,7 @@ function drawGround3d(ctx, tl, t, tiles) {
   warpGround(ctx, tl, lay, out);
   drawSky(ctx, tl, lay);
   drawVignette(ctx, tl);
-  view.p3 = { f: lay.f, sin: lay.sin, cos: lay.cos, sx: dims.w / 2, sy: lay.fy, cb: lay.cb, sb: lay.sb, W: dims.w, H: dims.h, cutY: lay.cutY };
+  view.p3 = { f: lay.f, sin: lay.sin, cos: lay.cos, sx: dims.w / 2, sy: lay.fy, cb: lay.cb, sb: lay.sb, W: dims.w, H: dims.h, cutY: lay.cutY, pitch: cam.pitch };
   return view;
 }
 
@@ -1452,8 +1461,8 @@ function tileWindow(cam, dims, spec) {
  */
 function forEachFrameTile(timeline, frame, visit) {
   const t = clamp(frame / FPS, 0, timeline.duration);
-  if (timeline.is3d) {
-    const c3 = camera3At(timeline, t);
+  const c3 = timeline.is3d ? camera3At(timeline, t) : null;
+  if (c3 && c3.pitch > FLAT_PITCH) {
     const lay = groundLayout(timeline, c3);
     for (let k = 0; k < lay.tiers.length; k++) {
       forEachTierTile(timeline, c3, lay, lay.tiers[k], function (z, tx, ty, n) {
@@ -2117,8 +2126,11 @@ function drawPins(ctx, tl, t, view) {
       const base = screenOf(view, tl.world[s].x, tl.world[s].y, 0);
       if (!base.ok || base.y < view.p3.cutY) continue;
       const kk = clamp(base.k, 0.45, 1.6);
+      // How tilted the view is: the stem, its shadow and the larger head
+      // fade into the flat pin as the camera levels out.
+      const tilt = clamp01(view.p3.pitch / PITCH_FOLLOW);
       const head = screenOf(view, tl.world[s].x, tl.world[s].y, PIN_HEIGHT * u * k);
-      ctx.fillStyle = 'rgba(0,0,0,.26)';
+      ctx.fillStyle = 'rgba(0,0,0,' + (0.26 * tilt).toFixed(3) + ')';
       ctx.beginPath();
       ctx.ellipse(base.x, base.y, 9 * u * kk, 9 * u * kk * view.p3.cos, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -2134,7 +2146,7 @@ function drawPins(ctx, tl, t, view) {
       ctx.stroke();
       x = head.x;
       y = head.y;
-      r = 12 * u * k * kk;
+      r = (10 + 2 * tilt) * u * k * kk;
     }
 
     ctx.beginPath();
@@ -2729,8 +2741,9 @@ export function renderFrame(ctx, timeline, t, tiles) {
   ctx.fillRect(0, 0, dims.w, dims.h);
 
   let view;
-  if (tl.is3d) {
-    view = drawGround3d(ctx, tl, time, tiles);
+  const cam3 = tl.is3d ? camera3At(tl, time) : null;
+  if (cam3 && cam3.pitch > FLAT_PITCH) {
+    view = drawGround3d(ctx, tl, time, tiles, cam3);
   } else {
     const cam = cameraAt(tl, time);
     const scale = 256 * Math.pow(2, cam.zoom);

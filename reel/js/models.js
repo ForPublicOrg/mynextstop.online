@@ -17,7 +17,7 @@
  * screen point the focus lands on.
  */
 
-import { drawVehicle } from './vehicles.js?v=e4';
+import { drawVehicle } from './vehicles.js?v=e5';
 
 /** Design choices per ground mode, in picker order. 'flat' is the classic icon. */
 export const DESIGNS = {
