@@ -141,7 +141,7 @@ export const THEMES = {
 
   satellite: {
     id: 'satellite',
-    name: 'Satellite',
+    name: 'Glow',
     tiles: {
       template: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
       subdomains: [],
@@ -200,6 +200,74 @@ export const THEMES = {
     swatch: { top: '#1a1e46', bottom: '#0b1020' }
   }
 };
+
+/**
+ * Map types, chosen apart from the route style. A style still owns its route,
+ * pins, labels and card; the map type owns the tiles under them, the tint, and
+ * the sky the tilted view shows. When the map type is the one a style was
+ * designed on, the style keeps its own tint exactly.
+ * @type {Object<string, object>}
+ */
+export const MAPS = {
+  light: {
+    id: 'light',
+    name: 'Light',
+    tiles: esriTiles('Canvas/World_Light_Gray_Base'),
+    bg: '#e9e8e5',
+    overlay: null,
+    vignette: 0,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
+    swatch: { top: '#eef0f0', bottom: '#dcdfe0' },
+    sky: ['#8ec3dc', '#e6edef']
+  },
+  dark: {
+    id: 'dark',
+    name: 'Dark',
+    tiles: esriTiles('Canvas/World_Dark_Gray_Base'),
+    bg: '#3f4144',
+    overlay: { color: 'rgba(8,11,14,.52)', blend: 'multiply' },
+    vignette: 0.35,
+    attribution: ESRI_CANVAS_ATTRIBUTION,
+    swatch: { top: '#33363b', bottom: '#15171a' },
+    sky: ['#04060a', '#24272c']
+  },
+  satellite: {
+    id: 'satellite',
+    name: 'Satellite',
+    tiles: THEMES.satellite.tiles,
+    bg: '#0b0e12',
+    overlay: null,
+    vignette: 0.3,
+    attribution: ESRI_ATTRIBUTION,
+    swatch: { top: '#23343f', bottom: '#0b0e12' },
+    sky: ['#2f6aa3', '#c3d4e0']
+  }
+};
+
+/** The map type each style was designed on. */
+export const NATIVE_MAP = { voyage: 'light', vintage: 'light', noir: 'dark', neon: 'dark', satellite: 'satellite' };
+
+/**
+ * A route style laid over a map type.
+ * @param {string} themeId A THEMES key.
+ * @param {string} [mapId] A MAPS key; the style's own map when missing.
+ * @returns {object} A theme object the renderer can use as is.
+ */
+export function composeTheme(themeId, mapId) {
+  const base = THEMES[themeId] || THEMES[DEFAULT_THEME];
+  const native = NATIVE_MAP[base.id] || 'light';
+  const map = MAPS[mapId] || MAPS[native];
+  const out = Object.assign({}, base, { mapId: map.id, sky: map.sky });
+  if (map.id !== native) {
+    out.tiles = map.tiles;
+    out.bg = map.bg;
+    out.overlay = map.overlay;
+    out.vignette = map.vignette;
+    out.attribution = map.attribution;
+    out.swatch = map.swatch;
+  }
+  return out;
+}
 
 /**
  * Trace a rounded rectangle. Used instead of ctx.roundRect, which is missing on

@@ -21,10 +21,11 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js?v=e3';
-import { roadKey } from './routes.js?v=e3';
-import { THEMES, DEFAULT_THEME, roundRectPath } from './themes.js?v=e3';
-import { MODE_META, drawVehicle } from './vehicles.js?v=e3';
+} from './geo.js?v=e4';
+import { roadKey } from './routes.js?v=e4';
+import { composeTheme, roundRectPath } from './themes.js?v=e4';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e4';
+import { modelFor, normalizeDesigns, drawModel, project, PX_PER_M } from './models.js?v=e4';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;
@@ -73,7 +74,10 @@ const D_CAMOUT = 0.8;
 const D_ARRIVE = 0.75;
 const D_HOLD = 0.6;
 const D_OUTRO_MOVE = 1;
-const D_OUTRO_HOLD = 1.9;
+// The closing shot of the whole trip. Long enough to read every stop while
+// the camera drifts and a light runs the route; never squeezed by MAX_DURATION.
+const D_OUTRO_HOLD = 4.2;
+const OUTRO_DRIFT = 0.16;
 const D_FREEZE = 0.4;
 const D_POP = 0.45;
 const D_CHIP_FADE = 0.3;
@@ -543,7 +547,8 @@ function cameraAt(tl, t) {
       zoom: seg.cam.zoom - TRAVEL_ZOOM_BREATH * Math.sin(Math.PI * p)
     };
   }
-  return { cx: seg.cam.cx, cy: seg.cam.cy, zoom: seg.cam.zoom };
+  const drift = seg.drift ? seg.drift * (seg.settled ? 1 : easeInOutSine(p)) : 0;
+  return { cx: seg.cam.cx, cy: seg.cam.cy, zoom: seg.cam.zoom + drift };
 }
 
 /* --------------------------------------------------------------- timeline */
@@ -612,7 +617,8 @@ export function buildTimeline(project) {
   const stops = Array.isArray(p.stops) ? p.stops : [];
   if (stops.length < 2) throw new Error('need-stops');
 
-  const theme = THEMES[p.themeId] || THEMES[DEFAULT_THEME];
+  const theme = composeTheme(p.themeId, p.mapId);
+  const is3d = p.view === '3d';
   const format = FORMATS[p.format] ? p.format : '9x16';
   const dims = { w: FORMATS[format].w, h: FORMATS[format].h };
   const u = Math.min(dims.w, dims.h) / 1080;
@@ -689,8 +695,8 @@ export function buildTimeline(project) {
   // the rhythm of a three stop one, only quicker. Squeezing only the travel
   // and the hold, as this once did, left the pull out and arrival alone, and
   // those two by themselves overran the cap past twenty legs.
-  const fixed = introDur + outroMoveDur + freezeDur;
-  let flex = outroHoldDur + legCount * (camOutDur + arriveDur + holdDur);
+  const fixed = introDur + outroMoveDur + outroHoldDur + freezeDur;
+  let flex = legCount * (camOutDur + arriveDur + holdDur);
   for (let i = 0; i < travel.length; i++) flex += travel[i];
   if (fixed + flex > MAX_DURATION && flex > 0) {
     const k = Math.max(LEG_SQUEEZE_FLOOR, (MAX_DURATION - fixed) / flex);
@@ -699,7 +705,6 @@ export function buildTimeline(project) {
       camOutDur *= k;
       arriveDur *= k;
       holdDur *= k;
-      outroHoldDur *= k;
     }
   }
 
@@ -710,7 +715,32 @@ export function buildTimeline(project) {
   const chipIn = new Array(stops.length).fill(0);
   const chipOut = new Array(stops.length).fill(null);
 
-  segments.push({ kind: 'static', t0: 0, t1: introDur, cam: holds[0] });
+  // The tilted camera rides along each leg, so its resting views carry a
+  // bearing (the way the next leg sets off) and a pitch as well.
+  let holds3 = null;
+  let wide3 = null;
+  if (is3d) {
+    for (let i = 0; i < legCount; i++) {
+      legs[i].follow = clamp(Math.min(legs[i].fit.zoom + FOLLOW_LIFT, holds[i + 1].zoom), ZOOM_MIN, ZOOM_MAX);
+    }
+    holds3 = holds.map(function (h, s) {
+      return {
+        cx: h.cx,
+        cy: h.cy,
+        zoom: h.zoom,
+        pitch: PITCH_HOLD,
+        bearing: s === 0 ? followBearing(legs[0], 0) : followBearing(legs[s - 1], 1)
+      };
+    });
+    wide3 = { cx: fitAll.cx, cy: fitAll.cy, zoom: fitAll.zoom - WIDE_PULLBACK, pitch: PITCH_WIDE, bearing: 0 };
+  }
+  const follow3 = function (i, f) {
+    if (!is3d) return null;
+    const pt = pathPointAt(legs[i].path, f);
+    return { cx: pt.x, cy: pt.y, zoom: legs[i].follow, pitch: PITCH_FOLLOW, bearing: followBearing(legs[i], f) };
+  };
+
+  segments.push({ kind: 'static', t0: 0, t1: introDur, cam: holds[0], a3: is3d ? holds3[0] : null, spin: [-ORBIT_INTRO, 0] });
   pinPop[0] = 0.9 * speed;
   chipIn[0] = 1.1 * speed;
 
@@ -722,10 +752,10 @@ export function buildTimeline(project) {
     const arrive1 = travel1 + arriveDur;
     const hold1 = arrive1 + holdDur;
 
-    segments.push({ kind: 'move', t0: camOut0, t1: travel0, from: holds[i], to: legs[i].fit });
-    segments.push({ kind: 'travel', t0: travel0, t1: travel1, cam: legs[i].fit });
-    segments.push({ kind: 'move', t0: travel1, t1: arrive1, from: legs[i].fit, to: holds[i + 1] });
-    segments.push({ kind: 'static', t0: arrive1, t1: hold1, cam: holds[i + 1] });
+    segments.push({ kind: 'move', t0: camOut0, t1: travel0, from: holds[i], to: legs[i].fit, a3: is3d ? holds3[i] : null, b3: follow3(i, 0) });
+    segments.push({ kind: 'travel', t0: travel0, t1: travel1, cam: legs[i].fit, leg: i });
+    segments.push({ kind: 'move', t0: travel1, t1: arrive1, from: legs[i].fit, to: holds[i + 1], a3: follow3(i, 1), b3: is3d ? holds3[i + 1] : null });
+    segments.push({ kind: 'static', t0: arrive1, t1: hold1, cam: holds[i + 1], a3: is3d ? holds3[i + 1] : null });
 
     legTimes.push({
       camOut0: camOut0,
@@ -748,12 +778,18 @@ export function buildTimeline(project) {
   const outroMove0 = cursor;
   const outroMove1 = outroMove0 + outroMoveDur;
   const duration = outroMove1 + outroHoldDur + freezeDur;
-  segments.push({ kind: 'move', t0: outroMove0, t1: outroMove1, from: holds[legCount], to: fitAll });
-  segments.push({ kind: 'static', t0: outroMove1, t1: duration, cam: fitAll });
+  segments.push({ kind: 'move', t0: outroMove0, t1: outroMove1, from: holds[legCount], to: fitAll, a3: is3d ? holds3[legCount] : null, b3: wide3 });
+  // The closing hold drifts in a touch and, tilted, orbits the trip; the
+  // freeze at the very end holds that last frame still.
+  const outroHold1 = outroMove1 + outroHoldDur;
+  segments.push({ kind: 'static', t0: outroMove1, t1: outroHold1, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT, spin: [0, ORBIT_OUTRO] });
+  segments.push({ kind: 'static', t0: outroHold1, t1: duration, cam: fitAll, a3: wide3, drift: OUTRO_DRIFT, spin: [ORBIT_OUTRO, ORBIT_OUTRO], settled: true });
 
   return {
     project: p,
     theme: theme,
+    is3d: is3d,
+    designs: normalizeDesigns(p.designs),
     format: format,
     dims: dims,
     u: u,
@@ -786,6 +822,480 @@ export function buildTimeline(project) {
     vehicleIn: D_VEHICLE_IN * speed,
     vehicleOut: D_VEHICLE_OUT * speed
   };
+}
+
+/* ------------------------------------------------------------- 3D camera */
+
+// The tilted view is a ground plane seen through a pinhole camera. The map is
+// rendered flat, in a few tiers of falling resolution, into offscreen canvases
+// turned to the camera bearing, then laid onto the frame in thin horizontal
+// bands, each band scaled for its own distance. Sky and haze hide where the
+// ground runs out. Pins, labels and the vehicle are drawn upright on top.
+
+const DEG = Math.PI / 180;
+const PITCH_HOLD = 56 * DEG;
+const PITCH_FOLLOW = 50 * DEG;
+const PITCH_WIDE = 34 * DEG;
+/** Focal length as a multiple of the frame height (or three quarters of a wide frame). */
+const FOCAL = 1.2;
+/** Ground pixels per screen pixel where the far ground ends in haze. */
+const S_MAX = 3;
+/** Ground scale where the haze starts to gather. */
+const HAZE_FROM = 1.7;
+/** Ground scale edges between render tiers; tier k renders at 1 / 2^k. */
+const TIER_EDGES = [1.3, 2.1];
+/**
+ * Tile levels each tier drops below the flat view's choice. Tilted ground is
+ * foreshortened, so the flat view's double density would be thrown away; this
+ * keeps about one tile texel per screen pixel and a third of the tiles.
+ */
+const TIER_TILE_DROP = [1, 1, 2];
+/** How much closer than the leg fit the camera rides while following. */
+const FOLLOW_LIFT = 0.75;
+const FOLLOW_BREATH = 0.28;
+/** The closing overview pulls back a little, since tilt crowds the far side. */
+const WIDE_PULLBACK = 0.3;
+/** Half window, as a fraction of the leg, the follow bearing is taken across. */
+const BEARING_WINDOW = 0.18;
+/** The chase camera sits a little off the road's line, so the vehicle shows its side. */
+const FOLLOW_SIDE = 0.32;
+/** Models read larger on the tilted view, where they are the hero of the shot. */
+const MODEL_BOOST_3D = 1.3;
+const ORBIT_INTRO = 0.4;
+const ORBIT_OUTRO = 0.42;
+/** Pin head height above the ground, in drawing units at unit scale. */
+const PIN_HEIGHT = 38;
+/** The 2D view draws models from a fixed three quarter camera. */
+const SPRITE_PITCH = 50 * DEG;
+const SPRITE_SCALE = 0.7;
+
+function wrapAngle(a) {
+  while (a > Math.PI) a -= Math.PI * 2;
+  while (a < -Math.PI) a += Math.PI * 2;
+  return a;
+}
+
+function lerpAngle(a, b, p) {
+  return a + wrapAngle(b - a) * p;
+}
+
+/**
+ * Compass bearing of the road around a point on a leg, from the chord across
+ * a wide window, so the camera turns with the route but never twitches.
+ * @param {object} leg A timeline leg.
+ * @param {number} f Fraction along the leg.
+ * @returns {number} Radians clockwise from north.
+ */
+function followBearing(leg, f) {
+  const a = pathPointAt(leg.path, clamp01(f - BEARING_WINDOW));
+  const b = pathPointAt(leg.path, clamp01(f + BEARING_WINDOW));
+  let dx = b.x - a.x;
+  let dy = b.y - a.y;
+  if (dx === 0 && dy === 0) {
+    const pts = leg.path.pts;
+    dx = pts[pts.length - 1].x - pts[0].x;
+    dy = pts[pts.length - 1].y - pts[0].y;
+  }
+  return (dx === 0 && dy === 0 ? 0 : Math.atan2(dx, -dy)) + FOLLOW_SIDE;
+}
+
+/**
+ * The tilted camera at a point in time. Pure in t, like cameraAt.
+ * @param {object} tl Timeline.
+ * @param {number} t Seconds.
+ * @returns {{cx: number, cy: number, zoom: number, pitch: number, bearing: number}}
+ */
+function camera3At(tl, t) {
+  const segs = tl.segments;
+  let seg = segs[segs.length - 1];
+  for (let i = 0; i < segs.length; i++) {
+    if (t < segs[i].t1) {
+      seg = segs[i];
+      break;
+    }
+  }
+  const p = clamp01((t - seg.t0) / Math.max(1e-6, seg.t1 - seg.t0));
+
+  if (seg.kind === 'travel') {
+    const leg = tl.legs[seg.leg];
+    const f = legProgress(tl, seg.leg, t);
+    const pt = pathPointAt(leg.path, f);
+    const rise = Math.sin(Math.PI * p);
+    return {
+      cx: pt.x,
+      cy: pt.y,
+      zoom: leg.follow - FOLLOW_BREATH * rise,
+      pitch: PITCH_FOLLOW - 4 * DEG * rise,
+      bearing: followBearing(leg, f)
+    };
+  }
+  if (seg.kind === 'move') {
+    const e = easeInOutCubic(p);
+    const a = seg.a3;
+    const b = seg.b3;
+    return {
+      cx: lerp(a.cx, b.cx, e),
+      cy: lerp(a.cy, b.cy, e),
+      zoom: lerp(a.zoom, b.zoom, e),
+      pitch: lerp(a.pitch, b.pitch, e),
+      bearing: lerpAngle(a.bearing, b.bearing, e)
+    };
+  }
+  const c = seg.a3;
+  const e = seg.settled ? 1 : easeInOutSine(p);
+  return {
+    cx: c.cx,
+    cy: c.cy,
+    zoom: c.zoom + (seg.drift ? seg.drift * e : 0),
+    pitch: c.pitch,
+    bearing: c.bearing + (seg.spin ? lerp(seg.spin[0], seg.spin[1], e) : 0)
+  };
+}
+
+/** Screen row the focus sits on: lower as the camera tilts, so more road shows ahead. */
+function focusRow(dims, pitch) {
+  return dims.h * (0.5 + 0.12 * clamp01((pitch - PITCH_WIDE) / (PITCH_HOLD - PITCH_WIDE)));
+}
+
+/**
+ * Everything one tilted frame needs to know about its ground: projection
+ * constants, where the ground ends, and the render tiers with their extents
+ * in the ground frame (gx right, gy away from the viewer, ground pixels).
+ * @param {object} tl Timeline.
+ * @param {{zoom: number, pitch: number, bearing: number}} cam Tilted camera.
+ * @returns {object} Layout.
+ */
+function groundLayout(tl, cam) {
+  const dims = tl.dims;
+  const sin = Math.sin(cam.pitch);
+  const cos = Math.cos(cam.pitch);
+  // Landscape frames would see a very wide fan of ground; a longer lens there
+  // keeps the tile load near the portrait one.
+  const f = FOCAL * Math.max(dims.h, 0.75 * dims.w);
+  const fc = f * cos;
+  const fy = focusRow(dims, cam.pitch);
+  const sAt = function (v) {
+    const d = fc + v * sin;
+    return d > 0 ? fc / d : Infinity;
+  };
+  const gyOf = function (sc) { return (f * (sc - 1)) / sin; };
+  const sBot = sAt(dims.h - fy);
+  const sTop = Math.min(S_MAX, sAt(-fy));
+
+  const tiers = [];
+  let lo = sBot;
+  for (let k = 0; k <= TIER_EDGES.length && lo < sTop; k++) {
+    const edge = k < TIER_EDGES.length ? TIER_EDGES[k] : Infinity;
+    if (edge <= lo) continue;
+    const hi = Math.min(edge, sTop);
+    tiers.push({
+      k: k,
+      sLo: lo,
+      sHi: hi,
+      gyLo: gyOf(lo / 1.03),
+      gyHi: gyOf(hi * 1.03),
+      halfW: (dims.w / 2) * hi * 1.03 + 2
+    });
+    lo = hi;
+  }
+
+  return {
+    f: f,
+    fc: fc,
+    sin: sin,
+    cos: cos,
+    fy: fy,
+    w2: dims.w / 2,
+    cutY: fy + (fc * (1 / S_MAX - 1)) / sin,
+    hazeY: fy + (fc * (1 / HAZE_FROM - 1)) / sin,
+    tiers: tiers,
+    scale: 256 * Math.pow(2, cam.zoom),
+    cb: Math.cos(cam.bearing),
+    sb: Math.sin(cam.bearing)
+  };
+}
+
+/**
+ * Visit the tiles one ground tier covers, at the tier's own tile level.
+ * @param {object} tl Timeline.
+ * @param {{cx: number, cy: number, zoom: number}} cam Tilted camera.
+ * @param {object} lay From groundLayout.
+ * @param {object} tier One of lay.tiers.
+ * @param {function(number, number, number, number): void} visit (z, x unwrapped, y, n).
+ * @returns {void}
+ */
+function forEachTierTile(tl, cam, lay, tier, visit) {
+  const spec = tl.theme.tiles;
+  const zt = clamp(Math.round(cam.zoom) + spec.zoomBias - TIER_TILE_DROP[tier.k], spec.minZoom, spec.maxZoom);
+  const n = Math.pow(2, zt);
+  const sc = lay.scale;
+  const cb = lay.cb;
+  const sb = lay.sb;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  const corners = [[-tier.halfW, tier.gyLo], [tier.halfW, tier.gyLo], [tier.halfW, tier.gyHi], [-tier.halfW, tier.gyHi]];
+  for (let i = 0; i < 4; i++) {
+    const gx = corners[i][0];
+    const gy = corners[i][1];
+    const wx = cam.cx + (gx * cb + gy * sb) / sc;
+    const wy = cam.cy + (gx * sb - gy * cb) / sc;
+    minX = Math.min(minX, wx);
+    maxX = Math.max(maxX, wx);
+    minY = Math.min(minY, wy);
+    maxY = Math.max(maxY, wy);
+  }
+  const x0 = Math.floor(minX * n);
+  const x1 = Math.min(x0 + 80, Math.floor(maxX * n));
+  const y0 = Math.max(0, Math.floor(minY * n));
+  const y1 = Math.min(n - 1, y0 + 80, Math.floor(maxY * n));
+  const rad = (sc / n) * 0.7072;
+  for (let ty = y0; ty <= y1; ty++) {
+    for (let tx = x0; tx <= x1; tx++) {
+      const dx = ((tx + 0.5) / n - cam.cx) * sc;
+      const dy = ((ty + 0.5) / n - cam.cy) * sc;
+      const gx = dx * cb + dy * sb;
+      const gy = dx * sb - dy * cb;
+      if (gy < tier.gyLo - rad || gy > tier.gyHi + rad) continue;
+      // The tier is a trapezoid, narrow near the viewer: skip its empty corners.
+      const half = Math.min(tier.halfW, lay.w2 * (1 + ((gy + rad) * lay.sin) / lay.f) * 1.03 + 2);
+      if (gx < -half - rad || gx > half + rad) continue;
+      visit(zt, tx, ty, n);
+    }
+  }
+}
+
+const TIER_CANVAS = [];
+
+function tierCanvas(k, w, h) {
+  let cv = TIER_CANVAS[k];
+  if (!cv) {
+    cv = typeof document !== 'undefined' ? document.createElement('canvas') : new OffscreenCanvas(w, h);
+    TIER_CANVAS[k] = cv;
+  }
+  // Grow only: resizing clears and reallocates, and every frame draws inside
+  // its own top left rectangle anyway.
+  if (cv.width < w) cv.width = w;
+  if (cv.height < h) cv.height = h;
+  return cv;
+}
+
+/** Paint one ground tier: tiles, theme tint, routes and landing rings. */
+function renderTier(tl, cam, lay, tier, tiles, t, view, outScale) {
+  const dims = tl.dims;
+  const r = Math.pow(2, -tier.k) * outScale;
+  const w = Math.max(1, Math.ceil(2 * tier.halfW * r));
+  const h = Math.max(1, Math.ceil((tier.gyHi - tier.gyLo) * r));
+  const cv = tierCanvas(tier.k, w, h);
+  const c = cv.getContext('2d');
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.globalAlpha = 1;
+  c.globalCompositeOperation = 'source-over';
+  c.setLineDash([]);
+  clearShadow(c);
+  c.imageSmoothingEnabled = true;
+  c.imageSmoothingQuality = 'high';
+  c.fillStyle = tl.theme.bg;
+  c.fillRect(0, 0, w, h);
+
+  // Flat drawing space to tier pixels: about the frame centre, turned so the
+  // camera bearing points up, scaled to the tier.
+  const cb = lay.cb;
+  const sb = lay.sb;
+  c.setTransform(
+    r * cb, -r * sb, r * sb, r * cb,
+    r * (tier.halfW - (cb * dims.w) / 2 - (sb * dims.h) / 2),
+    r * (tier.gyHi + (sb * dims.w) / 2 - (cb * dims.h) / 2)
+  );
+
+  if (tiles && typeof tiles.get === 'function') {
+    const spec = tiles.spec || tl.theme.tiles;
+    forEachTierTile(tl, cam, lay, tier, function (z, tx, ty, n) {
+      const span = lay.scale / n;
+      drawTileOrAncestor(c, tiles, spec, z, tx, ty, tx * span + view.ox, ty * span + view.oy, span + 0.75 / r);
+    });
+  }
+
+  if (tl.theme.overlay) {
+    c.save();
+    c.setTransform(1, 0, 0, 1, 0, 0);
+    c.globalCompositeOperation = tl.theme.overlay.blend;
+    c.fillStyle = tl.theme.overlay.color;
+    c.fillRect(0, 0, w, h);
+    c.restore();
+  }
+
+  const keep = shadowScale;
+  shadowScale = r;
+  drawTrails(c, tl, t, view);
+  drawSweep(c, tl, t, view);
+  drawPulses(c, tl, t, view);
+  shadowScale = keep;
+  return { cv: cv, r: r };
+}
+
+/** Lay the tiers onto the frame, one thin band per distance. */
+function warpGround(ctx, tl, lay, out) {
+  const dims = tl.dims;
+  const gyAt = function (row) {
+    const v = row - lay.fy;
+    return (-v * lay.f) / (lay.fc + v * lay.sin);
+  };
+  // Plain bilinear: the high quality path picks a different filter per band
+  // as the band's own scale changes, and the bands show as stripes.
+  const quality = ctx.imageSmoothingQuality;
+  ctx.imageSmoothingQuality = 'low';
+  let y = Math.max(0, Math.floor(lay.cutY));
+  while (y < dims.h) {
+    const s0 = lay.fc / (lay.fc + (y - lay.fy) * lay.sin);
+    // Bands stay thin where the scale changes fast, so their edges never step.
+    const step = Math.max(1, Math.min(6, Math.round((0.004 * lay.fc) / (s0 * lay.sin))));
+    const y1 = Math.min(dims.h, y + step);
+    const sm = lay.fc / (lay.fc + ((y + y1) / 2 - lay.fy) * lay.sin);
+    let ti = 0;
+    while (ti < lay.tiers.length - 1 && sm > lay.tiers[ti].sHi) ti++;
+    const tier = lay.tiers[ti];
+    const o = out[ti];
+    const g0 = gyAt(y);
+    const g1 = gyAt(y1 + 0.6);
+    const half = (dims.w / 2) * sm;
+    ctx.drawImage(o.cv, (tier.halfW - half) * o.r, (tier.gyHi - g0) * o.r, 2 * half * o.r, (g0 - g1) * o.r, 0, y, dims.w, y1 + 0.6 - y);
+    y = y1;
+  }
+  ctx.imageSmoothingQuality = quality;
+}
+
+/** Sky above the far edge of the ground, and haze where the ground fades into it. */
+function drawSky(ctx, tl, lay) {
+  const dims = tl.dims;
+  const sky = tl.theme.sky || ['#9ccbe0', '#e4ecee'];
+  const cut = lay.cutY;
+  if (cut > 0) {
+    const g = ctx.createLinearGradient(0, 0, 0, cut);
+    g.addColorStop(0, sky[0]);
+    g.addColorStop(1, sky[1]);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, dims.w, cut + 1);
+  }
+  if (lay.hazeY > 0 && lay.hazeY > cut) {
+    const g = ctx.createLinearGradient(0, cut, 0, lay.hazeY);
+    g.addColorStop(0, withAlpha(sky[1], 1));
+    g.addColorStop(0.3, withAlpha(sky[1], 0.62));
+    g.addColorStop(0.65, withAlpha(sky[1], 0.2));
+    g.addColorStop(1, withAlpha(sky[1], 0));
+    ctx.fillStyle = g;
+    const top = Math.max(0, cut);
+    ctx.fillRect(0, top, dims.w, lay.hazeY - top);
+  }
+}
+
+/**
+ * The whole tilted ground for one frame. Returns the view the upright layers
+ * project through.
+ */
+function drawGround3d(ctx, tl, t, tiles) {
+  const dims = tl.dims;
+  const cam = camera3At(tl, t);
+  const lay = groundLayout(tl, cam);
+  const view = {
+    scale: lay.scale,
+    ox: dims.w / 2 - cam.cx * lay.scale,
+    oy: dims.h / 2 - cam.cy * lay.scale
+  };
+  // A preview canvas is smaller than drawing space; the tiers need not be.
+  const outScale = Math.min(1, shadowScale);
+  const out = lay.tiers.map(function (tier) {
+    return renderTier(tl, cam, lay, tier, tiles, t, view, outScale);
+  });
+  warpGround(ctx, tl, lay, out);
+  drawSky(ctx, tl, lay);
+  drawVignette(ctx, tl);
+  view.p3 = { f: lay.f, sin: lay.sin, cos: lay.cos, sx: dims.w / 2, sy: lay.fy, cb: lay.cb, sb: lay.sb, W: dims.w, H: dims.h, cutY: lay.cutY };
+  return view;
+}
+
+/**
+ * A world point on screen, tilted or flat.
+ * @param {object} view Flat view, with `p3` when tilted.
+ * @param {number} wx World x.
+ * @param {number} wy World y.
+ * @param {number} z Height in drawing units.
+ * @returns {{x: number, y: number, k: number, ok: boolean, gx?: number, gy?: number}}
+ */
+function screenOf(view, wx, wy, z) {
+  const X = wx * view.scale + view.ox;
+  const Y = wy * view.scale + view.oy;
+  const p = view.p3;
+  if (!p) return { x: X, y: Y, k: 1, ok: Number.isFinite(X) && Number.isFinite(Y) };
+  const dx = X - p.W / 2;
+  const dy = Y - p.H / 2;
+  const gx = dx * p.cb + dy * p.sb;
+  const gy = dx * p.sb - dy * p.cb;
+  const r = project(p, gx, gy, z || 0);
+  r.ok = r.d > p.f * 0.2 && Number.isFinite(r.x) && Number.isFinite(r.y);
+  r.gx = gx;
+  r.gy = gy;
+  return r;
+}
+
+/**
+ * Closing flourish: a light runs the whole route once while the overview
+ * holds, brightest at its head.
+ * @param {CanvasRenderingContext2D} ctx Target context.
+ * @param {object} tl Timeline.
+ * @param {number} t Seconds.
+ * @param {{scale: number, ox: number, oy: number}} view Flat projection.
+ * @returns {void}
+ */
+function drawSweep(ctx, tl, t, view) {
+  const o = tl.outro;
+  const span = o.holdEnd - o.move1;
+  const p = (t - o.move1 - 0.12 * span) / (0.72 * span);
+  if (!(p > 0 && p < 1)) return;
+  const legs = tl.legs;
+  let total = 0;
+  for (let i = 0; i < legs.length; i++) total += legs[i].path.len || 0;
+  if (!(total > 0)) return;
+
+  const route = tl.theme.route;
+  const base = route.color || (route.gradient ? route.gradient[1] : '#ffffff');
+  const color = isLightColor(base) ? '#ffd76a' : '#ffffff';
+  const head = easeInOutSine(p) * total;
+  const tail = total * 0.22;
+  const fade = Math.sin(Math.PI * p);
+  const u = tl.u;
+
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = color;
+  // Three slices of tail, each brighter toward the head.
+  for (let q = 0; q < 3; q++) {
+    const from = head - tail * (1 - q / 3);
+    const to = head - tail * (1 - (q + 1) / 3);
+    let acc = 0;
+    for (let i = 0; i < legs.length; i++) {
+      const len = legs[i].path.len || 0;
+      const a = Math.max(from, acc);
+      const b = Math.min(to, acc + len);
+      if (b > a && len > 0) {
+        const geom = legs[i].path.kind === 'road' ? pickLevel(legs[i].path, view.scale) : legs[i].path;
+        const f0 = (a - acc) / len;
+        const f1 = (b - acc) / len;
+        ctx.globalAlpha = 0.16 * (q + 1) * fade;
+        ctx.lineWidth = route.width * 2.6 * u;
+        traceGeom(ctx, geom, f0, f1, view);
+        ctx.stroke();
+        ctx.globalAlpha = 0.32 * (q + 1) * fade;
+        ctx.lineWidth = route.width * 0.6 * u;
+        traceGeom(ctx, geom, f0, f1, view);
+        ctx.stroke();
+      }
+      acc += len;
+    }
+  }
+  ctx.restore();
 }
 
 /* -------------------------------------------------------------- tile plan */
@@ -836,6 +1346,16 @@ function tileWindow(cam, dims, spec) {
  */
 function forEachFrameTile(timeline, frame, visit) {
   const t = clamp(frame / FPS, 0, timeline.duration);
+  if (timeline.is3d) {
+    const c3 = camera3At(timeline, t);
+    const lay = groundLayout(timeline, c3);
+    for (let k = 0; k < lay.tiers.length; k++) {
+      forEachTierTile(timeline, c3, lay, lay.tiers[k], function (z, tx, ty, n) {
+        visit(z, ((tx % n) + n) % n, ty);
+      });
+    }
+    return;
+  }
   const cam = cameraAt(timeline, t);
   const win = tileWindow(cam, timeline.dims, timeline.theme.tiles);
 
@@ -1272,6 +1792,18 @@ function drawWash(ctx, tl) {
     ctx.restore();
   }
 
+  drawVignette(ctx, tl);
+}
+
+/**
+ * Edge darkening, for themes that have it.
+ * @param {CanvasRenderingContext2D} ctx Target context.
+ * @param {object} tl Timeline.
+ * @returns {void}
+ */
+function drawVignette(ctx, tl) {
+  const dims = tl.dims;
+  const theme = tl.theme;
   if (theme.vignette > 0) {
     const cx = dims.w / 2;
     const cy = dims.h / 2;
@@ -1470,11 +2002,37 @@ function drawPins(ctx, tl, t, view) {
     if (t < at) continue;
     const k = easeOutBack(clamp01((t - at) / tl.popDur));
     if (k <= 0) continue;
-    const x = tl.world[s].x * view.scale + view.ox;
-    const y = tl.world[s].y * view.scale + view.oy;
+    let x = tl.world[s].x * view.scale + view.ox;
+    let y = tl.world[s].y * view.scale + view.oy;
+    let r = 10 * u * k;
+
+    // Tilted, a pin stands on a short stem over its own ground shadow.
+    if (view.p3) {
+      const base = screenOf(view, tl.world[s].x, tl.world[s].y, 0);
+      if (!base.ok || base.y < view.p3.cutY) continue;
+      const kk = clamp(base.k, 0.45, 1.6);
+      const head = screenOf(view, tl.world[s].x, tl.world[s].y, PIN_HEIGHT * u * k);
+      ctx.fillStyle = 'rgba(0,0,0,.26)';
+      ctx.beginPath();
+      ctx.ellipse(base.x, base.y, 9 * u * kk, 9 * u * kk * view.p3.cos, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = pin.ring;
+      ctx.lineWidth = 6 * u * kk;
+      ctx.beginPath();
+      ctx.moveTo(base.x, base.y);
+      ctx.lineTo(head.x, head.y);
+      ctx.stroke();
+      ctx.strokeStyle = pin.fill;
+      ctx.lineWidth = 3 * u * kk;
+      ctx.stroke();
+      x = head.x;
+      y = head.y;
+      r = 12 * u * k * kk;
+    }
 
     ctx.beginPath();
-    ctx.arc(x, y, 10 * u * k, 0, Math.PI * 2);
+    ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.shadowColor = 'rgba(0,0,0,.28)';
     setShadow(ctx, 9 * u, 0, 2 * u);
     ctx.fillStyle = pin.fill;
@@ -1557,20 +2115,93 @@ function drawVehicleLayer(ctx, tl, t, view) {
   const u = tl.u;
   const pt = pathPointAt(leg.path, act.f);
   const angle = headingAt(leg.path, act.f, view, pt.angle);
-  const x = pt.x * view.scale + view.ox;
-  const y = pt.y * view.scale + view.oy;
+  const p3 = view.p3;
+  const model = modelFor(leg.mode, tl.designs);
+
+  if (model) {
+    // A real model: turned to the road, wheels rolling, two wheelers leaning
+    // into the bends. Flat, it is seen from a fixed three quarter camera.
+    let cam;
+    let gx = 0;
+    let gy = 0;
+    let ppm = PX_PER_M * u;
+    if (p3) {
+      const at = screenOf(view, pt.x, pt.y, 0);
+      if (!at.ok) return;
+      cam = p3;
+      gx = at.gx;
+      gy = at.gy;
+      ppm *= MODEL_BOOST_3D;
+    } else {
+      cam = {
+        f: 2400 * u,
+        sin: Math.sin(SPRITE_PITCH),
+        cos: Math.cos(SPRITE_PITCH),
+        sx: pt.x * view.scale + view.ox,
+        sy: pt.y * view.scale + view.oy
+      };
+      ppm *= SPRITE_SCALE;
+    }
+    const headingNear = function (f) {
+      return headingAt(leg.path, f, view, pathPointAt(leg.path, f).angle);
+    };
+    const turn = wrapAngle(headingNear(clamp01(act.f + 0.03)) - headingNear(clamp01(act.f - 0.03)));
+    const leanMax = leg.mode === 'moto' ? 0.42 : (leg.mode === 'cycle' ? 0.3 : 0);
+    const L = tl.times.legs[act.leg];
+    const spin = act.f * (L.travel1 - L.travel0) * 11;
+    const ca = Math.cos(angle);
+    const sa = Math.sin(angle);
+    const cb = p3 ? p3.cb : 1;
+    const sb = p3 ? p3.sb : 0;
+    drawModel(ctx, model, cam, {
+      gx: gx,
+      gy: gy,
+      hx: ca * cb + sa * sb,
+      hy: ca * sb - sa * cb,
+      ppm: ppm,
+      spin: spin,
+      lean: clamp(-turn * 2.4, -leanMax, leanMax) * act.alpha,
+      bob: leg.mode === 'car' ? 0.012 * Math.sin(spin * 0.9) : 0,
+      alpha: act.alpha,
+      halo: isLightColor(tl.theme.bg) ? null : 'rgba(255,255,255,.16)'
+    });
+    return;
+  }
+
   const flying = leg.mode === 'plane';
   const lift = flying ? Math.sin(Math.PI * act.p) : 0;
+  let x = pt.x * view.scale + view.ox;
+  let y = pt.y * view.scale + view.oy;
+  let sx = x;
+  let sy = y + (flying ? 22 * u * lift : 4 * u);
+  let ang = angle;
+  let kk = 1;
+  let faceLeft = flying ? undefined : facingAt(leg.path, act.f, view, angle);
+  if (p3) {
+    // Tilted, an icon floats over its own shadow, a plane by its altitude.
+    const h = (flying ? 110 * lift : 8) * u;
+    const base = screenOf(view, pt.x, pt.y, 0);
+    const up = screenOf(view, pt.x, pt.y, h);
+    const ahead = screenOf(view, pt.x + (Math.cos(angle) * 6) / view.scale, pt.y + (Math.sin(angle) * 6) / view.scale, h);
+    if (!base.ok || !up.ok) return;
+    kk = clamp(base.k, 0.5, 1.6);
+    sx = base.x;
+    sy = base.y;
+    x = up.x;
+    y = up.y;
+    ang = Math.atan2(ahead.y - up.y, ahead.x - up.x);
+    faceLeft = undefined;
+  }
 
   ctx.save();
   ctx.globalAlpha = (flying ? 0.3 * (1 - 0.65 * lift) : 0.22) * act.alpha;
   ctx.fillStyle = '#000000';
   ctx.beginPath();
   ctx.ellipse(
-    x,
-    y + (flying ? 22 * u * lift : 4 * u),
-    18 * u * (1 - 0.25 * lift),
-    7 * u * (1 - 0.25 * lift),
+    sx,
+    sy,
+    18 * u * kk * (1 - 0.25 * lift),
+    7 * u * kk * (1 - 0.25 * lift),
     0,
     0,
     Math.PI * 2
@@ -1586,9 +2217,9 @@ function drawVehicleLayer(ctx, tl, t, view) {
     tl.theme,
     x,
     y,
-    angle,
-    u * (flying ? 1 + 0.4 * lift : 1),
-    flying ? undefined : facingAt(leg.path, act.f, view, angle)
+    ang,
+    u * kk * (flying ? 1 + 0.4 * lift : 1),
+    faceLeft
   );
   ctx.restore();
 }
@@ -1715,9 +2346,10 @@ function drawChips(ctx, tl, t, view) {
     const alpha = chipAlpha(tl, s, t);
     if (alpha <= 0.01) continue;
 
-    const px = tl.world[s].x * view.scale + view.ox;
-    const py = tl.world[s].y * view.scale + view.oy;
-    if (!Number.isFinite(px) || !Number.isFinite(py)) continue;
+    const anchor = screenOf(view, tl.world[s].x, tl.world[s].y, view.p3 ? PIN_HEIGHT * u : 0);
+    if (!anchor.ok || (view.p3 && anchor.y < view.p3.cutY)) continue;
+    const px = anchor.x;
+    const py = anchor.y;
     // The horizontal clamp below keeps a chip on screen for a pin near the
     // edge. A pin past the edge would get a chip hugging it with a tail aimed
     // at nothing, so that case is culled on the pin before anything is sized.
@@ -1955,13 +2587,6 @@ export function renderFrame(ctx, timeline, t, tiles) {
   const tl = timeline;
   const dims = tl.dims;
   const time = t <= 0 ? 0 : (t >= tl.duration ? tl.duration : t);
-  const cam = cameraAt(tl, time);
-  const scale = 256 * Math.pow(2, cam.zoom);
-  const view = {
-    scale: scale,
-    ox: dims.w / 2 - cam.cx * scale,
-    oy: dims.h / 2 - cam.cy * scale
-  };
 
   // Shadows ignore the transform, so every shadow size in this frame is
   // corrected by the transform's own scale. Preview and export then match.
@@ -1980,10 +2605,23 @@ export function renderFrame(ctx, timeline, t, tiles) {
   ctx.fillStyle = tl.theme.bg;
   ctx.fillRect(0, 0, dims.w, dims.h);
 
-  drawTiles(ctx, tl, cam, tiles);
-  drawWash(ctx, tl);
-  drawTrails(ctx, tl, time, view);
-  drawPulses(ctx, tl, time, view);
+  let view;
+  if (tl.is3d) {
+    view = drawGround3d(ctx, tl, time, tiles);
+  } else {
+    const cam = cameraAt(tl, time);
+    const scale = 256 * Math.pow(2, cam.zoom);
+    view = {
+      scale: scale,
+      ox: dims.w / 2 - cam.cx * scale,
+      oy: dims.h / 2 - cam.cy * scale
+    };
+    drawTiles(ctx, tl, cam, tiles);
+    drawWash(ctx, tl);
+    drawTrails(ctx, tl, time, view);
+    drawSweep(ctx, tl, time, view);
+    drawPulses(ctx, tl, time, view);
+  }
   drawPins(ctx, tl, time, view);
   drawVehicleLayer(ctx, tl, time, view);
   drawChips(ctx, tl, time, view);

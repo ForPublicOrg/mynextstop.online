@@ -418,6 +418,23 @@ a { color: var(--accent); }
 .style-card[aria-checked="true"] canvas { box-shadow: 0 0 0 2px var(--accent), var(--elev-1); border-color: var(--accent); }
 .style-card[aria-checked="true"] .style-name { color: var(--accent); }
 
+/* ----- vehicle designs ----- */
+.design-rows { display: grid; gap: 8px; }
+.design-row { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.design-kind { flex: 0 0 42px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.design-opts { display: flex; gap: 6px; overflow-x: auto; padding: 2px; min-width: 0; scrollbar-width: thin; }
+.design-btn {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 4px 4px 5px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2);
+  transition: border-color .12s ease, transform .12s ease;
+}
+.design-btn:hover { transform: translateY(-1px); }
+.design-btn canvas { display: block; width: 72px; height: 48px; }
+.design-name { font-size: 11px; font-weight: 600; color: var(--muted); }
+.design-btn[aria-checked="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--panel); }
+.design-btn[aria-checked="true"] .design-name { color: var(--accent); }
+#routeColourLbl { display: block; margin: 14px 0 8px; }
+
 /* ----- segmented ----- */
 .seg {
   display: flex; gap: 4px; padding: 4px;

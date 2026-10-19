@@ -8,16 +8,17 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, paintSwatch } from './themes.js?v=e3';
-import { MODE_META, normalizeMode } from './vehicles.js?v=e3';
-import { TileCache } from './tiles.js?v=e3';
-import { haversineKm } from './geo.js?v=e3';
+import { THEMES, DEFAULT_THEME, MAPS, NATIVE_MAP, composeTheme, paintSwatch } from './themes.js?v=e4';
+import { DESIGNS, DEFAULT_DESIGNS, normalizeDesigns, paintDesign } from './models.js?v=e4';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e4';
+import { TileCache } from './tiles.js?v=e4';
+import { haversineKm } from './geo.js?v=e4';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js?v=e3';
-import { exportVideo, detectExportSupport } from './exporter.js?v=e3';
-import { createSearch } from './search.js?v=e3';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e3';
+} from './scene.js?v=e4';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e4';
+import { createSearch } from './search.js?v=e4';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e4';
 
 /* ------------------------------------------------------------------ *
  * constants
@@ -259,6 +260,12 @@ const state = {
   themeId: DEFAULT_THEME,
   format: '9x16',
   speed: 'normal',
+  /** '2d' flat map, '3d' tilted camera that rides along. */
+  view: '2d',
+  /** Map type under the route style: a MAPS key. */
+  mapId: 'light',
+  /** Chosen vehicle design per ground mode. */
+  designs: Object.assign({}, DEFAULT_DESIGNS),
   /** Road geometry that arrived, keyed by roadKey. Never persisted. */
   /** @type {Object<string, { coords: Array<Array<number>>, km: number }>} */ roads: {},
   /** 'roads' follows real roads on drive and ride legs, 'arcs' keeps the stylized bow. */
@@ -293,6 +300,9 @@ function project() {
     themeId: state.themeId,
     format: state.format,
     speed: state.speed,
+    view: state.view,
+    mapId: state.mapId,
+    designs: state.designs,
     // Stylized mode hands the engine nothing, so every leg falls back to its arc.
     roads: state.routeStyle === 'roads' ? state.roads : {}
   };
@@ -307,14 +317,15 @@ function nextId() {
 }
 
 /**
- * @param {string} themeId theme key
+ * The tile cache for the current map type, one per tile source.
  * @returns {TileCache}
  */
-function tilesFor(themeId) {
-  let cache = tileCaches.get(themeId);
+function tilesFor() {
+  const spec = composeTheme(state.themeId, state.mapId).tiles;
+  let cache = tileCaches.get(spec.template);
   if (!cache) {
-    cache = new TileCache(THEMES[themeId].tiles);
-    tileCaches.set(themeId, cache);
+    cache = new TileCache(spec);
+    tileCaches.set(spec.template, cache);
   }
   return cache;
 }
@@ -844,6 +855,9 @@ const saveDraft = debounce(function () {
       themeId: state.themeId,
       format: state.format,
       speed: state.speed,
+      view: state.view,
+      mapId: state.mapId,
+      designs: state.designs,
       routeStyle: state.routeStyle,
       pairs: pairs
     }));
@@ -920,6 +934,10 @@ function restoreDraft() {
   state.themeId = Object.prototype.hasOwnProperty.call(THEMES, data.themeId) ? data.themeId : DEFAULT_THEME;
   state.format = Object.prototype.hasOwnProperty.call(FORMATS, data.format) ? data.format : '9x16';
   state.speed = SPEEDS.indexOf(data.speed) !== -1 ? data.speed : 'normal';
+  state.view = data.view === '3d' ? '3d' : '2d';
+  // Drafts from before map types were split keep the map their style was on.
+  state.mapId = Object.prototype.hasOwnProperty.call(MAPS, data.mapId) ? data.mapId : (NATIVE_MAP[state.themeId] || 'light');
+  state.designs = normalizeDesigns(data.designs);
   // Drafts written before roads existed simply get the default.
   state.routeStyle = ROUTE_STYLES.indexOf(data.routeStyle) !== -1 ? data.routeStyle : 'roads';
 
@@ -966,6 +984,9 @@ function startFresh() {
   state.themeId = DEFAULT_THEME;
   state.format = '9x16';
   state.speed = 'normal';
+  state.view = '2d';
+  state.mapId = 'light';
+  state.designs = Object.assign({}, DEFAULT_DESIGNS);
   state.routeStyle = 'roads';
   state.roads = {};
   modeMemory.clear();
@@ -973,6 +994,7 @@ function startFresh() {
   syncRadio(dom.formatSeg, state.format);
   syncRadio(dom.speedSeg, state.speed);
   syncRadio(dom.styleRow, state.themeId);
+  syncLookControls();
   if (dom.routeSeg) syncRadio(dom.routeSeg, state.routeStyle);
   commit();
   announce('Draft cleared');
@@ -1105,6 +1127,7 @@ function restorePrevious() {
   syncRadio(dom.formatSeg, state.format);
   syncRadio(dom.speedSeg, state.speed);
   syncRadio(dom.styleRow, state.themeId);
+  syncLookControls();
   if (dom.routeSeg) syncRadio(dom.routeSeg, state.routeStyle);
   commit();
   announce('Previous draft restored');
@@ -1270,7 +1293,10 @@ function loadSample() {
   state.title = SAMPLE.title;
   dom.title.value = SAMPLE.title;
   state.themeId = SAMPLE.themeId;
+  state.mapId = NATIVE_MAP[SAMPLE.themeId] || 'light';
+  renderStyleCards();
   syncRadio(dom.styleRow, state.themeId);
+  syncLookControls();
   recomputeModes();
   commit();
   announce('Sample trip loaded, 3 stops');
@@ -1992,6 +2018,125 @@ function addRoutingCredit() {
   }
 }
 
+/**
+ * The Map type above the route colours, and View and Vehicles under Format.
+ * Built here, like Route shape, so the page still works without them.
+ */
+function buildLookControls() {
+  const segOf = function (id, labelId, choices) {
+    const seg = make('div', 'seg');
+    seg.id = id;
+    seg.setAttribute('role', 'radiogroup');
+    seg.setAttribute('aria-labelledby', labelId);
+    choices.forEach(function (c) {
+      const btn = make('button', 'seg-btn');
+      btn.type = 'button';
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', 'false');
+      btn.tabIndex = -1;
+      btn.dataset.value = c.value;
+      btn.appendChild(make('span', null, c.label));
+      seg.appendChild(btn);
+    });
+    return seg;
+  };
+  const fieldOf = function (text, labelId, body) {
+    const field = make('div', 'field');
+    const lbl = make('span', 'lbl', text);
+    lbl.id = labelId;
+    field.appendChild(lbl);
+    field.appendChild(body);
+    return field;
+  };
+
+  // Map type first, then the route colour cards under a label of their own.
+  const styleCard = dom.styleRow.parentNode;
+  dom.mapSeg = segOf('mapSeg', 'mapLbl', Object.keys(MAPS).map(function (id) {
+    return { value: id, label: MAPS[id].name };
+  }));
+  styleCard.insertBefore(fieldOf('Map', 'mapLbl', dom.mapSeg), dom.styleRow);
+  const routeLbl = make('span', 'lbl', 'Route colour');
+  routeLbl.id = 'routeColourLbl';
+  styleCard.insertBefore(routeLbl, dom.styleRow);
+  dom.styleRow.setAttribute('aria-labelledby', 'routeColourLbl');
+  wireRadioGroup(dom.mapSeg, function (value) {
+    state.mapId = value;
+    renderStyleCards();
+    commit();
+  });
+
+  const formatField = dom.formatSeg.closest('.field');
+  dom.viewSeg = segOf('viewSeg', 'viewLbl', [
+    { value: '2d', label: '2D map' },
+    { value: '3d', label: '3D tilt' }
+  ]);
+  const viewField = fieldOf('View', 'viewLbl', dom.viewSeg);
+  formatField.parentNode.insertBefore(viewField, formatField.nextSibling);
+  wireRadioGroup(dom.viewSeg, function (value) {
+    state.view = value;
+    commit();
+  });
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const rows = make('div', 'design-rows');
+  dom.designSegs = {};
+  [['car', 'Car'], ['moto', 'Bike'], ['cycle', 'Cycle']].forEach(function (pair) {
+    const kind = pair[0];
+    const row = make('div', 'design-row');
+    const name = make('span', 'design-kind', pair[1]);
+    name.id = 'design-' + kind;
+    row.appendChild(name);
+    const group = make('div', 'design-opts');
+    group.setAttribute('role', 'radiogroup');
+    group.setAttribute('aria-labelledby', 'design-' + kind);
+    DESIGNS[kind].forEach(function (d) {
+      const btn = make('button', 'design-btn');
+      btn.type = 'button';
+      btn.setAttribute('role', 'radio');
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('aria-label', pair[1] + ', ' + d.label);
+      btn.tabIndex = -1;
+      btn.dataset.value = d.id;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(72 * dpr);
+      canvas.height = Math.round(48 * dpr);
+      canvas.style.width = '72px';
+      canvas.style.height = '48px';
+      const c2d = canvas.getContext('2d');
+      if (c2d) {
+        c2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+        try {
+          paintDesign(c2d, kind, d.id, 72, 48);
+        } catch (err) {
+          /* a thumbnail is decoration */
+        }
+      }
+      btn.appendChild(canvas);
+      btn.appendChild(make('span', 'design-name', d.label));
+      group.appendChild(btn);
+    });
+    row.appendChild(group);
+    rows.appendChild(row);
+    dom.designSegs[kind] = group;
+    wireRadioGroup(group, function (value) {
+      const next = Object.assign({}, state.designs);
+      next[kind] = value;
+      state.designs = next;
+      commit();
+    });
+  });
+  viewField.parentNode.insertBefore(fieldOf('Vehicles', 'designsLbl', rows), viewField.nextSibling);
+}
+
+/** Bring the map, view and vehicle pickers in line with state. */
+function syncLookControls() {
+  if (dom.mapSeg) syncRadio(dom.mapSeg, state.mapId);
+  if (dom.viewSeg) syncRadio(dom.viewSeg, state.view);
+  if (dom.designSegs) {
+    Object.keys(dom.designSegs).forEach(function (k) { syncRadio(dom.designSegs[k], state.designs[k]); });
+  }
+}
+
 /** Paint the theme picker cards. */
 function renderStyleCards() {
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -2000,7 +2145,7 @@ function renderStyleCards() {
 
   for (let i = 0; i < keys.length; i++) {
     const id = keys[i];
-    const theme = THEMES[id];
+    const theme = composeTheme(id, state.mapId);
     const card = make('button', 'style-card');
     card.type = 'button';
     card.setAttribute('role', 'radio');
@@ -2044,7 +2189,7 @@ function layoutPreview() {
 /** Draw the current frame and refresh the playback bar. */
 function render() {
   if (!timeline || !ctx) return;
-  renderFrame(ctx, timeline, t, tilesFor(state.themeId));
+  renderFrame(ctx, timeline, t, tilesFor());
   syncPlaybar();
 }
 
@@ -2170,7 +2315,7 @@ function warmTiles() {
   // the renderer's parent-zoom fallback covers the rest, and an unbounded warm
   // list would pin the whole plan in the cache.
   if (list.length > WARM_TILE_CAP) list = list.slice(0, WARM_TILE_CAP);
-  const cache = tilesFor(state.themeId);
+  const cache = tilesFor();
   let seen = 0;
   cache.prefetch(list, {
     signal: warmAbort.signal,
@@ -2695,7 +2840,7 @@ async function startExport() {
   try {
     const result = await exportVideo({
       timeline: timeline,
-      tiles: tilesFor(state.themeId),
+      tiles: tilesFor(),
       // Bound to this run: a run that failed still has tile windows settling,
       // and their counts must not walk the bar of the retry that replaced it.
       onProgress: function (p) { if (exportSession === session) onExportProgress(p); },
@@ -2873,6 +3018,7 @@ function init() {
   renderStyleCards();
   buildStartOver();
   buildRouteShape();
+  buildLookControls();
   addRoutingCredit();
   wire();
 
@@ -2893,6 +3039,7 @@ function init() {
   syncRadio(dom.formatSeg, state.format);
   syncRadio(dom.speedSeg, state.speed);
   syncRadio(dom.styleRow, state.themeId);
+  syncLookControls();
   if (dom.routeSeg) syncRadio(dom.routeSeg, state.routeStyle);
   syncPlayButton();
   commit();
