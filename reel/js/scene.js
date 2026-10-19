@@ -197,10 +197,6 @@ const FEATHER_SHRINK_STEPS = 4;
  */
 const HEADING_WINDOW_PX = 60;
 
-/** Bounds of that window once expressed as a fraction of the leg. */
-const HEADING_W_MIN = 0.006;
-const HEADING_W_MAX = 0.035;
-
 /**
  * The window for deciding which way a ground vehicle faces, as a multiple of
  * the heading window. Facing is a binary, and a road running more or less
@@ -736,7 +732,8 @@ export function buildTimeline(project) {
   }
   const follow3 = function (i, f) {
     if (!is3d) return null;
-    const pt = pathPointAt(legs[i].path, f);
+    // The same centre camera3At rides during travel, so the hand-over is seamless.
+    const pt = chaseCentre(legs[i], f, legs[i].follow, u);
     return { cx: pt.x, cy: pt.y, zoom: legs[i].follow, pitch: PITCH_FOLLOW, bearing: followBearing(legs[i], f) };
   };
 
@@ -869,6 +866,114 @@ const PIN_HEIGHT = 38;
 const SPRITE_PITCH = 50 * DEG;
 const SPRITE_SCALE = 0.7;
 
+/** Ground pixels of road the chase camera averages over, so hairpins never shake it. */
+const CAM_SMOOTH_PX = 260;
+/** Never average over more than this much of a leg. */
+const CAM_SMOOTH_MAX = 0.15;
+/** Fraction of a leg each end of the bearing chord is averaged over. */
+const BEARING_SMOOTH = 0.12;
+/** Vehicle position is averaged over this much road: corners round off. */
+const POSE_POS_PX = 14;
+/** Vehicle heading runs between points this far behind and ahead: about one car length. */
+const POSE_HEADING_PX = 48;
+/**
+ * At speed a vehicle covers several hairpins per frame, so each window also
+ * spans at least this many frames of travel: tight while it creeps out of a
+ * stop, wide at full speed, where the bends would only read as jitter.
+ */
+const POSE_POS_FRAMES = 1.2;
+const POSE_HEADING_FRAMES = 3;
+/**
+ * The heading is also averaged over this many frames either side, so even a
+ * U turn right at a stop sweeps round over several frames.
+ */
+const HEADING_SPAN = 4;
+/** Lean reads the heading change across this many frames either side. */
+const LEAN_SPAN = 2;
+
+/**
+ * A point on a path averaged over a window either side of f, with a triangle
+ * kernel, so a zigzag road reads as one easy line. By default the window
+ * shrinks to nothing at the ends, so f = 0 and f = 1 land exactly on the
+ * stops; `full` keeps it whole and lets the samples pile up on the ends
+ * instead, for a camera that should be just as calm leaving a stop.
+ * Pure in f.
+ * @param {object} path A leg path.
+ * @param {number} f Fraction along the leg.
+ * @param {number} w Half window, as a fraction of the leg.
+ * @param {boolean} [full] Keep the whole window at the ends.
+ * @returns {{x: number, y: number}} World point.
+ */
+function smoothPointAt(path, f, w, full) {
+  const half = full ? w : Math.min(w, f, 1 - f);
+  if (!(half > 1e-6)) return pathPointAt(path, clamp01(f));
+  let sx = 0;
+  let sy = 0;
+  let sw = 0;
+  for (let i = -4; i <= 4; i++) {
+    const wt = 1 - Math.abs(i) * 0.2;
+    const pt = pathPointAt(path, clamp01(f + (i / 4) * half));
+    sx += pt.x * wt;
+    sy += pt.y * wt;
+    sw += wt;
+  }
+  return { x: sx / sw, y: sy / sw };
+}
+
+/**
+ * A screen distance as a fraction of a leg.
+ * @param {object} path A leg path.
+ * @param {number} px Drawing space pixels.
+ * @param {number} scale Pixels per world unit.
+ * @returns {number} Fraction of the leg.
+ */
+function legFrac(path, px, scale) {
+  const lenPx = path.len * scale;
+  return lenPx > 0 ? px / lenPx : 0;
+}
+
+/**
+ * Where the vehicle is and which way it points. On a road the position rounds
+ * the polyline's corners and the heading runs from a point a car length
+ * behind to one a car length ahead, so a hairpin turns the vehicle through
+ * the bend instead of snapping it at each vertex. Arcs are smooth already.
+ * Pure in f.
+ * @param {object} leg A timeline leg.
+ * @param {number} f Fraction along the leg.
+ * @param {{scale: number}} view Projection.
+ * @param {number} u Unit scale.
+ * @param {number} step Fraction of the leg covered in one frame right now.
+ * @returns {{x: number, y: number, angle: number}} World point and heading.
+ */
+function vehiclePose(leg, f, view, u, step) {
+  const path = leg.path;
+  if (path.kind !== 'road') {
+    const pt = pathPointAt(path, f);
+    return { x: pt.x, y: pt.y, angle: pt.angle };
+  }
+  const pos = smoothPointAt(path, f, Math.max(legFrac(path, POSE_POS_PX * u, view.scale), POSE_POS_FRAMES * step));
+  const h = Math.max(legFrac(path, POSE_HEADING_PX * u, view.scale), POSE_HEADING_FRAMES * step);
+  const w = h / 2;
+  const a = smoothPointAt(path, clamp01(f - h), w);
+  const b = smoothPointAt(path, clamp01(f + h), w);
+  const angle = (a.x === b.x && a.y === b.y) ? pathPointAt(path, f).angle : Math.atan2(b.y - a.y, b.x - a.x);
+  return { x: pos.x, y: pos.y, angle: angle };
+}
+
+/**
+ * Where the chase camera looks along a leg: an averaged line through the
+ * road, so the vehicle weaves through the hairpins and the frame does not.
+ * @param {object} leg A timeline leg.
+ * @param {number} f Fraction along the leg.
+ * @param {number} zoom Camera zoom, which sets how much road is averaged.
+ * @param {number} u Unit scale.
+ * @returns {{x: number, y: number}} World point.
+ */
+function chaseCentre(leg, f, zoom, u) {
+  const w = Math.min(CAM_SMOOTH_MAX, legFrac(leg.path, CAM_SMOOTH_PX * u, 256 * Math.pow(2, zoom)));
+  return smoothPointAt(leg.path, f, w, true);
+}
+
 function wrapAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2;
   while (a < -Math.PI) a += Math.PI * 2;
@@ -887,8 +992,8 @@ function lerpAngle(a, b, p) {
  * @returns {number} Radians clockwise from north.
  */
 function followBearing(leg, f) {
-  const a = pathPointAt(leg.path, clamp01(f - BEARING_WINDOW));
-  const b = pathPointAt(leg.path, clamp01(f + BEARING_WINDOW));
+  const a = smoothPointAt(leg.path, clamp01(f - BEARING_WINDOW), BEARING_SMOOTH, true);
+  const b = smoothPointAt(leg.path, clamp01(f + BEARING_WINDOW), BEARING_SMOOTH, true);
   let dx = b.x - a.x;
   let dy = b.y - a.y;
   if (dx === 0 && dy === 0) {
@@ -919,12 +1024,13 @@ function camera3At(tl, t) {
   if (seg.kind === 'travel') {
     const leg = tl.legs[seg.leg];
     const f = legProgress(tl, seg.leg, t);
-    const pt = pathPointAt(leg.path, f);
     const rise = Math.sin(Math.PI * p);
+    const zoom = leg.follow - FOLLOW_BREATH * rise;
+    const pt = chaseCentre(leg, f, zoom, tl.u);
     return {
       cx: pt.x,
       cy: pt.y,
-      zoom: leg.follow - FOLLOW_BREATH * rise,
+      zoom: zoom,
       pitch: PITCH_FOLLOW - 4 * DEG * rise,
       bearing: followBearing(leg, f)
     };
@@ -2046,38 +2152,8 @@ function drawPins(ctx, tl, t, view) {
 }
 
 /**
- * The heading to point a vehicle in.
- *
- * On a stylized arc this is the local tangent, exactly as before. On a real
- * road it is the chord across a short window either side of the vehicle, about
- * six pixels of screen distance, clamped so the window is neither meaningless
- * on a long leg nor most of the route on a short one. A hairpin swings the car
- * around over several frames instead of spinning it on the spot.
- *
- * Pure in `f`: the window depends on the camera scale, not on the clock.
- *
- * @param {object} path A timeline leg path.
- * @param {number} f Fraction along the leg.
- * @param {{scale: number, ox: number, oy: number}} view Projection.
- * @param {number} fallback Tangent angle to use when the chord is degenerate.
- * @returns {number} Angle in screen aligned radians.
- */
-function headingAt(path, f, view, fallback) {
-  if (path.kind !== 'road') return fallback;
-  const lenPx = path.len * view.scale;
-  const raw = lenPx > 0 ? HEADING_WINDOW_PX / lenPx : HEADING_W_MAX;
-  const w = clamp(raw, HEADING_W_MIN, HEADING_W_MAX);
-  const back = pathPointAt(path, clamp01(f - w));
-  const fwd = pathPointAt(path, clamp01(f + w));
-  const dx = fwd.x - back.x;
-  const dy = fwd.y - back.y;
-  if (dx === 0 && dy === 0) return fallback;
-  return Math.atan2(dy, dx);
-}
-
-/**
  * Which way a ground vehicle faces, from the chord across a wide window
- * either side of it. Pure in `f`, like headingAt.
+ * either side of it. Pure in `f`.
  *
  * @param {object} path A timeline leg path.
  * @param {number} f Fraction along the leg.
@@ -2100,6 +2176,56 @@ function facingAt(path, f, view, angle) {
 }
 
 /**
+ * The vehicle's place, heading and rate of turn at one moment of a leg.
+ * Position comes from vehiclePose; the heading is averaged over a few frames
+ * either side, so a hairpin, even a U turn right at a stop, sweeps the
+ * vehicle round instead of snapping it. Pure in t.
+ * @param {object} tl Timeline.
+ * @param {{leg: number, p: number, f: number}} act From activeVehicle.
+ * @param {{scale: number}} view Projection.
+ * @returns {{x: number, y: number, angle: number, turn: number, travel: number}}
+ *   World point, heading, heading change across the lean window, and the
+ *   leg's travel time in seconds.
+ */
+function vehicleMotion(tl, act, view) {
+  const leg = tl.legs[act.leg];
+  const u = tl.u;
+  // How much of the leg one frame covers at a moment of the eased travel.
+  const LT = tl.times.legs[act.leg];
+  const T = Math.max(1e-3, LT.travel1 - LT.travel0);
+  const stepAt = function (p) { return ((Math.PI / 2) * Math.sin(Math.PI * p)) / (T * FPS); };
+  const pos = vehiclePose(leg, act.f, view, u, stepAt(act.p));
+  // Headings a few frames either side, still pure in t, unwrapped into one
+  // continuous run and averaged. Averaging the angles, not unit vectors,
+  // turns a hairpin into an even sweep: opposite vectors would cancel and
+  // flip the result in a single frame.
+  const reach = HEADING_SPAN + LEAN_SPAN;
+  const heads = [];
+  for (let k = -reach; k <= reach; k++) {
+    const pk = clamp01(act.p + k / (T * FPS));
+    const a = vehiclePose(leg, easeInOutSine(pk), view, u, stepAt(pk)).angle;
+    heads.push(heads.length ? heads[heads.length - 1] + wrapAngle(a - heads[heads.length - 1]) : a);
+  }
+  const headingAround = function (c) {
+    let sum = 0;
+    let sw = 0;
+    for (let k = -HEADING_SPAN; k <= HEADING_SPAN; k++) {
+      const wt = HEADING_SPAN + 1 - Math.abs(k);
+      sum += heads[c + k + reach] * wt;
+      sw += wt;
+    }
+    return sum / sw;
+  };
+  return {
+    x: pos.x,
+    y: pos.y,
+    angle: headingAround(0),
+    turn: headingAround(LEAN_SPAN) - headingAround(-LEAN_SPAN),
+    travel: T
+  };
+}
+
+/**
  * Layer 7: the travelling vehicle and its ground shadow.
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
@@ -2113,8 +2239,8 @@ function drawVehicleLayer(ctx, tl, t, view) {
 
   const leg = tl.legs[act.leg];
   const u = tl.u;
-  const pt = pathPointAt(leg.path, act.f);
-  const angle = headingAt(leg.path, act.f, view, pt.angle);
+  const pt = vehicleMotion(tl, act, view);
+  const angle = pt.angle;
   const p3 = view.p3;
   const model = modelFor(leg.mode, tl.designs);
 
@@ -2142,13 +2268,9 @@ function drawVehicleLayer(ctx, tl, t, view) {
       };
       ppm *= SPRITE_SCALE;
     }
-    const headingNear = function (f) {
-      return headingAt(leg.path, f, view, pathPointAt(leg.path, f).angle);
-    };
-    const turn = wrapAngle(headingNear(clamp01(act.f + 0.03)) - headingNear(clamp01(act.f - 0.03)));
+    const turn = pt.turn;
     const leanMax = leg.mode === 'moto' ? 0.42 : (leg.mode === 'cycle' ? 0.3 : 0);
-    const L = tl.times.legs[act.leg];
-    const spin = act.f * (L.travel1 - L.travel0) * 11;
+    const spin = act.f * pt.travel * 11;
     const ca = Math.cos(angle);
     const sa = Math.sin(angle);
     const cb = p3 ? p3.cb : 1;
@@ -2160,10 +2282,11 @@ function drawVehicleLayer(ctx, tl, t, view) {
       hy: ca * sb - sa * cb,
       ppm: ppm,
       spin: spin,
-      lean: clamp(-turn * 2.4, -leanMax, leanMax) * act.alpha,
+      lean: clamp(-turn * 1.2, -leanMax, leanMax) * act.alpha,
       bob: leg.mode === 'car' ? 0.012 * Math.sin(spin * 0.9) : 0,
       alpha: act.alpha,
-      halo: isLightColor(tl.theme.bg) ? null : 'rgba(255,255,255,.16)'
+      // Flat and on a dark map, a faint halo keeps a dark vehicle readable.
+      halo: p3 || isLightColor(tl.theme.bg) ? null : 'rgba(255,255,255,.16)'
     });
     return;
   }
