@@ -8,17 +8,17 @@
  * Every piece of user text reaches the page through textContent.
  */
 
-import { THEMES, DEFAULT_THEME, MAPS, NATIVE_MAP, composeTheme, paintSwatch } from './themes.js?v=e5';
-import { DESIGNS, DEFAULT_DESIGNS, normalizeDesigns, paintDesign } from './models.js?v=e5';
-import { MODE_META, normalizeMode } from './vehicles.js?v=e5';
-import { TileCache } from './tiles.js?v=e5';
-import { haversineKm } from './geo.js?v=e5';
+import { THEMES, DEFAULT_THEME, MAPS, NATIVE_MAP, composeTheme, paintSwatch } from './themes.js?v=e6';
+import { DESIGNS, DEFAULT_DESIGNS, normalizeDesigns, paintDesign } from './models.js?v=e6';
+import { MODE_META, normalizeMode } from './vehicles.js?v=e6';
+import { TileCache } from './tiles.js?v=e6';
+import { haversineKm } from './geo.js?v=e6';
 import {
   FORMATS, buildTimeline, renderFrame, planTiles, setupPreviewCanvas
-} from './scene.js?v=e5';
-import { exportVideo, detectExportSupport } from './exporter.js?v=e5';
-import { createSearch } from './search.js?v=e5';
-import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e5';
+} from './scene.js?v=e6';
+import { exportVideo, detectExportSupport } from './exporter.js?v=e6';
+import { createSearch } from './search.js?v=e6';
+import { roadKey, fetchRoad, cachedRoad, storeRoad } from './routes.js?v=e6';
 
 /* ------------------------------------------------------------------ *
  * constants
@@ -266,6 +266,8 @@ const state = {
   mapId: 'light',
   /** Chosen vehicle design per ground mode. */
   designs: Object.assign({}, DEFAULT_DESIGNS),
+  /** Lay the map's own place names over it. */
+  labels: false,
   /** Road geometry that arrived, keyed by roadKey. Never persisted. */
   /** @type {Object<string, { coords: Array<Array<number>>, km: number }>} */ roads: {},
   /** 'roads' follows real roads on drive and ride legs, 'arcs' keeps the stylized bow. */
@@ -303,6 +305,7 @@ function project() {
     view: state.view,
     mapId: state.mapId,
     designs: state.designs,
+    labels: state.labels,
     // Stylized mode hands the engine nothing, so every leg falls back to its arc.
     roads: state.routeStyle === 'roads' ? state.roads : {}
   };
@@ -321,10 +324,11 @@ function nextId() {
  * @returns {TileCache}
  */
 function tilesFor() {
-  const spec = composeTheme(state.themeId, state.mapId).tiles;
+  const theme = composeTheme(state.themeId, state.mapId, true);
+  const spec = theme.tiles;
   let cache = tileCaches.get(spec.template);
   if (!cache) {
-    cache = new TileCache(spec);
+    cache = new TileCache(spec, theme.labels);
     tileCaches.set(spec.template, cache);
   }
   return cache;
@@ -858,6 +862,7 @@ const saveDraft = debounce(function () {
       view: state.view,
       mapId: state.mapId,
       designs: state.designs,
+      labels: state.labels,
       routeStyle: state.routeStyle,
       pairs: pairs
     }));
@@ -938,6 +943,7 @@ function restoreDraft() {
   // Drafts from before map types were split keep the map their style was on.
   state.mapId = Object.prototype.hasOwnProperty.call(MAPS, data.mapId) ? data.mapId : (NATIVE_MAP[state.themeId] || 'light');
   state.designs = normalizeDesigns(data.designs);
+  state.labels = data.labels === true;
   // Drafts written before roads existed simply get the default.
   state.routeStyle = ROUTE_STYLES.indexOf(data.routeStyle) !== -1 ? data.routeStyle : 'roads';
 
@@ -987,6 +993,7 @@ function startFresh() {
   state.view = '2d';
   state.mapId = 'light';
   state.designs = Object.assign({}, DEFAULT_DESIGNS);
+  state.labels = false;
   state.routeStyle = 'roads';
   state.roads = {};
   modeMemory.clear();
@@ -2055,7 +2062,24 @@ function buildLookControls() {
   dom.mapSeg = segOf('mapSeg', 'mapLbl', Object.keys(MAPS).map(function (id) {
     return { value: id, label: MAPS[id].name };
   }));
-  styleCard.insertBefore(fieldOf('Map', 'mapLbl', dom.mapSeg), dom.styleRow);
+  const mapField = fieldOf('Map', 'mapLbl', dom.mapSeg);
+  // Place names switch on the Map label's own line, so it costs no height.
+  const head = make('div', 'field-head');
+  mapField.insertBefore(head, mapField.firstChild);
+  head.appendChild(mapField.querySelector('.lbl'));
+  dom.labelsSwitch = make('button', 'switch');
+  dom.labelsSwitch.type = 'button';
+  dom.labelsSwitch.setAttribute('role', 'switch');
+  dom.labelsSwitch.setAttribute('aria-checked', 'false');
+  dom.labelsSwitch.appendChild(make('span', null, 'Place names'));
+  dom.labelsSwitch.appendChild(make('span', 'switch-track'));
+  head.appendChild(dom.labelsSwitch);
+  dom.labelsSwitch.addEventListener('click', function () {
+    state.labels = !state.labels;
+    syncLookControls();
+    commit();
+  });
+  styleCard.insertBefore(mapField, dom.styleRow);
   const routeLbl = make('span', 'lbl', 'Route colour');
   routeLbl.id = 'routeColourLbl';
   styleCard.insertBefore(routeLbl, dom.styleRow);
@@ -2196,6 +2220,7 @@ function syncFoldSummaries() {
 function syncLookControls() {
   if (dom.mapSeg) syncRadio(dom.mapSeg, state.mapId);
   if (dom.viewSeg) syncRadio(dom.viewSeg, state.view);
+  if (dom.labelsSwitch) dom.labelsSwitch.setAttribute('aria-checked', state.labels ? 'true' : 'false');
   if (dom.designSegs) {
     Object.keys(dom.designSegs).forEach(function (k) { syncRadio(dom.designSegs[k], state.designs[k]); });
   }

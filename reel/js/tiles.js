@@ -98,14 +98,30 @@ function abortError() {
   return e;
 }
 
+/**
+ * Cache key for a tile. Layer 1 is the map's place name overlay, kept apart
+ * from the base tiles at the same address.
+ * @param {number} z Tile zoom.
+ * @param {number} x Wrapped tile column.
+ * @param {number} y Tile row.
+ * @param {number} [l] Layer, 0 or missing for the base map.
+ * @returns {string} Key.
+ */
+function keyOf(z, x, y, l) {
+  return (l ? 'L' : '') + z + '/' + x + '/' + y;
+}
+
 export class TileCache {
   /**
    * @param {{template: string, subdomains: string[], size: number, zoomBias: number, minZoom: number, maxZoom: number}} tilesSpec
    *   A theme's `tiles` block.
+   * @param {object} [labelSpec] The map's place name overlay, served as layer 1.
    */
-  constructor(tilesSpec) {
+  constructor(tilesSpec, labelSpec) {
     /** @type {object} The tiles spec this cache serves. */
     this.spec = tilesSpec;
+    /** @type {object|null} Tiles spec for layer 1, the place names. */
+    this.labelSpec = labelSpec || null;
     /** @type {Map<string, object>} Key to entry, in least recently used order. */
     this.entries = new Map();
     /** @type {number} Tiles that used up every attempt. */
@@ -129,14 +145,15 @@ export class TileCache {
    * @param {number} z Integer tile zoom.
    * @param {number} x Tile column, wrapped around the world here.
    * @param {number} y Tile row, rejected when outside the world.
+   * @param {number} [l] Layer: 1 for the place name overlay.
    * @returns {HTMLImageElement|null} A decoded image, or null.
    */
-  get(z, x, y) {
+  get(z, x, y, l) {
     if (this.disposed) return null;
     const n = Math.pow(2, z);
     if (!(y >= 0) || y >= n) return null;
     const wx = ((x % n) + n) % n;
-    const key = z + '/' + wx + '/' + y;
+    const key = keyOf(z, wx, y, l);
 
     const found = this.entries.get(key);
     if (found) {
@@ -150,7 +167,7 @@ export class TileCache {
       return null;
     }
 
-    this._start(key, z, wx, y);
+    this._start(key, z, wx, y, l);
     return null;
   }
 
@@ -164,14 +181,15 @@ export class TileCache {
    * @param {number} z Integer tile zoom.
    * @param {number} x Tile column, wrapped around the world here.
    * @param {number} y Tile row.
+   * @param {number} [l] Layer.
    * @returns {boolean} True when `get` would hand back an image right now.
    */
-  isLoaded(z, x, y) {
+  isLoaded(z, x, y, l) {
     if (this.disposed) return false;
     const n = Math.pow(2, z);
     if (!(y >= 0) || y >= n) return false;
     const wx = ((x % n) + n) % n;
-    return this._resident(z + '/' + wx + '/' + y);
+    return this._resident(keyOf(z, wx, y, l));
   }
 
   /**
@@ -205,7 +223,7 @@ export class TileCache {
       const n = Math.pow(2, it.z);
       if (!(it.y >= 0) || it.y >= n) continue;
       const wx = ((it.x % n) + n) % n;
-      const key = it.z + '/' + wx + '/' + it.y;
+      const key = keyOf(it.z, wx, it.y, it.l);
       if (this._resident(key)) continue;
       if (ignoreFailed) {
         const entry = this.entries.get(key);
@@ -214,7 +232,7 @@ export class TileCache {
       if (!seen) seen = new Set();
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push({ z: it.z, x: wx, y: it.y });
+      out.push(it.l ? { z: it.z, x: wx, y: it.y, l: it.l } : { z: it.z, x: wx, y: it.y });
     }
     return out;
   }
@@ -371,10 +389,10 @@ export class TileCache {
       const n = Math.pow(2, it.z);
       if (!(it.y >= 0) || it.y >= n) continue;
       const wx = ((it.x % n) + n) % n;
-      const key = it.z + '/' + wx + '/' + it.y;
+      const key = keyOf(it.z, wx, it.y, it.l);
       if (seen.has(key)) continue;
       seen.add(key);
-      items.push({ key: key, z: it.z, x: wx, y: it.y, seen: false, ok: false });
+      items.push({ key: key, z: it.z, x: wx, y: it.y, l: it.l || 0, seen: false, ok: false });
     }
     return items;
   }
@@ -486,7 +504,7 @@ export class TileCache {
         while (!settled && active < concurrency && next < total) {
           const it = items[next++];
           active++;
-          self._ensure(it.key, it.z, it.x, it.y).then(function (good) {
+          self._ensure(it.key, it.z, it.x, it.y, it.l).then(function (good) {
             if (settled) return;
             active--;
             done++;
@@ -554,12 +572,13 @@ export class TileCache {
    * @param {number} z Tile zoom.
    * @param {number} x Wrapped tile column.
    * @param {number} y Tile row.
+   * @param {number} [l] Layer.
    * @returns {Promise<boolean>} True when the tile is available.
    */
-  _ensure(key, z, x, y) {
+  _ensure(key, z, x, y, l) {
     if (this.disposed) return Promise.resolve(false);
     const found = this.entries.get(key);
-    if (!found) return this._start(key, z, x, y).promise;
+    if (!found) return this._start(key, z, x, y, l).promise;
     if (found.state === 'ok') return Promise.resolve(true);
     if (found.state === 'loading') return found.promise;
     const restarted = this._retryIfDue(key, z, x, y, found);
@@ -586,7 +605,7 @@ export class TileCache {
       entry.attempts = 0;
       if (this.failedCount > 0) this.failedCount--;
     }
-    return this._start(key, z, x, y);
+    return this._start(key, z, x, y, entry.l);
   }
 
   /**
@@ -595,13 +614,14 @@ export class TileCache {
    * @param {number} z Tile zoom.
    * @param {number} x Wrapped tile column.
    * @param {number} y Tile row.
+   * @param {number} [l] Layer.
    * @returns {object} The cache entry.
    */
-  _start(key, z, x, y) {
+  _start(key, z, x, y, l) {
     const self = this;
     let entry = this.entries.get(key);
     if (!entry) {
-      entry = { state: 'loading', img: null, promise: null, settle: null, attempts: 0, retryAt: 0 };
+      entry = { state: 'loading', img: null, promise: null, settle: null, attempts: 0, retryAt: 0, l: l ? 1 : 0 };
       this.entries.set(key, entry);
     } else {
       entry.state = 'loading';
@@ -668,7 +688,7 @@ export class TileCache {
         timer = 0;
         settle(false);
       }, LOAD_TIMEOUT_MS);
-      img.src = self._url(z, x, y, attempt);
+      img.src = self._url(z, x, y, attempt, entry.l);
     });
 
     return entry;
@@ -680,13 +700,15 @@ export class TileCache {
    * @param {number} x Wrapped tile column.
    * @param {number} y Tile row.
    * @param {number} attempt Zero based attempt index, rotates the subdomain.
+   * @param {number} [l] Layer.
    * @returns {string} The tile URL.
    */
-  _url(z, x, y, attempt) {
-    const subs = this.spec.subdomains;
+  _url(z, x, y, attempt, l) {
+    const spec = l && this.labelSpec ? this.labelSpec : this.spec;
+    const subs = spec.subdomains;
     let s = '';
     if (subs && subs.length) s = subs[(x + y + attempt) % subs.length];
-    return this.spec.template
+    return spec.template
       .replace(/\{s\}/g, s)
       .replace(/\{z\}/g, String(z))
       .replace(/\{x\}/g, String(x))

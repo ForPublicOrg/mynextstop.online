@@ -21,11 +21,11 @@ import {
   easeInOutCubic,
   easeInOutSine,
   easeOutBack
-} from './geo.js?v=e5';
-import { roadKey } from './routes.js?v=e5';
-import { composeTheme, roundRectPath } from './themes.js?v=e5';
-import { MODE_META, drawVehicle } from './vehicles.js?v=e5';
-import { modelFor, normalizeDesigns, drawModel, project, PX_PER_M } from './models.js?v=e5';
+} from './geo.js?v=e6';
+import { roadKey } from './routes.js?v=e6';
+import { composeTheme, roundRectPath } from './themes.js?v=e6';
+import { MODE_META, drawVehicle } from './vehicles.js?v=e6';
+import { modelFor, normalizeDesigns, drawModel, project, PX_PER_M } from './models.js?v=e6';
 
 /** Frames per second for every timeline and export. */
 export const FPS = 30;
@@ -613,7 +613,7 @@ export function buildTimeline(project) {
   const stops = Array.isArray(p.stops) ? p.stops : [];
   if (stops.length < 2) throw new Error('need-stops');
 
-  const theme = composeTheme(p.themeId, p.mapId);
+  const theme = composeTheme(p.themeId, p.mapId, p.labels === true);
   const is3d = p.view === '3d';
   const format = FORMATS[p.format] ? p.format : '9x16';
   const dims = { w: FORMATS[format].w, h: FORMATS[format].h };
@@ -865,6 +865,13 @@ const FLAT_PITCH = 0.2 * DEG;
 const FULL_TILE_PITCH = 25 * DEG;
 /** The tilt up into the closing overview takes a little longer than a flat pull out. */
 const OUTRO_MOVE_3D = 1.6;
+/**
+ * Place names are baked into the map tiles, so they turn with the ground.
+ * Upright up to the first angle, gone by the second, where they would read
+ * sideways or upside down.
+ */
+const NAMES_UPRIGHT = 30 * DEG;
+const NAMES_GONE = 70 * DEG;
 /** Pin head height above the ground, in drawing units at unit scale. */
 const PIN_HEIGHT = 38;
 /** The 2D view draws models from a fixed three quarter camera. */
@@ -1139,10 +1146,10 @@ function groundLayout(tl, cam) {
  * @param {function(number, number, number, number): void} visit (z, x unwrapped, y, n).
  * @returns {void}
  */
-function forEachTierTile(tl, cam, lay, tier, visit) {
-  const spec = tl.theme.tiles;
+function forEachTierTile(tl, cam, lay, tier, visit, layerSpec) {
+  const spec = layerSpec || tl.theme.tiles;
   const drop = tier.k === 0 && cam.pitch < FULL_TILE_PITCH ? 0 : TIER_TILE_DROP[tier.k];
-  const zt = clamp(Math.round(cam.zoom) + spec.zoomBias - drop, spec.minZoom, spec.maxZoom);
+  const zt = clamp(Math.round(cam.zoom + (spec.zoomShift || 0)) + spec.zoomBias - drop, spec.minZoom, spec.maxZoom);
   const n = Math.pow(2, zt);
   const sc = lay.scale;
   const cb = lay.cb;
@@ -1197,6 +1204,17 @@ function tierCanvas(k, w, h) {
   return cv;
 }
 
+/**
+ * How strongly the tiles' place names show at a camera bearing.
+ * @param {number} bearing Radians clockwise from north.
+ * @returns {number} 0 to 1.
+ */
+function namesAlpha(bearing) {
+  const c = Math.cos(bearing);
+  const p = clamp01((c - Math.cos(NAMES_GONE)) / (Math.cos(NAMES_UPRIGHT) - Math.cos(NAMES_GONE)));
+  return p * p * (3 - 2 * p);
+}
+
 /** Paint one ground tier: tiles, theme tint, routes and landing rings. */
 function renderTier(tl, cam, lay, tier, tiles, t, view, outScale) {
   const dims = tl.dims;
@@ -1240,6 +1258,20 @@ function renderTier(tl, cam, lay, tier, tiles, t, view, outScale) {
     c.fillStyle = tl.theme.overlay.color;
     c.fillRect(0, 0, w, h);
     c.restore();
+  }
+
+  // Place names lie on the ground like the rest of the map, over the tint and
+  // under the route, and fade while the map is turned too far to read them.
+  const lab = tl.theme.labels;
+  const fade = lab ? namesAlpha(cam.bearing) : 0;
+  if (fade > 0.01 && tiles && typeof tiles.get === 'function') {
+    c.globalAlpha = lab.alpha * fade;
+    forEachTierTile(tl, cam, lay, tier, function (z, tx, ty, n) {
+      const img = tiles.get(z, tx, ty, 1);
+      const span = lay.scale / n;
+      if (img) c.drawImage(img, tx * span + view.ox, ty * span + view.oy, span, span);
+    }, lab);
+    c.globalAlpha = 1;
   }
 
   const keep = shadowScale;
@@ -1425,7 +1457,7 @@ function drawSweep(ctx, tl, t, view) {
  *   pixels, and the inclusive tile index range.
  */
 function tileWindow(cam, dims, spec) {
-  const zt = clamp(Math.round(cam.zoom) + spec.zoomBias, spec.minZoom, spec.maxZoom);
+  const zt = clamp(Math.round(cam.zoom + (spec.zoomShift || 0)) + spec.zoomBias, spec.minZoom, spec.maxZoom);
   const n = Math.pow(2, zt);
   const scale = 256 * Math.pow(2, cam.zoom);
   const span = 256 * Math.pow(2, cam.zoom - zt);
@@ -1456,29 +1488,50 @@ function tileWindow(cam, dims, spec) {
  *
  * @param {object} timeline A timeline from buildTimeline.
  * @param {number} frame Frame index at FPS.
- * @param {function(number, number, number): void} visit Called with (z, x, y).
+ * @param {function(number, number, number, number): void} visit Called with
+ *   (z, x, y, layer), layer 1 being the place name overlay.
  * @returns {void}
  */
 function forEachFrameTile(timeline, frame, visit) {
   const t = clamp(frame / FPS, 0, timeline.duration);
+  const lab = timeline.theme.labels;
   const c3 = timeline.is3d ? camera3At(timeline, t) : null;
   if (c3 && c3.pitch > FLAT_PITCH) {
     const lay = groundLayout(timeline, c3);
     for (let k = 0; k < lay.tiers.length; k++) {
       forEachTierTile(timeline, c3, lay, lay.tiers[k], function (z, tx, ty, n) {
-        visit(z, ((tx % n) + n) % n, ty);
+        visit(z, ((tx % n) + n) % n, ty, 0);
       });
+      if (lab && namesAlpha(c3.bearing) > 0.01) {
+        forEachTierTile(timeline, c3, lay, lay.tiers[k], function (z, tx, ty, n) {
+          visit(z, ((tx % n) + n) % n, ty, 1);
+        }, lab);
+      }
     }
     return;
   }
   const cam = cameraAt(timeline, t);
-  const win = tileWindow(cam, timeline.dims, timeline.theme.tiles);
-
-  for (let ty = win.y0; ty <= win.y1; ty++) {
-    for (let tx = win.x0; tx <= win.x1; tx++) {
-      visit(win.zt, ((tx % win.n) + win.n) % win.n, ty);
+  const specs = lab ? [timeline.theme.tiles, lab] : [timeline.theme.tiles];
+  for (let l = 0; l < specs.length; l++) {
+    const win = tileWindow(cam, timeline.dims, specs[l]);
+    for (let ty = win.y0; ty <= win.y1; ty++) {
+      for (let tx = win.x0; tx <= win.x1; tx++) {
+        visit(win.zt, ((tx % win.n) + win.n) % win.n, ty, l);
+      }
     }
   }
+}
+
+/**
+ * A plan entry for one tile, with the layer only when it is the overlay.
+ * @param {number} z Tile zoom.
+ * @param {number} x Wrapped tile column.
+ * @param {number} y Tile row.
+ * @param {number} l Layer.
+ * @returns {{z: number, x: number, y: number, l?: number}} Entry.
+ */
+function tileEntry(z, x, y, l) {
+  return l ? { z: z, x: x, y: y, l: l } : { z: z, x: x, y: y };
 }
 
 /**
@@ -1502,11 +1555,13 @@ export function planTiles(timeline) {
 
   for (let f = 0; f <= frames; f++) {
     const at = f;
-    forEachFrameTile(timeline, at, function (z, x, y) {
-      const key = z + '/' + x + '/' + y;
+    forEachFrameTile(timeline, at, function (z, x, y, l) {
+      const key = (l ? 'L' : '') + z + '/' + x + '/' + y;
       if (seen.has(key)) return;
       seen.add(key);
-      out.push({ z: z, x: x, y: y, firstFrame: at });
+      const entry = tileEntry(z, x, y, l);
+      entry.firstFrame = at;
+      out.push(entry);
     });
   }
   return out;
@@ -1528,11 +1583,11 @@ export function tilesForFrame(timeline, frame) {
   const seen = new Set();
   const out = [];
 
-  forEachFrameTile(timeline, frame, function (z, x, y) {
-    const key = z + '/' + x + '/' + y;
+  forEachFrameTile(timeline, frame, function (z, x, y, l) {
+    const key = (l ? 'L' : '') + z + '/' + x + '/' + y;
     if (seen.has(key)) return;
     seen.add(key);
-    out.push({ z: z, x: x, y: y });
+    out.push(tileEntry(z, x, y, l));
   });
   return out;
 }
@@ -1890,12 +1945,41 @@ function drawTiles(ctx, tl, cam, tiles) {
 }
 
 /**
+ * Layer 2b: the map's own place names, when the reel asks for them. Only
+ * resident tiles are drawn: a coarser ancestor would show its names at the
+ * wrong size for a moment.
+ * @param {CanvasRenderingContext2D} ctx Target context.
+ * @param {object} tl Timeline.
+ * @param {{cx: number, cy: number, zoom: number}} cam Camera.
+ * @param {object|null} tiles A TileCache.
+ * @returns {void}
+ */
+function drawLabelTiles(ctx, tl, cam, tiles) {
+  const lab = tl.theme.labels;
+  if (!lab || !tiles || typeof tiles.get !== 'function') return;
+  const dims = tl.dims;
+  const win = tileWindow(cam, dims, lab);
+  const ox = dims.w / 2 - cam.cx * win.scale;
+  const oy = dims.h / 2 - cam.cy * win.scale;
+  ctx.save();
+  ctx.globalAlpha = lab.alpha;
+  for (let ty = win.y0; ty <= win.y1; ty++) {
+    for (let tx = win.x0; tx <= win.x1; tx++) {
+      const img = tiles.get(win.zt, tx, ty, 1);
+      if (img) ctx.drawImage(img, (tx / win.n) * win.scale + ox, (ty / win.n) * win.scale + oy, win.span, win.span);
+    }
+  }
+  ctx.restore();
+}
+
+/**
  * Layer 3: theme tint and edge darkening.
  * @param {CanvasRenderingContext2D} ctx Target context.
  * @param {object} tl Timeline.
+ * @param {function(): void} [between] Drawn over the tint, under the vignette.
  * @returns {void}
  */
-function drawWash(ctx, tl) {
+function drawWash(ctx, tl, between) {
   const dims = tl.dims;
   const theme = tl.theme;
 
@@ -1907,6 +1991,7 @@ function drawWash(ctx, tl) {
     ctx.restore();
   }
 
+  if (between) between();
   drawVignette(ctx, tl);
 }
 
@@ -2753,7 +2838,7 @@ export function renderFrame(ctx, timeline, t, tiles) {
       oy: dims.h / 2 - cam.cy * scale
     };
     drawTiles(ctx, tl, cam, tiles);
-    drawWash(ctx, tl);
+    drawWash(ctx, tl, function () { drawLabelTiles(ctx, tl, cam, tiles); });
     drawTrails(ctx, tl, time, view);
     drawSweep(ctx, tl, time, view);
     drawPulses(ctx, tl, time, view);

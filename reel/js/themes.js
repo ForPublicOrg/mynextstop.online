@@ -40,6 +40,21 @@ function esriTiles(path) {
   };
 }
 
+/**
+ * The place name overlay that matches a base map: transparent tiles with town
+ * and city names only. Fetched two levels shallower than the base, so each
+ * tile is drawn at about twice its pixel size and the names stay readable on
+ * a phone instead of shrinking to the base map's fine density.
+ * @param {string} path Service path.
+ * @param {number} alpha How strongly the names are drawn.
+ * @returns {object} A tiles spec with an `alpha`.
+ */
+function labelTiles(path, alpha) {
+  // zoomShift moves the level change a quarter step early, so text runs
+  // from 1.2 to 2.4 times its tile size rather than 1.4 to 2.8: never blown up.
+  return Object.assign(esriTiles(path), { zoomBias: -1, zoomShift: 0.25, alpha: alpha });
+}
+
 /** Default theme id, used when a project carries an unknown theme. */
 export const DEFAULT_THEME = 'voyage';
 
@@ -213,6 +228,7 @@ export const MAPS = {
     id: 'light',
     name: 'Light',
     tiles: esriTiles('Canvas/World_Light_Gray_Base'),
+    labels: labelTiles('Canvas/World_Light_Gray_Reference', 0.85),
     bg: '#e9e8e5',
     overlay: null,
     vignette: 0,
@@ -224,6 +240,7 @@ export const MAPS = {
     id: 'dark',
     name: 'Dark',
     tiles: esriTiles('Canvas/World_Dark_Gray_Base'),
+    labels: labelTiles('Canvas/World_Dark_Gray_Reference', 0.8),
     bg: '#3f4144',
     overlay: { color: 'rgba(8,11,14,.52)', blend: 'multiply' },
     vignette: 0.35,
@@ -235,6 +252,10 @@ export const MAPS = {
     id: 'satellite',
     name: 'Satellite',
     tiles: THEMES.satellite.tiles,
+    // The imagery's own reference layer draws every district border too; the
+    // dark map's names, light on a dark halo, read cleanly over photos.
+    labels: labelTiles('Canvas/World_Dark_Gray_Reference', 0.9),
+    labelCredit: ESRI_ATTRIBUTION + ', HERE, Garmin © OpenStreetMap contributors',
     bg: '#0b0e12',
     overlay: null,
     vignette: 0.3,
@@ -251,9 +272,10 @@ export const NATIVE_MAP = { voyage: 'light', vintage: 'light', noir: 'dark', neo
  * A route style laid over a map type.
  * @param {string} themeId A THEMES key.
  * @param {string} [mapId] A MAPS key; the style's own map when missing.
+ * @param {boolean} [labels] Lay the map's place names over it.
  * @returns {object} A theme object the renderer can use as is.
  */
-export function composeTheme(themeId, mapId) {
+export function composeTheme(themeId, mapId, labels) {
   const base = THEMES[themeId] || THEMES[DEFAULT_THEME];
   const native = NATIVE_MAP[base.id] || 'light';
   const map = MAPS[mapId] || MAPS[native];
@@ -266,6 +288,8 @@ export function composeTheme(themeId, mapId) {
     out.attribution = map.attribution;
     out.swatch = map.swatch;
   }
+  out.labels = labels ? map.labels : null;
+  if (labels && map.labelCredit) out.attribution = map.labelCredit;
   return out;
 }
 
